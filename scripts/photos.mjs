@@ -14,6 +14,11 @@
  * name, url, author, alt – wymagane; focus – opcjonalny punkt kadru (object-position).
  * Na końcu wypisuje gotowy HTML ramki z podpisem autora.
  * Bez zależności (Node 18+ z wbudowanym fetch).
+ *
+ * Przekierowanie z /download jest traktowane jako plik tylko wtedy, gdy prowadzi do obrazu
+ * (images.unsplash.com albo ścieżka z rozszerzeniem obrazu). Przekierowanie na bramkę
+ * anty-botową (/.within.website) albo odpowiedź 401/403 z HTML są zgłaszane jako blokada;
+ * parametrów kadru nie dokleja się wtedy do adresu bramki, a pliku nie zapisuje.
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -35,6 +40,14 @@ const photoId = (url) => {
   return segment.length >= 11 ? segment.slice(-11) : null;
 };
 
+// Bramka anty-botowa przed Unsplash (strona „Checking your browser”, ścieżka /.within.website).
+const isGate = (url) => url.pathname.startsWith("/.within.website");
+const isImageUrl = (url) =>
+  !isGate(url) && (/(^|\.)images\.unsplash\.com$/i.test(url.hostname) || /\.(jpe?g|png|webp|avif)$/i.test(url.pathname));
+const isHtml = (res) => /text\/html/i.test(res.headers.get("content-type") || "");
+const BLOCKED = "pobieranie zablokowane przez bramkę anty-botową Unsplash; pliku nie zapisano. "
+  + "Zostaw zaślepkę i przekaż użytkownikowi photos.json z poleceniem do uruchomienia u siebie (references/zdjecia.md)";
+
 const list = JSON.parse(await readFile(listPath, "utf8"));
 let failed = 0;
 for (const item of list) {
@@ -53,14 +66,29 @@ for (const item of list) {
   try {
     const dl = await fetch(`https://unsplash.com/photos/${id}/download?force=true`, { redirect: "manual" });
     const location = dl.headers.get("location");
-    if (!location) throw new Error(`brak przekierowania do pliku (HTTP ${dl.status}); zdjęcie może być płatne (Unsplash+) albo usunięte`);
+    await dl.body?.cancel();
+    if (!location) {
+      if ((dl.status === 401 || dl.status === 403) && isHtml(dl)) throw new Error(`HTTP ${dl.status} z HTML przy /download: ${BLOCKED}`);
+      throw new Error(`brak przekierowania do pliku (HTTP ${dl.status}); zdjęcie może być płatne (Unsplash+) albo usunięte`);
+    }
     const src = new URL(location, "https://unsplash.com");
+    if (isGate(src)) throw new Error(`HTTP ${dl.status} → ${src.origin}${src.pathname}: ${BLOCKED}`);
+    if (!isImageUrl(src)) throw new Error(`przekierowanie (HTTP ${dl.status}) nie prowadzi do obrazu: ${src.origin}${src.pathname}; pliku nie zapisano`);
     for (const [k, v] of Object.entries({ w: W, h: H, fit: "crop", crop: "entropy", fm: "jpg", q: 80 })) {
       src.searchParams.set(k, String(v));
     }
     src.searchParams.delete("dl");
     const res = await fetch(src);
-    if (!res.ok) throw new Error(`HTTP ${res.status} przy pobieraniu pliku`);
+    if (!res.ok) {
+      await res.body?.cancel();
+      if ((res.status === 401 || res.status === 403) && isHtml(res)) throw new Error(`HTTP ${res.status} z HTML przy pobieraniu pliku: ${BLOCKED}`);
+      throw new Error(`HTTP ${res.status} przy pobieraniu pliku ${src.origin}${src.pathname}`);
+    }
+    if (!/^image\//i.test(res.headers.get("content-type") || "")) {
+      const type = res.headers.get("content-type") || "brak";
+      await res.body?.cancel();
+      throw new Error(`odpowiedź nie jest obrazem (Content-Type: ${type})${isHtml(res) ? `; ${BLOCKED}` : ""}`);
+    }
     const file = path.join(outDir, `${item.name}.jpg`);
     await writeFile(file, Buffer.from(await res.arrayBuffer()));
     const handle = item.author.replace(/^@/, "");

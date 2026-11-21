@@ -60,7 +60,15 @@ Skrypt pobiera zdjęcie zwykłym linkiem pobierania Unsplash (bez klucza API), k
 1504 × 1728 i zapisuje w `screens/`. Wypisuje gotowy HTML ramki z podpisem. Na koniec
 `inline-assets.mjs` osadza zdjęcie w pliku.
 
-Gdy w danym środowisku nie da się pobrać pliku (brak sieci, czat bez dostępu do Unsplash):
+Przekierowanie z linku pobierania skrypt uznaje za plik tylko wtedy, gdy prowadzi do obrazu
+(`images.unsplash.com` albo ścieżka z rozszerzeniem obrazu). W części środowisk Unsplash
+przekierowuje na bramkę anty-botową (`/.within.website`, strona „Checking your browser”,
+HTTP 401/403 z HTML). Skrypt zgłasza to jako blokadę z numerem statusu, nie zapisuje pliku
+i kończy się kodem 1. Headless przeglądarka tej bramki nie przechodzi, więc nie próbuj jej
+obchodzić.
+
+Gdy w danym środowisku nie da się pobrać pliku (brak sieci, blokada bramki, czat bez dostępu
+do Unsplash):
 zostaw w decku zaślepkę `.photo-placeholder`, przekaż użytkownikowi gotowy `photos.json`
 z wybranymi zdjęciami i polecenie do uruchomienia u siebie. Nie wstawiaj zdjęcia
 z innego źródła i nie generuj go.

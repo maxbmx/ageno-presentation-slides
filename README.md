@@ -45,7 +45,7 @@ Zostaw style i skrypt szablonu. Kolejne slajdy kopiuj z układów w tym pliku, p
 node scripts/ageno-assets.mjs --out decks/2026-11-16-klient-temat/
 ```
 
-Pobiera `ageno-mountains.svg`, `people/maksymilian-sleziak.png` oraz logotypy do `logos/` i `logos.json`. Logotypy są wycinane z HTML strony głównej ageno.pl. Brak tej sekcji w odpowiedzi kończy skrypt kodem 1. Góry i portret mogą być już zapisane, `logos.json` wtedy nie powstaje.
+Pobiera `ageno-mountains.svg`, `people/maksymilian-sleziak.png` oraz logotypy do `logos/` i `logos.json`. Góry i portret mają stałe adresy i są pobierane niezależnie od strony głównej. Logotypy są wycinane z HTML strony głównej ageno.pl, ale tylko przy odpowiedzi HTTP 200. Inny status (np. 403 z bramki Cloudflare „Just a moment…”) jest zgłaszany z numerem statusu, a body nie jest parsowane. Status 200 bez sekcji klientów jest zgłaszany jako możliwa zmiana układu strony. W obu przypadkach to, co się udało, zostaje zapisane, `logos.json` powstaje z pustą listą `logos` i polem `error`, a skrypt kończy się kodem 1. Headless przeglądarka nie obchodzi tej bramki: w środowisku z blokadą logotypów tą metodą nie da się pobrać.
 
 Screeny, gdy mają być w prezentacji. Ramki `full`, `wide`, `half`, `mobile` i pola JSON: `references/screeny.md`.
 
@@ -61,7 +61,7 @@ Zdjęcie górskie tylko w układzie „Zdjęcie + treść”. Wybór i kształt 
 node scripts/photos.mjs decks/2026-11-16-klient-temat/photos.json
 ```
 
-Bez klucza API. Skrypt czeka na przekierowanie unsplash.com na plik zdjęcia, kadruje do 1504 × 1728 i zapisuje JPEG w `screens/`.
+Bez klucza API. Skrypt czeka na przekierowanie unsplash.com na plik zdjęcia, kadruje do 1504 × 1728 i zapisuje JPEG w `screens/`. Przekierowanie uznaje za plik tylko wtedy, gdy prowadzi do obrazu (`images.unsplash.com` albo ścieżka z rozszerzeniem obrazu). Przekierowanie na bramkę anty-botową (`/.within.website`), odpowiedź 401/403 z HTML albo odpowiedź, która nie jest obrazem, zgłasza jako blokadę lub błąd z numerem statusu, bez zapisu pliku, i kończy się kodem 1. Parametrów kadru nie dokleja do adresu bramki. Headless przeglądarka tej bramki też nie przechodzi.
 
 Jeden plik do wysłania:
 

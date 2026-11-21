@@ -11,6 +11,11 @@
  * Użycie: node scripts/ageno-assets.mjs [--out decks/…/] [--site https://ageno.pl/]
  *         [--mountains <adres svg>]
  * Bez zależności (Node 18+). Wymaga dostępu do ageno.pl.
+ *
+ * Status HTTP strony głównej jest sprawdzany przed parsowaniem: przy statusie innym niż 200
+ * (np. 403 z bramki Cloudflare „Just a moment…”) body nie jest czytane, a komunikat podaje status.
+ * Góry i zdjęcia osób są pobierane niezależnie od strony głównej. logos.json powstaje zawsze:
+ * z pobranymi logotypami albo z pustą listą i polem "error". Kod 1, gdy cokolwiek się nie udało.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -83,13 +88,27 @@ async function main() {
     }
   }
 
-  const html = await (await fetch(SITE)).text();
-  const images = imagesInSection(html, SITE);
-  if (!images.length) {
-    console.error("BŁĄD: nie znaleziono logotypów w sekcji klientów na stronie głównej (zmienił się układ strony?).");
-    process.exit(1);
-  }
   const list = [];
+  let error = null;
+  let images = [];
+  try {
+    const res = await fetch(SITE);
+    if (res.status !== 200) {
+      await res.body?.cancel();
+      const gate = res.headers.get("cf-mitigated") || /cloudflare/i.test(res.headers.get("server") || "") ? ", bramka Cloudflare" : "";
+      error = `strona główna ${SITE} zwróciła HTTP ${res.status}${gate}; strony nie parsowano, logotypów nie pobrano`;
+    } else {
+      images = imagesInSection(await res.text(), SITE);
+      if (!images.length) error = `HTTP 200, ale w HTML strony ${SITE} nie ma sekcji klientów z logotypami (zmienił się układ strony?)`;
+    }
+  } catch (e) {
+    error = `nie udało się pobrać strony głównej ${SITE}: ${e.cause?.code || e.message}`;
+  }
+  if (error) {
+    failed += 1;
+    console.error(`BŁĄD logotypy: ${error}`);
+  }
+
   for (const [i, img] of images.entries()) {
     const ext = path.extname(new URL(img.url).pathname) || ".svg";
     const file = `logos/${String(i + 1).padStart(2, "0")}-${slug(img.alt || path.basename(img.url, ext))}${ext}`;
@@ -102,9 +121,13 @@ async function main() {
       console.error(`BŁĄD ${img.url}: ${error.message}`);
     }
   }
-  await writeFile(path.join(OUT, "logos.json"), JSON.stringify({ source: SITE, downloaded: new Date().toISOString().slice(0, 10), logos: list }, null, 2));
+  // Zapisz to, co się udało: logos.json powstaje także bez logotypów (wtedy z polem "error").
+  const meta = { source: SITE, downloaded: new Date().toISOString().slice(0, 10), ...(error ? { error } : {}), logos: list };
+  await writeFile(path.join(OUT, "logos.json"), JSON.stringify(meta, null, 2));
   console.log(`\nLogotypów: ${list.length} → ${path.join(OUT, "logos.json")}`);
-  console.log("Na slajd „Klienci Ageno” wybierz 10 (2 wiersze po 5); kolejność jak w logos.json albo wg branży klienta.");
+  if (list.length) console.log("Na slajd „Klienci Ageno” wybierz 10 (2 wiersze po 5); kolejność jak w logos.json albo wg branży klienta.");
+  else console.log("Brak logotypów: zgłoś to użytkownikowi; nie szukaj ich w innych źródłach bez zgody.");
+  if (failed) console.error(`\nNie udało się: ${failed}. Pliki pobrane poprawnie zostały zapisane.`);
   process.exit(failed ? 1 : 0);
 }
 
