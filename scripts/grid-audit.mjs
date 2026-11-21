@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Audyt siatki 8 / 32 px dla prezentacji z assets/template.html.
- * Otwiera plik w oknie 1536 × 864 (skala płótna = 1), więc pomiary są w px logicznych slajdu.
+ * Otwiera plik w oknie płótna (CANVAS z constants.mjs, 1536 × 864, skala = 1), więc pomiary są w px logicznych slajdu.
  * Sprawdza KAŻDY slajd, także nieaktywne (są ułożone, tylko niewidoczne).
  *
  * Reguły:
@@ -24,20 +24,22 @@ import { chromium } from "playwright";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseCli, requireFile } from "./cli.mjs";
+import { CANVAS, CONTAINER, FOOTER, GRID } from "./constants.mjs";
 
 const USAGE = "node scripts/grid-audit.mjs prezentacja.html";
 const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1] });
 requireFile(USAGE, input);
 
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1536, height: 864 } });
+const page = await browser.newPage({ viewport: { width: CANVAS.width, height: CANVAS.height } });
 await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 await page.evaluate(() => document.fonts?.ready);
 await page.waitForTimeout(300); // ResizeObserver i snap
 
-const result = await page.evaluate(() => {
+const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
   const TOL = 0.1;
-  const X0 = 112, Y_MIN = 64, Y_MAX = 768, X_MAX = 1424, FOOTER_Y = 800;
+  const X0 = CONTAINER.x0, Y_MIN = CONTAINER.y0, Y_MAX = CONTAINER.y1, X_MAX = CONTAINER.x1, FOOTER_Y = FOOTER.y;
+  const M = GRID.module, U = GRID.unit;
   const off = (v, step) => Math.abs(v - step * Math.round(v / step));
   const name = (el) => {
     const cls = typeof el.className === "string" ? el.className.trim().split(/\s+/).filter(Boolean).join(".") : "";
@@ -62,10 +64,10 @@ const result = await page.evaluate(() => {
     for (const el of slide.querySelectorAll("[data-grid]")) {
       if (!visible(el)) continue;
       const mode = el.dataset.grid;
-      const step = mode.startsWith("32") ? 32 : 8;
+      const step = mode.startsWith("32") ? M : U;
       const b = rel(el);
       const snap = el.hasAttribute("data-snap") ? parseFloat(getComputedStyle(el).marginBottom) || 0 : 0;
-      const checks = [["y", b.y, 32], ["h", b.h + snap, 32]];
+      const checks = [["y", b.y, M], ["h", b.h + snap, M]];
       if (mode !== "32y") checks.push(["x", b.x, step], ["w", b.w, step]);
       const bad = checks.filter(([, v, m]) => off(v, m) > TOL);
       if (bad.length) problems.push(`${name(el)} [${mode}] ${bad.map(([k, v]) => `${k}=${v.toFixed(2)}`).join(" ")}`);
@@ -75,7 +77,7 @@ const result = await page.evaluate(() => {
     for (const el of lines) {
       if (el.hasAttribute("data-grid") || !visible(el)) continue;
       const b = rel(el);
-      if (off(b.y, 32) > TOL || off(b.h, 32) > TOL) {
+      if (off(b.y, M) > TOL || off(b.h, M) > TOL) {
         problems.push(`${name(el)} [wiersz] y=${b.y.toFixed(2)} h=${b.h.toFixed(2)}`);
       }
     }
@@ -87,7 +89,7 @@ const result = await page.evaluate(() => {
       const el = walker.currentNode.parentElement;
       if (!walker.currentNode.textContent.trim() || el.closest("strong, script, style, .slide-footer, .deck-nav")) continue;
       const v = parseFloat(getComputedStyle(el).lineHeight);
-      if (Number.isNaN(v) || v % 32 !== 0) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
+      if (Number.isNaN(v) || v % M !== 0) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
     }
     problems.push(...lh);
 
@@ -113,7 +115,7 @@ const result = await page.evaluate(() => {
     report.push({ slide: i + 1, problems });
   });
   return report;
-});
+}, { CONTAINER, FOOTER, GRID });
 
 await browser.close();
 let failed = 0;

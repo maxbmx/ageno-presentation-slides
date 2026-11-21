@@ -2,7 +2,7 @@
 /**
  * Zrzuty ekranu do slajdów, dopasowane do ramek z siatki (references/screeny.md).
  * Viewport zrzutu ma te same proporcje co ramka, więc obraz wypełnia ją bez kadrowania.
- * deviceScaleFactor 2 daje ostry obraz na dużym ekranie.
+ * deviceScaleFactor 2 daje ostry obraz na dużym ekranie. Ramki, skala i jakość JPEG: constants.mjs.
  *
  * Użycie: node scripts/screenshots.mjs screens.json [--out ./screens]
  * Kod wyjścia: 0 = wszystkie zrzuty, 1 = któryś zrzut się nie udał, 2 = złe wywołanie (scripts/cli.mjs).
@@ -22,13 +22,7 @@ import { chromium } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { parseCli, requireFile, usageError } from "./cli.mjs";
-
-const FRAMES = {
-  full:   { frame: [1312, 608], viewport: [1312, 608], mobile: false },
-  wide:   { frame: [864, 544],  viewport: [1296, 816], mobile: false },
-  half:   { frame: [640, 416],  viewport: [1280, 832], mobile: false },
-  mobile: { frame: [320, 640],  viewport: [400, 800],  mobile: true },
-};
+import { DEVICE_SCALE, FRAMES, JPEG_QUALITY } from "./constants.mjs";
 
 const USAGE = "node scripts/screenshots.mjs screens.json [--out katalog]  (domyślnie screens/ obok JSON)";
 const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
@@ -51,7 +45,7 @@ for (const item of list) {
   const [vw, vh] = preset.viewport;
   const context = await browser.newContext({
     viewport: { width: vw, height: vh },
-    deviceScaleFactor: 2,
+    deviceScaleFactor: DEVICE_SCALE,
     isMobile: preset.mobile,
     hasTouch: preset.mobile,
     locale: "pl-PL",
@@ -67,7 +61,7 @@ for (const item of list) {
     if (item.scrollY) await page.evaluate((y) => window.scrollTo(0, y), item.scrollY);
     await page.waitForTimeout(item.delay ?? 400);
     const file = path.join(outDir, `${item.name}.jpg`);
-    await page.screenshot({ path: file, type: "jpeg", quality: 85, animations: "disabled" });
+    await page.screenshot({ path: file, type: "jpeg", quality: JPEG_QUALITY, animations: "disabled" });
     console.log(`OK  ${item.name}  ramka ${preset.frame.join("×")}  viewport ${vw}×${vh}  → ${file}`);
   } catch (error) {
     failed += 1;

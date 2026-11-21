@@ -134,8 +134,9 @@ zdjęcia z tej listy, nigdy ze stocku.
 | --- | --- | --- | --- | --- |
 | Maksymilian Śleziak | **[uzupełnić]** | maksymilian.sleziak@ageno.pl | +48 502 02 22 02 | https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png → `people/maksymilian-sleziak.png` |
 
-Domyślna osoba na slajdzie kontaktowym: Maksymilian Śleziak. Inna osoba: dopisz wiersz tu
-i w liście `PEOPLE` w `scripts/ageno-assets.mjs`.
+Domyślna osoba na slajdzie kontaktowym: Maksymilian Śleziak. Ta tabela jest źródłem prawdy.
+Inna osoba: dopisz wiersz tu, potem wpis z tym samym adresem zdjęcia w liście `PEOPLE`
+w `scripts/constants.mjs` (z niej korzysta `scripts/ageno-assets.mjs`).
 
 ## Słownik
 

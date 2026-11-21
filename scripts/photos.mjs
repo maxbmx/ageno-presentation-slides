@@ -25,8 +25,9 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parseCli, requireFile, usageError } from "./cli.mjs";
+import { DEVICE_SCALE, JPEG_QUALITY, PHOTO_FRAME } from "./constants.mjs";
 
-const W = 1504, H = 1728;
+const [W, H] = PHOTO_FRAME.map((v) => v * DEVICE_SCALE); // 1504 × 1728
 const USAGE = "node scripts/photos.mjs photos.json [--out katalog]  (domyślnie screens/ obok JSON)";
 const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
 requireFile(USAGE, listPath);
@@ -79,7 +80,7 @@ for (const item of list) {
     const src = new URL(location, "https://unsplash.com");
     if (isGate(src)) throw new Error(`HTTP ${dl.status} → ${src.origin}${src.pathname}: ${BLOCKED}`);
     if (!isImageUrl(src)) throw new Error(`przekierowanie (HTTP ${dl.status}) nie prowadzi do obrazu: ${src.origin}${src.pathname}; pliku nie zapisano`);
-    for (const [k, v] of Object.entries({ w: W, h: H, fit: "crop", crop: "entropy", fm: "jpg", q: 80 })) {
+    for (const [k, v] of Object.entries({ w: W, h: H, fit: "crop", crop: "entropy", fm: "jpg", q: JPEG_QUALITY })) {
       src.searchParams.set(k, String(v));
     }
     src.searchParams.delete("dl");

@@ -4,7 +4,7 @@
  *  - góry na slajd tytułowy: ageno-mountains.svg,
  *  - logotypy klientów ze strony głównej ageno.pl (sekcja „Ponad 100+ zadowolonych klientów”)
  *    do logos/NN-nazwa.ext oraz listę logos.json,
- *  - zdjęcia osób na slajd kontaktowy do people/ (lista PEOPLE niżej, zgodna z references/ageno.md).
+ *  - zdjęcia osób na slajd kontaktowy do people/ (lista PEOPLE w constants.mjs, zgodna z references/ageno.md).
  * Pliki logo zapisuje bajt w bajt: nie przycina i nie skaluje obszaru roboczego, dlatego
  * w równych polach slajdu „Klienci Ageno” logotypy są równe.
  *
@@ -22,6 +22,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseCli, requireUrl } from "./cli.mjs";
+import { PEOPLE } from "./constants.mjs";
 
 const USAGE = "node scripts/ageno-assets.mjs [--out katalog] [--site https://ageno.pl/] [--mountains <adres svg>]";
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
@@ -31,10 +32,6 @@ const { values } = isMain
 const SITE = isMain ? requireUrl(USAGE, "site", values.site ?? "https://ageno.pl/") : "https://ageno.pl/";
 const MOUNTAINS = isMain ? requireUrl(USAGE, "mountains", values.mountains ?? "https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg") : "";
 const OUT = path.resolve(values.out ?? ".");
-// Osoby na slajd kontaktowy: plik = slug imienia i nazwiska, jak w szablonie (people/<slug>.png).
-const PEOPLE = [
-  { file: "maksymilian-sleziak.png", url: "https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png" },
-];
 // Sekcja z logotypami: od zdania o klientach do nagłówka „Nasze realizacje”.
 const SECTION_START = /zadowolonych\s+klient/i;
 const SECTION_END = /Nasze\s+realizacje/i;

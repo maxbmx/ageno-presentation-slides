@@ -19,6 +19,9 @@ wymiary w slajdzie są w px logicznych i nie ma progów responsywnych.
 
 Początek współrzędnych: **X = lewa krawędź kontenera (112), Y = góra slajdu (0)**.
 
+Te same liczby dla skryptów są w `scripts/constants.mjs` (płótno, kontener, stopka, budżet,
+siatka). Zmiana liczby tutaj bez zmiany tam, i odwrotnie, jest błędem.
+
 ## Kolumny
 
 Szerokość kontenera spełnia `W = 2C₂ + G = 3C₃ + 2G` dla `G = 32`, więc dzieli się

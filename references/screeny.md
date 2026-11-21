@@ -17,7 +17,9 @@ bez kadrowania.
 | `half` | `.shot-half` | 640 × 416 | 1280 × 832 | dwa screeny obok siebie |
 | `mobile` | `.shot-mobile` | 320 × 640 | 400 × 800 | telefon w kolumnie 416 |
 
-Zrzuty mają `deviceScaleFactor: 2`, więc są ostre także na projektorze 4K.
+Zrzuty mają `deviceScaleFactor: 2`, więc są ostre także na projektorze 4K. Zapis: JPEG o jakości
+80, ta sama wartość co przy zdjęciach z Unsplash. Ramki, skala i jakość są w `scripts/constants.mjs`
+(`FRAMES`, `DEVICE_SCALE`, `JPEG_QUALITY`); zmiana liczby wymaga zmiany tej tabeli.
 
 ## Zrzut automatyczny
 
@@ -55,7 +57,8 @@ Gdy użytkownik dostarcza gotowe pliki:
 
 - W trakcie pracy: `<img src="screens/home.jpg" alt="…">` w `index.html` decku.
 - Na koniec `scripts/inline-assets.mjs` zamienia lokalne obrazy na data URI; plik ponad 15 MB kończy go kodem 1.
-- Za duży plik: mniej screenów, mniejsza jakość JPEG (75), ramka `half` zamiast `full`.
+- Za duży plik: mniej screenów albo ramka `half` zamiast `full`. Jakości JPEG nie obniżaj
+  dla jednego decku (stała 80 w `scripts/constants.mjs`).
 
 ## Wygląd
 

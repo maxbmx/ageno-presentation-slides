@@ -16,13 +16,14 @@ import { chromium } from "playwright";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseCli, requireFile } from "./cli.mjs";
+import { CANVAS } from "./constants.mjs";
 
 const USAGE = "node scripts/text-lint.mjs prezentacja.html";
 const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1] });
 requireFile(USAGE, input);
 
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1536, height: 864 } });
+const page = await browser.newPage({ viewport: { width: CANVAS.width, height: CANVAS.height } });
 await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 
 // Tekst zbierany per element blokowy; nagłówki osobno, bo mają ostrzejsze reguły.

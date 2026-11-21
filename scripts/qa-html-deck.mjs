@@ -4,6 +4,7 @@
  * błędy konsoli i zrzut każdego slajdu w każdym oknie. Raport: <out>/qa-report.json.
  *
  * Użycie: node scripts/qa-html-deck.mjs prezentacja.html [--out katalog] [--viewports 1600x900,1366x768,1280x720,1280x800]
+ * Domyślne okna: QA_VIEWPORTS z constants.mjs.
  * Domyślne --out: qa/ obok pliku HTML.
  * Kod wyjścia: 0 = bez problemów, 1 = przepełnienie, błąd nawigacji albo konsoli,
  * 2 = złe wywołanie, także zły --viewports (scripts/cli.mjs), przed uruchomieniem przeglądarki.
@@ -14,8 +15,12 @@ import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseCli, requireFile, usageError } from './cli.mjs';
+import { NAV, QA_VIEWPORTS } from './constants.mjs';
 
-const DEFAULT_VIEWPORTS = '1600x900,1366x768,1280x720,1280x800';
+const DEFAULT_VIEWPORTS = QA_VIEWPORTS.map(([w, h]) => `${w}x${h}`).join(',');
+// Oczekiwanie po przejściu slajdu i po czasie autoukrywania strzałek, z zapasem.
+const AFTER_TRANSITION = NAV.transitionMs + 60;
+const AFTER_HIDE = NAV.hideAfterMs + 100;
 const USAGE = `node scripts/qa-html-deck.mjs prezentacja.html [--out katalog] [--viewports ${DEFAULT_VIEWPORTS}]`;
 const { values, positionals: [input] } = parseCli({
   usage: USAGE,
@@ -59,10 +64,10 @@ try {
     const prevButton = page.locator('button[data-nav="prev"]');
     if (await nextButton.count()) {
       await page.mouse.move(Math.round(viewport.width / 2), Math.round(viewport.height / 2));
-      await page.waitForTimeout(260);
+      await page.waitForTimeout(AFTER_TRANSITION);
       const shownOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
       if (shownOpacity < 0.5) viewportReport.navigation.push('Strzałka „Następny” nie pokazała się po ruchu myszy.');
-      await page.waitForTimeout(1900);
+      await page.waitForTimeout(AFTER_HIDE);
       const hiddenOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
       if (hiddenOpacity > 0.1) viewportReport.navigation.push('Strzałka „Następny” nie zniknęła po 1,8 s bezczynności.');
       await page.mouse.move(Math.round(viewport.width / 2), Math.round(viewport.height / 2));
@@ -70,12 +75,12 @@ try {
       const box = await nextButton.boundingBox();
       if (box) {
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-        await page.waitForTimeout(1900);
+        await page.waitForTimeout(AFTER_HIDE);
         const hoverOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
         if (hoverOpacity < 0.5) viewportReport.navigation.push('Strzałka „Następny” zniknęła mimo najechania kursorem.');
       }
       await page.mouse.move(-1, -1);
-      await page.waitForTimeout(1900);
+      await page.waitForTimeout(AFTER_HIDE);
     }
 
     // Strzałki ukryte tylko na zrzutach; nawigację sprawdza osobny krok.
@@ -107,7 +112,7 @@ try {
 
       if (i < slideCount - 1) {
         await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(260);
+        await page.waitForTimeout(AFTER_TRANSITION);
         if (await activeCount() !== 1) throw new Error(`Okno ${viewport.label}: po ArrowRight zmieniła się liczba aktywnych slajdów.`);
         const next = await activeIndex();
         if (next === current) throw new Error(`Okno ${viewport.label}: ArrowRight nie przełączył dalej ze slajdu ${current}.`);
@@ -119,18 +124,18 @@ try {
       viewportReport.navigation.push('Przycisk „Następny” powinien mieć disabled na ostatnim slajdzie.');
     }
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(260);
+    await page.waitForTimeout(AFTER_TRANSITION);
     if (await activeCount() !== 1) throw new Error(`Okno ${viewport.label}: po ArrowLeft zły stan aktywnego slajdu.`);
     for (let i = 0; i < Math.max(0, slideCount - 2); i += 1) {
       await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(230);
+      await page.waitForTimeout(AFTER_TRANSITION);
     }
     const firstIndex = await activeIndex();
     if (await prevButton.count() && !await prevButton.isDisabled().catch(() => false)) {
       viewportReport.navigation.push('Przycisk „Poprzedni” powinien mieć disabled na pierwszym slajdzie.');
     }
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(230);
+    await page.waitForTimeout(AFTER_TRANSITION);
     if (await activeIndex() !== firstIndex) viewportReport.navigation.push('ArrowLeft przeszedł przed pierwszy slajd.');
 
     // Przepełnienie strony; przepełnienie slajdu sprawdzone wyżej.
