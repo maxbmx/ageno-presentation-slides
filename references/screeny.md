@@ -20,7 +20,7 @@ W folderze decku utwórz `screens.json`:
   { "name": "home", "url": "https://sklep.klient.pl", "frame": "wide",
     "hide": ["#cookie-banner", ".chat-widget"] },
   { "name": "koszyk-mobile", "url": "https://sklep.klient.pl/koszyk", "frame": "mobile",
-    "waitFor": ".cart", "delay": 800 }
+    "waitFor": ".cart", "delay": 400 }
 ]
 ```
 
@@ -30,6 +30,8 @@ obok `screens.json` jako `nazwa.jpg`.
 - `hide` ukrywa banery cookies, czaty i popupy przez CSS. Nie klikaj zgód w cudzym serwisie.
 - Strony za logowaniem, koszyk z produktami, panel admina: zrzut ręczny użytkownika.
 - Fragment niżej na stronie: `scrollY`.
+- `delay`: pauza przed zrzutem w ms, domyślnie 400 (`SCREENSHOT_DELAY_MS` w `scripts/constants.mjs`);
+  dłuższa tylko dla stron z animacją wejścia.
 
 ## Zrzut ręczny
 

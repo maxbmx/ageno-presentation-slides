@@ -143,8 +143,10 @@ się rozdzielić. Łączy je twarda spacja (U+00A0, w HTML `&nbsp;`).
 **Jak to działa w szablonie:**
 
 - Funkcja `fixOrphans` w skrypcie szablonu wstawia twarde spacje we wszystkich przypadkach
-  z pięciu pierwszych wierszy tabeli, w całym tekście slajdów, przy otwarciu pliku i przed
-  drukiem. Nie wpisuj `&nbsp;` ręcznie w tych przypadkach i nie usuwaj tej funkcji.
+  z pięciu pierwszych wierszy tabeli, w całym tekście slajdów, raz, przy otwarciu pliku.
+  Poprawiony tekst zostaje w DOM, więc druk i PDF dostają te same twarde spacje; osobnego
+  wywołania przed drukiem nie ma. Nie wpisuj `&nbsp;` ręcznie w tych przypadkach i nie usuwaj
+  tej funkcji.
 - Ręcznie tylko ostatni wiersz tabeli: wyrażenie, które ma zostać razem, w `.nowrap`. Używaj
   rzadko; długie `.nowrap` wypycha tekst poza kolumnę.
 - Ostatni wiersz akapitu z jednym słowem (wdowa) ogranicza CSS: `text-wrap: balance`

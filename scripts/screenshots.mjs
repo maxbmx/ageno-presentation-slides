@@ -12,17 +12,17 @@
  * [
  *   { "name": "home", "url": "https://example.com", "frame": "wide" },
  *   { "name": "koszyk-mobile", "url": "https://example.com/koszyk", "frame": "mobile",
- *     "hide": ["#cookie-banner"], "waitFor": ".cart", "scrollY": 0, "delay": 500 }
+ *     "hide": ["#cookie-banner"], "waitFor": ".cart", "scrollY": 0, "delay": 400 }
  * ]
  *
  * Pola: name, url, frame (full | wide | half | mobile) – wymagane;
- * hide (selektory ukrywane przez CSS, np. banery), waitFor (selektor), scrollY (px), delay (ms) – opcjonalne.
+ * hide (selektory ukrywane przez CSS, np. banery), waitFor (selektor), scrollY (px), delay (ms, domyślnie 400 = SCREENSHOT_DELAY_MS) – opcjonalne.
  * Wymaga: npm install && npx playwright install chromium (package.json)
  */
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { launchChromium, parseCli, usageError } from "./cli.mjs";
-import { DEVICE_SCALE, FRAMES, JPEG_QUALITY } from "./constants.mjs";
+import { DEVICE_SCALE, FRAMES, JPEG_QUALITY, SCREENSHOT_DELAY_MS } from "./constants.mjs";
 
 const USAGE = "node scripts/screenshots.mjs screens.json [--out katalog]  (domyślnie screens/ obok JSON)";
 const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1], files: true });
@@ -58,7 +58,7 @@ for (const item of list) {
     if (item.waitFor) await page.waitForSelector(item.waitFor, { timeout: 15000 });
     await page.evaluate(() => document.fonts?.ready);
     if (item.scrollY) await page.evaluate((y) => window.scrollTo(0, y), item.scrollY);
-    await page.waitForTimeout(item.delay ?? 400);
+    await page.waitForTimeout(item.delay ?? SCREENSHOT_DELAY_MS);
     const file = path.join(outDir, `${item.name}.jpg`);
     await page.screenshot({ path: file, type: "jpeg", quality: JPEG_QUALITY, animations: "disabled" });
     console.log(`OK  ${item.name}  ramka ${preset.frame.join("×")}  viewport ${vw}×${vh}  → ${file}`);

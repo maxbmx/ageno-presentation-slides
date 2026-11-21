@@ -34,6 +34,9 @@ export const FRAMES = {
   mobile: { frame: [320, 640],  viewport: [400, 800],  mobile: true },
 };
 
+/** Domyślna pauza przed zrzutem ekranu w ms (pole delay w screens.json, references/screeny.md). */
+export const SCREENSHOT_DELAY_MS = 400;
+
 /** Gęstość pikseli zrzutów i zdjęć (references/siatka.md, „Ramki screenów”). */
 export const DEVICE_SCALE = 2;
 
