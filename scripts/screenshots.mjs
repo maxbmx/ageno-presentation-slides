@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Zrzuty ekranu do slajdów, dopasowane do ramek z siatki (references/screeny.md).
+ * Zrzuty ekranu do slajdów, dopasowane do ramek z siatki (references/siatka.md, „Ramki screenów”;
+ * zasady zrzutów: references/screeny.md).
  * Viewport zrzutu ma te same proporcje co ramka, więc obraz wypełnia ją bez kadrowania.
  * deviceScaleFactor 2 daje ostry obraz na dużym ekranie. Ramki, skala i jakość JPEG: constants.mjs.
  *

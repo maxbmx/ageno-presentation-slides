@@ -20,7 +20,7 @@ wymiary w slajdzie są w px logicznych i nie ma progów responsywnych.
 Początek współrzędnych: **X = lewa krawędź kontenera (112), Y = góra slajdu (0)**.
 
 Te same liczby dla skryptów są w `scripts/constants.mjs` (płótno, kontener, stopka, budżet,
-siatka). Zmiana liczby tutaj bez zmiany tam, i odwrotnie, jest błędem.
+siatka, ramki screenów, skala, jakość JPEG). Zmiana liczby tutaj bez zmiany tam, i odwrotnie, jest błędem.
 
 ## Kolumny
 
@@ -58,6 +58,21 @@ Kolumny tylko tokenami. `1fr`, procenty i `gap` spoza tokenów dają szerokości
 | Liczba + 2 wiersze opisu | 64 + 64 |
 
 Zsumuj przed kodowaniem. Przekroczenie 704 = podziel slajd.
+
+## Ramki screenów
+
+Screen stoi w jednej z czterech ramek. Zrzut robi się w viewporcie o tych samych proporcjach,
+z `deviceScaleFactor: 2` (ostry obraz także na projektorze 4K), zapis JPEG o jakości 80
+(ta sama wartość dla zdjęć z Unsplash). Zrzuty i osadzanie: `references/screeny.md`.
+
+| Ramka (`frame`) | Klasa | Wymiar na slajdzie | Viewport zrzutu | Do czego |
+| --- | --- | --- | --- | --- |
+| `full` | `.shot-full` | 1312 × 608 | 1312 × 608 | pełny ekran desktop |
+| `wide` | `.shot-wide` | 864 × 544 | 1296 × 816 | screen obok tekstu |
+| `half` | `.shot-half` | 640 × 416 | 1280 × 832 | dwa screeny obok siebie |
+| `mobile` | `.shot-mobile` | 320 × 640 | 400 × 800 | telefon w kolumnie 416 |
+
+Zdjęcie w układzie „Zdjęcie + treść”: ramka 752 × 864, plik 1504 × 1728 (2×).
 
 ## Typografia
 
@@ -183,7 +198,7 @@ oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 | Tło każdego slajdu zawsze `#f7f7f7`, bez pasów | spójny wygląd wszystkich prezentacji |
 | Kratka w tle ukryta (`--grid-line: transparent`), kod zostaje | czysty slajd; podgląd klawiszem `G` |
 | Slajd tytułowy z górami Ageno po lewej, wychodzącymi poza slajd; tekst w kolumnie po prawej | grafika z ageno.pl łączy deck z marką |
-| Slajd kończący z 10 logotypami klientów z ageno.pl, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
+| Przedostatni slajd z 10 logotypami klientów z ageno.pl, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
 | Ostatni slajd „Kontakt” z portretem w kole i górami Ageno po prawej | rozmowa kończy się konkretną osobą; koło to kadr zdjęcia, jedyny wyjątek od zakazu zaokrągleń |
 | Kolory z logo Ageno: tekst `#231430`, akcent `#ff6b00` | prezentacja rozpoznawalna jako Ageno, spójna z logo |
 | Logo Ageno: duże na slajdzie tytułowym i „Kontakt”, małe (24 px) w stopce pozostałych slajdów | prezentacje Ageno zawsze podpisane marką |

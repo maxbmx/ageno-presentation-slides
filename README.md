@@ -84,7 +84,7 @@ node scripts/inline-assets.mjs decks/2026-11-16-klient-temat/index.html --out di
 
 Lokalne obrazy zamienia na data URI. Kod 1 (plik zapisany, ale nie do wysłania) przy: obrazie `http(s)`, nieznanym typie obrazu, braku lokalnego pliku, zewnętrznym arkuszu, skrypcie albo `@import` i rozmiarze powyżej 15 MB. Każdy przypadek ma osobny komunikat `BŁĄD:`. Do wysłania nadaje się tylko plik z kodem 0.
 
-W otwartym pliku strzałki przełączają slajdy, `F` włącza pełny ekran, `G` albo adres `#siatka` pokazuje kratkę. PDF: Chrome lub Edge, Drukuj, Zapisz jako PDF, strona 16:9, jeden slajd na stronę (`references/nawigacja.md`).
+Sterowanie w otwartym pliku i zapis do PDF z przeglądarki: `references/nawigacja.md`.
 
 ## Kontrola
 
@@ -97,6 +97,12 @@ node scripts/qa-html-deck.mjs dist/2026-11-16-klient-temat.html --out decks/2026
 - `grid-audit.mjs` otwiera plik w oknie 1536 × 864 i sprawdza `data-grid`, wiersze tekstu, interlinię 32 lub 64 px (poza `strong` i stopką), granice kontenera i stopkę na y = 800. Kod 1, gdy slajd nie pasuje. Audyt `assets/template.html` kończy się kodem 0, 24 slajdy OK.
 - `text-lint.mjs` czyta widoczny tekst slajdów według `references/redakcja.md`. Kod 1 jest tylko przy błędzie. Sama uwaga zostawia kod 0. Szablon: 0 błędów i 0 uwag. Czego skrypt nie sprawdza do końca, jest w nagłówku `scripts/text-lint.mjs` i na liście w `references/qa.md`.
 - `qa-html-deck.mjs` sprawdza 1600×900, 1366×768, 1280×720 i 1280×800 (inne okna: `--viewports 1366x768,1920x1080`): przepełnienie, strzałki (w tym krańce i autoukrywanie) oraz błędy konsoli. Zapisuje zrzut każdego slajdu w każdym oknie i `qa-report.json` w katalogu `--out` (domyślnie `qa/` obok pliku HTML). Kod 1, gdy któryś z tych punktów nie przejdzie. Sam szablon, bez `ageno-mountains.svg` i `people/maksymilian-sleziak.png` obok pliku, kończy się kodem 1 przez `ERR_FILE_NOT_FOUND` w konsoli. Po złożeniu tych obrazów przez `inline-assets.mjs` ten sam szablon przechodzi kontrolę z kodem 0.
+
+PDF przez Playwright (ten sam wynik co „Zapisz jako PDF” w Chrome; zasady druku: `references/nawigacja.md`, lista kontrolna PDF: `references/qa.md`):
+
+```bash
+node -e "const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+require('path').resolve('dist/2026-11-16-klient-temat.html'));await p.pdf({path:'dist/2026-11-16-klient-temat.pdf',preferCSSPageSize:true,printBackground:true});await b.close()})()"
+```
 
 ## Umowa CLI
 

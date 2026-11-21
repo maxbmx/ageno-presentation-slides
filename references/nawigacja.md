@@ -69,7 +69,7 @@ Styl `@media print` w szablonie zamienia deck w dokument do druku:
 - tekst w PDF zostaje tekstem, logo jest wektorowe.
 
 Zapis: Chrome lub Edge → Drukuj (`Cmd/Ctrl + P`) → Zapisz jako PDF. Safari może zignorować
-rozmiar strony i dać A4; wtedy Chrome albo Playwright (`references/qa.md`). Nie dodawaj
+rozmiar strony i dać A4; wtedy Chrome albo Playwright (polecenie: `README.md`, „Kontrola”). Nie dodawaj
 przycisku „Pobierz PDF” na slajdach.
 
 ## Czego nie dodawać

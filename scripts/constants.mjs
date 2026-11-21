@@ -25,7 +25,7 @@ export const FOOTER = { y: 800, height: 32 };
 
 /**
  * Ramki screenów: wymiar na slajdzie i viewport zrzutu w tych samych proporcjach
- * (references/screeny.md, „Ramki z siatki”).
+ * (references/siatka.md, „Ramki screenów”).
  */
 export const FRAMES = {
   full:   { frame: [1312, 608], viewport: [1312, 608], mobile: false },
@@ -34,22 +34,22 @@ export const FRAMES = {
   mobile: { frame: [320, 640],  viewport: [400, 800],  mobile: true },
 };
 
-/** Gęstość pikseli zrzutów i zdjęć (references/screeny.md, references/zdjecia.md). */
+/** Gęstość pikseli zrzutów i zdjęć (references/siatka.md, „Ramki screenów”). */
 export const DEVICE_SCALE = 2;
 
-/** Ramka zdjęcia w układzie „Zdjęcie + treść”: 752 × 864 na slajdzie (references/zdjecia.md). */
+/** Ramka zdjęcia w układzie „Zdjęcie + treść”: 752 × 864 na slajdzie (references/siatka.md). */
 export const PHOTO_FRAME = [752, 864];
 
-/** Jakość JPEG zrzutów (screenshots.mjs) i zdjęć z Unsplash (photos.mjs) (references/screeny.md). */
+/** Jakość JPEG zrzutów (screenshots.mjs) i zdjęć z Unsplash (photos.mjs) (references/siatka.md). */
 export const JPEG_QUALITY = 80;
 
-/** Okna sprawdzane przez qa-html-deck.mjs (references/qa.md). */
+/** Okna sprawdzane przez qa-html-deck.mjs (README.md, „Kontrola”). */
 export const QA_VIEWPORTS = [[1600, 900], [1366, 768], [1280, 720], [1280, 800]];
 
 /** Nawigacja szablonu: autoukrywanie strzałek i przejście (references/nawigacja.md). */
 export const NAV = { hideAfterMs: 1800, transitionMs: 200 };
 
-/** Limit rozmiaru złożonego pliku HTML w MB (inline-assets.mjs, references/qa.md). */
+/** Limit rozmiaru złożonego pliku HTML w MB (inline-assets.mjs, references/nawigacja.md, „Jeden plik”). */
 export const MAX_DECK_MB = 15;
 
 /**

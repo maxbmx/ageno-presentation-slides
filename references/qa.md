@@ -5,29 +5,15 @@ sprawdzono, jeśli tego nie zrobiono.
 
 ## 1. Automat
 
-```bash
-npm install && npx playwright install chromium   # raz (wersja Playwrighta z package.json)
-node scripts/grid-audit.mjs dist/prezentacja.html
-node scripts/text-lint.mjs dist/prezentacja.html
-node scripts/qa-html-deck.mjs dist/prezentacja.html --out decks/…/qa
-```
+Polecenia, opis tego, co sprawdza każdy skrypt, i kody wyjścia: `README.md`, sekcje „Kontrola”
+i „Umowa CLI”. Uruchamiaj na złożonym pliku z `dist/`.
 
-- `grid-audit.mjs`: każdy slajd w px płótna (okno 1536 × 864): pozycje i wymiary `data-grid`,
-  wiersze tekstu, interlinie, granice kontenera, stopka na y = 800, przewijanie.
-- `text-lint.mjs`: widoczny tekst każdego slajdu według `references/redakcja.md` (słownictwo,
-  myślniki, nawiasy, dwukropki w tytułach, cudzysłowy, wycinek „my”, daty, kalki); błędy i uwagi.
-  Sprawdza tylko część reguł, lista: `references/redakcja.md`, sekcja „Kontrola automatyczna”.
-- `qa-html-deck.mjs`: 1600×900, 1366×768, 1280×720, 1280×800: przepełnienia, nawigacja,
-  autoukrywanie strzałek, krańce, błędy konsoli, zrzut każdego slajdu.
-
-Kod 0 = bez problemu, 1 = problem do poprawienia, 2 = złe wywołanie (popraw polecenie, nie deck).
-Umowa CLI: `README.md`.
-
-PDF (ten sam wynik co „Zapisz jako PDF” w Chrome):
-
-```bash
-node -e "const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+require('path').resolve('dist/prezentacja.html'));await p.pdf({path:'dist/prezentacja.pdf',preferCSSPageSize:true,printBackground:true});await b.close()})()"
-```
+- [ ] `grid-audit.mjs`: kod 0.
+- [ ] `text-lint.mjs`: kod 0, każda uwaga oceniona (co skrypt sprawdza:
+      `references/redakcja.md`, „Kontrola automatyczna”).
+- [ ] `qa-html-deck.mjs`: kod 0 we wszystkich czterech oknach.
+- [ ] PDF wygenerowany (polecenie w `README.md`) i obejrzany według punktu 3.
+- [ ] Kod 2 oznacza złe wywołanie: popraw polecenie, nie deck.
 
 Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 
