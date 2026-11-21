@@ -92,8 +92,8 @@ górskie z Unsplash (`references/zdjecia.md`). Polecenia: `README.md`.
 
 ### 6. Kontrola
 
-Przejdź `references/qa.md`: automat (siatka, tekst, smoke-test), PDF, oględziny zrzutu każdego
-slajdu i lista kontrolna. Po każdej poprawce sprawdź slajd i sąsiadów, po ostatniej zmianie całość.
+Przejdź `references/qa.md`: automat (siatka, tekst, smoke-test, PDF), oględziny zrzutu każdego
+slajdu i stron PDF oraz lista kontrolna. Po każdej poprawce sprawdź slajd i sąsiadów, po ostatniej zmianie całość.
 
 ### 7. Przekazanie
 

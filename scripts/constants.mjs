@@ -60,3 +60,9 @@ export const MAX_DECK_MB = 15;
 export const PEOPLE = [
   { file: "maksymilian-sleziak.png", url: "https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png" },
 ];
+
+/**
+ * Strona PDF: płótno 1536 × 864 px przy 96 dpi = 16 × 9 cali = 1152 × 648 pt
+ * (references/nawigacja.md, „Druk i PDF”). Sprawdza scripts/pdf.mjs.
+ */
+export const PDF_PAGE_PT = [CANVAS.width * 0.75, CANVAS.height * 0.75];

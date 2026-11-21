@@ -12,7 +12,7 @@ i „Umowa CLI”. Uruchamiaj na złożonym pliku z `dist/`.
 - [ ] `text-lint.mjs`: kod 0, każda uwaga oceniona (co skrypt sprawdza:
       `references/redakcja.md`, „Kontrola automatyczna”).
 - [ ] `qa-html-deck.mjs`: kod 0 we wszystkich czterech oknach.
-- [ ] PDF wygenerowany (polecenie w `README.md`) i obejrzany według punktu 3.
+- [ ] `pdf.mjs`: kod 0 (stron tyle, ile slajdów, każda 1152 × 648 pt), PDF obejrzany według punktu 3.
 - [ ] Kod 2 oznacza złe wywołanie: popraw polecenie, nie deck.
 
 Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
@@ -39,8 +39,8 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 
 ## 3. PDF
 
-- [ ] Liczba stron = liczba slajdów, bez pustej strony na końcu.
-- [ ] Każda strona 16:9 (16 × 9 cali), bez marginesów.
+- [ ] Liczba stron = liczba slajdów, bez pustej strony na końcu (sprawdza `pdf.mjs`).
+- [ ] Każda strona 16:9 (16 × 9 cali, 1152 × 648 pt), bez marginesów (rozmiar sprawdza `pdf.mjs`).
 - [ ] Szare tło na każdej stronie, brak strzałek i nakładek siatki.
 - [ ] Układ identyczny jak na ekranie, nic nie ucięte.
 

@@ -17,6 +17,7 @@
     "grid": "node scripts/grid-audit.mjs",
     "lint": "node scripts/text-lint.mjs",
     "qa": "node scripts/qa-html-deck.mjs",
+    "pdf": "node scripts/pdf.mjs",
     "browsers": "playwright install chromium"
   },
   "devDependencies": {

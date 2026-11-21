@@ -44,7 +44,7 @@ Skróty `npm run` (argumenty po `--`, np. `npm run grid -- dist/plik.html`):
 | `npm run check` | `node --check` wszystkich skryptów |
 | `npm run verify` | `grid-audit.mjs` i `text-lint.mjs` na `assets/template.html` (oczekiwane: kod 0) |
 | `npm run assets`, `screens`, `photos`, `inline` | `ageno-assets.mjs`, `screenshots.mjs`, `photos.mjs`, `inline-assets.mjs` |
-| `npm run grid`, `lint`, `qa` | `grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs` |
+| `npm run grid`, `lint`, `qa`, `pdf` | `grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs`, `pdf.mjs` |
 | `npm run browsers` | `playwright install chromium` |
 
 ```bash
@@ -94,15 +94,17 @@ node scripts/text-lint.mjs dist/2026-11-16-klient-temat.html
 node scripts/qa-html-deck.mjs dist/2026-11-16-klient-temat.html --out decks/2026-11-16-klient-temat/qa
 ```
 
-- `grid-audit.mjs` otwiera plik w oknie 1536 × 864 i sprawdza `data-grid`, wiersze tekstu, interlinię 32 lub 64 px (poza `strong` i stopką), granice kontenera i stopkę na y = 800. Kod 1, gdy slajd nie pasuje. Audyt `assets/template.html` kończy się kodem 0, 24 slajdy OK.
+- `grid-audit.mjs` otwiera plik w oknie 1536 × 864 i sprawdza `data-grid`, wiersze tekstu, interlinię (wielokrotność 32 px, poza `strong` i stopką), granice kontenera (zgłasza każdy element poza kontenerem) i stopkę na y = 800, z tolerancją 0,1 px. Kod 1, gdy slajd nie pasuje. Audyt `assets/template.html` kończy się kodem 0, 24 slajdy OK.
 - `text-lint.mjs` czyta widoczny tekst slajdów według `references/redakcja.md`. Kod 1 jest tylko przy błędzie. Sama uwaga zostawia kod 0. Szablon: 0 błędów i 0 uwag. Czego skrypt nie sprawdza do końca, jest w nagłówku `scripts/text-lint.mjs` i na liście w `references/qa.md`.
 - `qa-html-deck.mjs` sprawdza 1600×900, 1366×768, 1280×720 i 1280×800 (inne okna: `--viewports 1366x768,1920x1080`): przepełnienie, strzałki (w tym krańce i autoukrywanie) oraz błędy konsoli. Zapisuje zrzut każdego slajdu w każdym oknie i `qa-report.json` w katalogu `--out` (domyślnie `qa/` obok pliku HTML). Kod 1, gdy któryś z tych punktów nie przejdzie. Sam szablon, bez `ageno-mountains.svg` i `people/maksymilian-sleziak.png` obok pliku, kończy się kodem 1 przez `ERR_FILE_NOT_FOUND` w konsoli. Po złożeniu tych obrazów przez `inline-assets.mjs` ten sam szablon przechodzi kontrolę z kodem 0.
 
-PDF przez Playwright (ten sam wynik co „Zapisz jako PDF” w Chrome; zasady druku: `references/nawigacja.md`, lista kontrolna PDF: `references/qa.md`):
+PDF (ten sam wynik co „Zapisz jako PDF” w Chrome; zasady druku: `references/nawigacja.md`, lista kontrolna PDF: `references/qa.md`):
 
 ```bash
-node -e "const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+require('path').resolve('dist/2026-11-16-klient-temat.html'));await p.pdf({path:'dist/2026-11-16-klient-temat.pdf',preferCSSPageSize:true,printBackground:true});await b.close()})()"
+node scripts/pdf.mjs dist/2026-11-16-klient-temat.html --out dist/2026-11-16-klient-temat.pdf
 ```
+
+- `pdf.mjs` drukuje plik przez Playwright (`preferCSSPageSize`, tło drukowane) i sprawdza, że liczba stron równa się liczbie slajdów, a każda strona ma MediaBox 1152 × 648 pt (16 × 9 cali). Kod 1 przy niezgodności; PDF zostaje zapisany do obejrzenia. Domyślne `--out`: plik `.pdf` obok HTML.
 
 ## Umowa CLI
 
@@ -111,7 +113,7 @@ Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/
 - argumenty pozycyjne to pliki wejściowe, opcje mają postać `--nazwa wartość` (`--out`, `--viewports`, `--site`, `--mountains`); `-h` albo `--help` wypisuje użycie,
 - komunikaty są po polsku,
 - **kod 0**: skrypt zadziałał i nie znalazł problemu; sama uwaga `text-lint.mjs` też daje 0,
-- **kod 1**: skrypt zadziałał i znalazł problem (błąd siatki, błąd tekstu, nieudany smoke-test, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania) albo nie mógł sprawdzić, bo brakuje Playwrighta lub przeglądarki Chromium (komunikat podaje polecenie instalacji),
+- **kod 1**: skrypt zadziałał i znalazł problem (błąd siatki, błąd tekstu, nieudany smoke-test, niezgodny PDF, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania) albo nie mógł sprawdzić, bo brakuje Playwrighta lub przeglądarki Chromium (komunikat podaje polecenie instalacji),
 - **kod 2**: złe wywołanie: brak albo nadmiar argumentu, nieznana opcja, opcja bez wartości, zła wartość (np. `--viewports 1366x`), brak pliku wejściowego. Skrypt kończy się wtedy, zanim uruchomi przeglądarkę albo cokolwiek zapisze.
 
 | Skrypt | Wywołanie |
@@ -123,3 +125,4 @@ Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/
 | `grid-audit.mjs` | `prezentacja.html` |
 | `text-lint.mjs` | `prezentacja.html` |
 | `qa-html-deck.mjs` | `prezentacja.html [--out katalog] [--viewports SZERxWYS,…]` |
+| `pdf.mjs` | `prezentacja.html [--out plik.pdf]` |

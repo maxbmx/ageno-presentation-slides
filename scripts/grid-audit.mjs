@@ -9,8 +9,9 @@
  *  - [data-grid="8"]:  X i szerokość przez 8, Y i wysokość przez 32,
  *  - [data-grid="32y"]: tylko Y i wysokość przez 32 (blok dochodzący do krawędzi slajdu, np. .photo),
  *  - wiersze tekstu (h1–h3, p, li, figcaption, blockquote, dt, dd): Y i wysokość przez 32,
- *  - interlinia każdego tekstu: 32 lub 64 px (poza <strong> i stopką),
- *  - nic w kontenerze nie wychodzi poza 112–1424 × 64–768,
+ *  - interlinia każdego tekstu: wielokrotność 32 px (poza <strong> i stopką),
+ *  - nic w kontenerze nie wychodzi poza 112–1424 × 64–768 (zgłaszane wszystkie takie elementy),
+ *  - tolerancja 0,1 px przy krawędziach, wymiarach i interlinii,
  *  - stopka na y = 800,
  *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w warstwie .bleed z szablonu
  *    albo oznacz atrybutem data-bleed; obie formy audyt traktuje tak samo).
@@ -87,17 +88,19 @@ const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
       const el = walker.currentNode.parentElement;
       if (!walker.currentNode.textContent.trim() || el.closest("strong, script, style, .slide-footer, .deck-nav")) continue;
       const v = parseFloat(getComputedStyle(el).lineHeight);
-      if (Number.isNaN(v) || v % M !== 0) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
+      if (Number.isNaN(v) || v < M - TOL || off(v, M) > TOL) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
     }
     problems.push(...lh);
 
-    // Granice kontenera
+    // Granice kontenera: wszystkie elementy poza kontenerem; potomek już zgłoszonego elementu
+    // nie jest zgłaszany drugi raz, żeby jeden za duży blok nie dawał kilkudziesięciu wierszy.
+    const outside = [];
     for (const el of slide.querySelectorAll(".container *")) {
-      if (!visible(el)) continue;
+      if (!visible(el) || outside.some((o) => o.contains(el))) continue;
       const b = rel(el);
       if (b.left < X0 - TOL || b.right > X_MAX + TOL || b.bottom > Y_MAX + TOL || b.y < Y_MIN - TOL) {
+        outside.push(el);
         problems.push(`${name(el)} poza kontenerem: x ${b.left.toFixed(0)}–${b.right.toFixed(0)}, y ${b.y.toFixed(0)}–${b.bottom.toFixed(0)}`);
-        break;
       }
     }
 
