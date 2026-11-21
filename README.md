@@ -15,14 +15,16 @@ Katalog prezentacji jest konwencją ze `SKILL.md`. Skrypty czytają tylko pliki 
 
 ```
 decks/2026-11-16-klient-temat/
-├── brief.md                 cel, źródła, plan
-├── index.html               kopia szablonu
+├── brief.md                 cel, odbiorca, rejestr źródeł, plan slajdów
+├── index.html               kopia szablonu, obrazy jako ścieżki
 ├── ageno-mountains.svg      góry na slajd tytułowy i kontaktowy
-├── logos/   logos.json      logotypy klientów
-├── people/                  zdjęcia osób
-├── screens.json  photos.json  screens/
+├── logos/   logos.json      logotypy klientów z ageno.pl
+├── people/                  zdjęcia osób na slajd kontaktowy
+├── screens.json             lista zrzutów
+├── photos.json              wybrane zdjęcia z Unsplash
+├── screens/                 zrzuty, zdjęcia i logo klienta
 └── qa/                      zrzuty i qa-report.json
-dist/2026-11-16-klient-temat.html
+dist/2026-11-16-klient-temat.html   jeden plik do wysłania
 ```
 
 ## Szybki start

@@ -106,6 +106,31 @@ Tło całej prezentacji jest zawsze `#f7f7f7`: bez pasów, kolorowych i ciemnych
 Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, `--c-on-accent`,
 `--c-muted`) z jego brandbooka. Tła i wymiarów nie ruszaj.
 
+## Logo
+
+- **Logo Ageno, duże** (`.brand-logo`, `data-grid="8"`): ramka 208 × 64, logo wysokości 64 px,
+  lewy górny róg kontenera. Zawsze na slajdzie tytułowym i na ostatnim slajdzie „Kontakt”,
+  na innych slajdach nie.
+- **Logo Ageno, małe** (`.footer-logo`, 24 px): w stopce przed źródłem na każdym slajdzie bez
+  `.brand-logo`; wstawia je skrypt szablonu. Slajd z dużym logo nie ma małego.
+- Logo jest zdefiniowane raz w szablonie (`<symbol id="ageno-logo">`) i używane przez `<use>`;
+  oryginał: `assets/ageno-logo.svg`. Nie usuwaj go, nie przesuwaj i nie zmieniaj kolorów
+  (`#ff6b00`, `#231430`), także w prezentacji w marce klienta.
+- **Logo klienta** dostarcza użytkownik przy danej prezentacji; skill go nie przechowuje.
+  Miejsce: slajd tytułowy, ten sam wiersz co logo Ageno, wyrównane do prawej
+  (`.title-client-logo`, wysokość 64 px, maks. 416 px szerokości), oraz układ „Case study”.
+  Używaj dokładnie tego pliku (najlepiej SVG): bez odrysowywania, zmiany proporcji i kolorów.
+  Brak logo klienta = wariant bez niego, nie tekstowe pseudo-logo; nie szukaj go w sieci bez zgody.
+- Wstawiając SVG do HTML, nadaj identyfikatorom w środku (`clipPath`, gradienty) unikalne nazwy,
+  żeby dwa loga się nie gryzły.
+
+### Wyjątek: małe logo w stopce
+
+Małe logo stoi pośrodku wiersza stopki 32 px (`align-items: center`): góra na y = 804, dół
+na y = 828, po 4 px odstępu z każdej strony. To jedyny element poza kratką 32 px; wiersz stopki
+(800 → 832) zostaje na siatce. Logo nie ma `data-grid` i audyt go nie mierzy. Nie zmieniaj jego
+wysokości ani nie wyrównuj go do kratki.
+
 ## Czego nie robić
 
 - Ramek, linii podziału, cieni i zaokrągleń pudełek. Na slajdzie nie ma żadnych linii, bo
@@ -135,13 +160,6 @@ z audytu, a błąd o 8 px przejdzie niezauważony.
 Wiersze tekstu (`h1–h3`, `p`, `li`, `figcaption`, `blockquote`, `dt`, `dd`) audyt sprawdza bez
 oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 
-### Wyjątek: małe logo w stopce
-
-Małe logo Ageno (`.footer-logo`) ma 24 px wysokości i stoi pośrodku wiersza stopki 32 px
-(`align-items: center`): góra na y = 804, dół na y = 828, po 4 px odstępu z każdej strony.
-To jedyny element poza kratką 32 px; wiersz stopki (800 → 832) zostaje na siatce. Logo nie ma
-`data-grid` i audyt go nie mierzy. Nie zmieniaj jego wysokości ani nie wyrównuj go do kratki.
-Wstawia je skrypt tylko na slajdach bez `.brand-logo` (czyli nie na tytułowym i nie na „Kontakt”).
 
 ## Najczęstsze błędy
 

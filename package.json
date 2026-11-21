@@ -1,6 +1,6 @@
 {
   "name": "ageno-presentation-slides",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Skill i skrypty do prezentacji Ageno w jednym pliku HTML (slajdy 16:9, siatka 8 / 32 px).",
   "private": true,
   "license": "UNLICENSED",

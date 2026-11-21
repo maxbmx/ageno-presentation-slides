@@ -3,6 +3,14 @@
 `assets/template.html` już to wszystko implementuje. Ten plik mówi, czego nie zepsuć przy
 edycji i jak sprawdzić zachowanie.
 
+## Jeden plik
+
+Wynik to jeden samodzielny plik HTML, który działa lokalnie bez sieci: CSS, JS, screeny,
+zdjęcia i logo są w środku. Bez CDN, `@import`, zewnętrznych arkuszy, skryptów i fontów
+(tylko fonty systemowe, `references/siatka.md`). Obrazy osadza `scripts/inline-assets.mjs`
+(polecenie i kody wyjścia: `README.md`); limit 15 MB. Gdy pracujesz bez systemu plików
+użytkownika (np. w czacie), dostarcz od razu jeden plik HTML z obrazami jako data URI.
+
 ## Kontrakt DOM (wymagany przez `scripts/qa-html-deck.mjs`)
 
 - kontener: `[data-presentation]`,
