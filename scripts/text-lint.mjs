@@ -3,7 +3,10 @@
  * Kontrola tekstu slajdów według references/redakcja.md.
  * Czyta widoczny tekst każdego slajdu (bez treści cytatów i zaślepek) i zgłasza fragmenty
  * z numerem reguły. BŁĄD = do poprawienia, UWAGA = do oceny w kontekście.
- * Nie zastępuje czytania: reguł 8, 9, 22, 24, 25, 29 i S1–S7 nie sprawdza w całości.
+ * Sprawdza reguły 5, 6, 7, 10, 11, 12 (tylko nagłówki), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
+ * wycinek S3 (lista czasowników w 1. os. lm.) i format dat. Lista ma być zgodna z references/redakcja.md.
+ * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
+ * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
  * Użycie: node scripts/text-lint.mjs prezentacja.html
  * Kod wyjścia 1, gdy są błędy.
@@ -51,7 +54,7 @@ const rules = [
   // [reguła, poziom, wzorzec, opis, tylko nagłówki]
   ["5", "błąd", word("dodatkowo|kluczow\\p{L}*|kompleksow\\p{L}*|innowacyjn\\p{L}*|holistyczn\\p{L}*|synergi\\p{L}*|ekosystem\\p{L}*|krajobraz\\p{L}*|unikaln\\p{L}*|przełomow\\p{L}*|wartoś\\p{L}* dodan\\p{L}*|w dzisiejszych czasach"), "słowo typowe dla AI"],
   ["5", "błąd", word("additionally|crucial|delve\\p{L}*|enhanc\\p{L}*|foster\\p{L}*|landscape|pivotal|showcas\\p{L}*|testament|underscor\\p{L}*|vibrant"), "słowo typowe dla AI (EN)"],
-  ["6", "błąd", word("stanowi\\p{L}*|pełni\\p{L}* rolę|może pochwalić się"), "zamiast „jest” / „ma”"],
+  ["6", "błąd", word("stanowi(?!sk)\\p{L}*|pełni\\p{L}* rolę|może pochwalić się"), "zamiast „jest” / „ma”"],
   ["7", "błąd", /nie tylko\b.*\bale/iu, "„nie tylko X, ale Y”"],
   ["10", "uwaga", /(?<![\p{L}\p{N}])od [^.,]{1,40}? po /iu, "„od X po Y”: czy to prawdziwa skala?"],
   ["11", "błąd", /—/u, "pauza (em dash)"],
@@ -64,7 +67,7 @@ const rules = [
   ["23", "uwaga", word("fundament\\p{L}*|kręgosłup\\p{L}*|filar\\p{L}*|paradygmat\\p{L}*|koł\\p{L}* zamachow\\p{L}*|gwiazd\\p{L}* przewodni\\p{L}*|motor\\p{L}* napędow\\p{L}*"), "metafora zamiast konkretnego słowa"],
   ["28", "uwaga", word("wykorzyst\\p{L}*|zaimplementow\\p{L}*|lewarow\\p{L}*"), "czy wystarczy „użyć”?"],
   ["31", "błąd", word("dokona\\p{L}*|przeprowadzeni\\p{L}*"), "rzeczownik odczasownikowy z pustym czasownikiem"],
-  ["32", "błąd", word("w oparciu o|adresow\\p{L}*|dedykowan\\p{L}*"), "kalka z angielskiego"],
+  ["32", "błąd", word("w oparciu o|adresowa[ćłn]\\p{L}*|adresuj\\p{L}*|dedykowan\\p{L}*"), "kalka z angielskiego"],
   ["33", "uwaga", word("w ramach|na poziomie|w obszarze|w zakresie|pozwala na|umożliwia\\p{L}*"), "pusty łącznik"],
   ["34", "błąd", word("feature\\p{L}*|insight\\p{L}*|deliverable\\p{L}*|performance"), "zbędny anglicyzm"],
   ["35", "błąd", /(?<![\p{L}])zostan(?:ie|ą) \p{L}+(?:ny|na|ne|ni|ty|ta|te|ci)(?![\p{L}])/iu, "strona bierna w przyszłości"],

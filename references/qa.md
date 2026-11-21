@@ -15,7 +15,8 @@ node scripts/qa-html-deck.mjs dist/prezentacja.html --out decks/…/qa
 - `grid-audit.mjs`: każdy slajd w px płótna (okno 1536 × 864): pozycje i wymiary `data-grid`,
   wiersze tekstu, interlinie, granice kontenera, stopka na y = 800, przewijanie.
 - `text-lint.mjs`: widoczny tekst każdego slajdu według `references/redakcja.md` (słownictwo,
-  myślniki, nawiasy, dwukropki w tytułach, cudzysłowy, „my”, daty, kalki); błędy i uwagi.
+  myślniki, nawiasy, dwukropki w tytułach, cudzysłowy, wycinek „my”, daty, kalki); błędy i uwagi.
+  Sprawdza tylko część reguł, lista: `references/redakcja.md`, sekcja „Kontrola automatyczna”.
 - `qa-html-deck.mjs`: 1600×900, 1366×768, 1280×720, 1280×800: przepełnienia, nawigacja,
   autoukrywanie strzałek, krańce, błędy konsoli, zrzut każdego slajdu.
 
@@ -71,9 +72,11 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 - [ ] Podpisy, stopki, źródła, `alt` i `<title>` też poprawione.
 - [ ] Bez sloganów i tekstu dodanego dla wypełnienia.
 - [ ] `text-lint.mjs` bez błędów; każda uwaga oceniona.
-- [ ] Cały deck przeczytany pod kątem `references/redakcja.md`, zwłaszcza reguł, których skrypt
-      nie sprawdza: S1–S7, 8, 9, 22, 24, 25, 29 (plan opisany jako plan, jedna nazwa dla
-      jednej rzeczy, konkret zamiast ogólników).
+- [ ] Cały deck przeczytany pod kątem `references/redakcja.md`, zwłaszcza tego, czego skrypt
+      nie sprawdza (tabela w sekcji „Kontrola automatyczna”): reguły 3, 4, 8, 9, 13, 14, 15,
+      18, 19, 22, 24, 25, 26, 27, 29, 30; S1, S2, S4–S7 i S3 poza listą czasowników;
+      reguła 12 w treści (skrypt patrzy tylko na nagłówki); `alt`, `<title>`, `aria-label`
+      (plan opisany jako plan, jedna nazwa dla jednej rzeczy, konkret zamiast ogólników).
 
 ## 6. Interakcje (ręcznie, jeśli automat ich nie obejmuje)
 
