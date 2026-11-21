@@ -27,7 +27,7 @@ danych, użytkownik dopisze.
 ## Marka i grafiki (2026-11-17)
 
 - Logo Ageno: `assets/ageno-logo.svg`; w szablonie jako `<symbol id="ageno-logo">`. Duże na slajdzie
-  tytułowym, małe w stopce każdego kolejnego slajdu.
+  tytułowym i „Kontakt”, małe w stopce pozostałych slajdów (na slajdach z dużym logo małego nie ma).
 - Kolory z logo: ciemny fiolet `#231430` (tekst), pomarańcz `#ff6b00` (akcent).
 - Góry Ageno: `https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg` →
   `ageno-mountains.svg` (pobiera `scripts/ageno-assets.mjs`). Obowiązkowo na slajdzie tytułowym

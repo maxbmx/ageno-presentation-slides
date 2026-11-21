@@ -101,8 +101,9 @@ tylko w tym układzie, zawsze z podpisem `@autor`. Szczegóły: `references/zdje
    Nowego CSS dodawaj jak najmniej i tylko z tokenami.
 3. Każdy blok układu oznacz `data-grid="32"` (wnętrza o szerokości z siatki 8 px: `data-grid="8"`),
    a blok o zmiennej wysokości także `data-snap`.
-4. Slajd tytułowy zawsze z dużym logo Ageno (blok `.brand-logo` z szablonu, zostaw bez zmian).
-   Stopka: małe logo Ageno wstawia skrypt, ty wpisujesz źródło lub opis screenu w `data-source`,
+4. Slajd tytułowy i slajd „Kontakt” zawsze z dużym logo Ageno (blok `.brand-logo` z szablonu,
+   zostaw bez zmian). Stopka: małe logo Ageno wstawia skrypt na każdym slajdzie bez `.brand-logo`
+   (na tytułowym i kontaktowym go nie ma), ty wpisujesz źródło lub opis screenu w `data-source`,
    numer też wypełnia skrypt. Logo klienta (jeśli jest) na slajdzie tytułowym po prawej.
 5. Tło każdego slajdu zawsze `#f7f7f7`, kolory z logo Ageno (tekst `#231430`, akcent `#ff6b00`). Marka klienta: zmień tylko kolor tekstu i akcentu
    (`--c-text`, `--c-accent`, `--c-on-accent`, `--c-muted`). Tła i geometrii nie ruszaj.
@@ -126,12 +127,14 @@ Podaj krótko:
 
 ## Logo
 
-- **Logo Ageno** jest zawsze na slajdzie tytułowym: lewy górny róg kontenera, wysokość 64 px,
-  ramka 208 × 64. Na każdym kolejnym slajdzie małe logo (24 px) stoi w stopce przed źródłem;
-  wstawia je skrypt szablonu. Logo jest zdefiniowane raz w szablonie (`<symbol id="ageno-logo">`)
-  i używane przez `<use>`; oryginał: `assets/ageno-logo.svg`.
-  Nie usuwaj go, nie przesuwaj i nie zmieniaj kolorów (#ff6b00, #231430), także w prezentacji
-  w marce klienta. Nie powtarzaj go na kolejnych slajdach.
+- **Logo Ageno, duże** (blok `.brand-logo`) jest zawsze na slajdzie tytułowym i na ostatnim
+  slajdzie „Kontakt”: lewy górny róg kontenera, wysokość 64 px, ramka 208 × 64. Na innych
+  slajdach dużego logo nie wstawiaj.
+- **Logo Ageno, małe** (24 px, `.footer-logo`) stoi w stopce przed źródłem na każdym slajdzie,
+  który nie ma `.brand-logo`; wstawia je skrypt szablonu. Slajd z dużym logo nie ma małego.
+- Logo jest zdefiniowane raz w szablonie (`<symbol id="ageno-logo">`) i używane przez `<use>`;
+  oryginał: `assets/ageno-logo.svg`. Nie usuwaj go, nie przesuwaj i nie zmieniaj kolorów
+  (#ff6b00, #231430), także w prezentacji w marce klienta.
 - **Logo klienta** dostarcza użytkownik przy danej prezentacji; skill go nie przechowuje.
   Miejsce: slajd tytułowy, ten sam wiersz co logo Ageno, wyrównane do prawej
   (`.title-client-logo`, wysokość 64 px), oraz układ „Case study”.

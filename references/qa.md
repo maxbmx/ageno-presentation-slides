@@ -36,9 +36,10 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 - [ ] Slajd tytułowy ma duże logo Ageno w lewym górnym rogu, w oryginalnych kolorach,
       i góry Ageno po lewej, przycięte krawędzią slajdu (nie zaślepkę „brak ageno-mountains.svg”).
 - [ ] Slajd „Klienci Ageno”: logotypy z ageno.pl bez zmian, równe, 2 pełne wiersze po 5.
-- [ ] Ostatni slajd „Kontakt”: prawdziwe zdjęcie (nie zaślepka „brak zdjęcia”), e-mail i telefon
+- [ ] Ostatni slajd „Kontakt”: duże logo Ageno w lewym górnym rogu, prawdziwe zdjęcie (nie zaślepka „brak zdjęcia”), e-mail i telefon
       z `references/ageno.md`, linki `mailto:` i `tel:` działają, góry po prawej.
-- [ ] Każdy kolejny slajd ma małe logo Ageno w stopce, także w PDF.
+- [ ] Każdy slajd poza tytułowym i „Kontakt” ma małe logo Ageno w stopce, także w PDF;
+      slajdy tytułowy i „Kontakt” mają duże logo i nie mają małego.
 - [ ] Logo klienta (jeśli jest) na slajdzie tytułowym po prawej, oryginalne, nie zniekształcone.
 - [ ] Zdjęcia tylko w układzie „Zdjęcie + treść”: górskie, z licencją Unsplash License (nie Unsplash+),
       zgodne z kryteriami z `references/zdjecia.md`, każde inne.

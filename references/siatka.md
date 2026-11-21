@@ -14,7 +14,7 @@ wymiary w slajdzie są w px logicznych i nie ma progów responsywnych.
 | Strefa | X | Y | Rozmiar |
 | --- | --- | --- | --- |
 | Kontener treści `.container` | 112 → 1424 | 64 → 768 | 1312 × 704 (41 × 22 kratki) |
-| Stopka `.slide-footer` | 112 → 1424 | 800 → 832 | jeden wiersz 32 px |
+| Stopka `.slide-footer` | 112 → 1424 | 800 → 832 | jeden wiersz 32 px; małe logo 24 px na y = 804 |
 | Strzałki nawigacji | marginesy 0–112 i 1424–1536 | środek wysokości | poza treścią |
 
 Początek współrzędnych: **X = lewa krawędź kontenera (112), Y = góra slajdu (0)**.
@@ -124,6 +124,14 @@ Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, 
 Wiersze tekstu (`h1–h3`, `p`, `li`, `figcaption`, `blockquote`, `dt`, `dd`) audyt sprawdza bez
 oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 
+### Wyjątek: małe logo w stopce
+
+Małe logo Ageno (`.footer-logo`) ma 24 px wysokości i stoi pośrodku wiersza stopki 32 px
+(`align-items: center`): góra na y = 804, dół na y = 828, po 4 px odstępu z każdej strony.
+To jedyny element poza kratką 32 px; wiersz stopki (800 → 832) zostaje na siatce. Logo nie ma
+`data-grid` i audyt go nie mierzy. Nie zmieniaj jego wysokości ani nie wyrównuj go do kratki.
+Wstawia je skrypt tylko na slajdach bez `.brand-logo` (czyli nie na tytułowym i nie na „Kontakt”).
+
 ## Najczęstsze błędy
 
 | Objaw | Przyczyna | Poprawka |
@@ -149,7 +157,7 @@ oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 | Slajd kończący z 10 logotypami klientów z ageno.pl, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
 | Ostatni slajd „Kontakt” z portretem w kole i górami Ageno po prawej | rozmowa kończy się konkretną osobą; koło to kadr zdjęcia, jedyny wyjątek od zakazu zaokrągleń |
 | Kolory z logo Ageno: tekst `#231430`, akcent `#ff6b00` | prezentacja rozpoznawalna jako Ageno, spójna z logo |
-| Logo Ageno: duże na slajdzie tytułowym, małe (24 px) w stopce każdego kolejnego slajdu | prezentacje Ageno zawsze podpisane marką |
+| Logo Ageno: duże na slajdzie tytułowym i „Kontakt”, małe (24 px) w stopce pozostałych slajdów | prezentacje Ageno zawsze podpisane marką |
 | Marka klienta zmienia tylko kolor tekstu i akcentu | geometria, tło i logo Ageno zostają |
 | Zdjęcia ze stocku tylko w układzie „Zdjęcie + treść”: górskie, z Unsplash, z podpisem `@autor` | górski klimat Ageno; reszta slajdów zostaje rzeczowa |
 | Daty zawsze YYYY-MM-DD, okresy jako zakres dat | jednoznaczne i sortowalne; jedna konwencja we wszystkich deckach |

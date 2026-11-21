@@ -165,7 +165,8 @@ strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
   font-size: var(--fs-meta);
   line-height: var(--lh-meta);
 }
-/* Małe logo Ageno w stopce każdego slajdu poza tytułowym (wstawia je skrypt), wysokość 24 px */
+/* Małe logo Ageno w stopce każdego slajdu bez .brand-logo, czyli poza tytułowym (1) i „Kontakt” (24);
+   wstawia je skrypt. Wysokość 24 px w wierszu 32 px (align-items: center), offset 4 px. */
 .footer-logo { display: block; flex: none; height: 24px; width: auto; }
 .slide-footer [data-source] { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .slide-footer [data-slide-number] { flex: none; margin-left: auto; }
@@ -1275,7 +1276,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 
   fixOrphans(deck);
 
-  // Numeracja, etykiety i małe logo Ageno w stopce (poza slajdem tytułowym z dużym logo)
+  // Numeracja, etykiety i małe logo Ageno w stopce (poza slajdami z dużym logo: tytułowy i „Kontakt”)
   slides.forEach((slide, i) => {
     const footer = slide.querySelector(".slide-footer");
     if (footer && !slide.querySelector(".brand-logo") && !footer.querySelector(".footer-logo")) {
