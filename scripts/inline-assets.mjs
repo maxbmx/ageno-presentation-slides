@@ -15,12 +15,11 @@
  */
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { parseCli, requireFile, usageError } from "./cli.mjs";
+import { parseCli, usageError } from "./cli.mjs";
 import { MAX_DECK_MB } from "./constants.mjs";
 
 const USAGE = "node scripts/inline-assets.mjs wejscie.html --out wyjscie.html";
-const { values, positionals: [input] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
-requireFile(USAGE, input);
+const { values, positionals: [input] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1], files: true });
 if (!values.out) usageError(USAGE, "brak opcji --out (plik wynikowy)");
 const output = values.out;
 const MAX_MB = MAX_DECK_MB;

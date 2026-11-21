@@ -24,13 +24,12 @@
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { parseCli, requireFile, usageError } from "./cli.mjs";
+import { parseCli, usageError } from "./cli.mjs";
 import { DEVICE_SCALE, JPEG_QUALITY, PHOTO_FRAME } from "./constants.mjs";
 
 const [W, H] = PHOTO_FRAME.map((v) => v * DEVICE_SCALE); // 1504 × 1728
 const USAGE = "node scripts/photos.mjs photos.json [--out katalog]  (domyślnie screens/ obok JSON)";
-const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
-requireFile(USAGE, listPath);
+const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1], files: true });
 const deckDir = path.dirname(path.resolve(listPath));
 const outDir = path.resolve(values.out ?? path.join(deckDir, "screens"));
 // src w wypisywanym HTML: względem katalogu decku (index.html obok photos.json), zgodnie z --out.

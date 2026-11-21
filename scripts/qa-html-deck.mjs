@@ -10,11 +10,10 @@
  * 2 = złe wywołanie, także zły --viewports (scripts/cli.mjs), przed uruchomieniem przeglądarki.
  * Wymaga: npm install && npx playwright install chromium
  */
-import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { parseCli, requireFile, usageError } from './cli.mjs';
+import { launchChromium, parseCli, usageError } from './cli.mjs';
 import { NAV, QA_VIEWPORTS } from './constants.mjs';
 
 const DEFAULT_VIEWPORTS = QA_VIEWPORTS.map(([w, h]) => `${w}x${h}`).join(',');
@@ -26,8 +25,8 @@ const { values, positionals: [input] } = parseCli({
   usage: USAGE,
   options: { out: { type: 'string' }, viewports: { type: 'string' } },
   positionals: [1, 1],
+  files: true,
 });
-requireFile(USAGE, input);
 const viewports = (values.viewports ?? DEFAULT_VIEWPORTS).split(',').map((s) => s.trim()).map((s) => {
   const m = s.match(/^(\d+)x(\d+)$/);
   const [width, height] = m ? [Number(m[1]), Number(m[2])] : [0, 0];
@@ -38,7 +37,7 @@ const htmlPath = path.resolve(input);
 const outDir = path.resolve(values.out ?? path.join(path.dirname(htmlPath), 'qa'));
 await mkdir(outDir, { recursive: true });
 
-const browser = await chromium.launch({ headless: true });
+const browser = await launchChromium();
 const report = { file: htmlPath, viewports: [], errors: [] };
 try {
   for (const viewport of viewports) {

@@ -19,21 +19,19 @@
  * hide (selektory ukrywane przez CSS, np. banery), waitFor (selektor), scrollY (px), delay (ms) – opcjonalne.
  * Wymaga: npm install && npx playwright install chromium (package.json)
  */
-import { chromium } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import { parseCli, requireFile, usageError } from "./cli.mjs";
+import { launchChromium, parseCli, usageError } from "./cli.mjs";
 import { DEVICE_SCALE, FRAMES, JPEG_QUALITY } from "./constants.mjs";
 
 const USAGE = "node scripts/screenshots.mjs screens.json [--out katalog]  (domyślnie screens/ obok JSON)";
-const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
-requireFile(USAGE, listPath);
+const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1], files: true });
 let list;
 try { list = JSON.parse(await readFile(listPath, "utf8")); } catch (error) { usageError(USAGE, `${listPath} nie jest poprawnym JSON: ${error.message}`); }
 if (!Array.isArray(list)) usageError(USAGE, `${listPath} ma zawierać listę (tablicę JSON)`);
 const outDir = path.resolve(values.out ?? path.join(path.dirname(listPath), "screens"));
 await mkdir(outDir, { recursive: true });
-const browser = await chromium.launch({ headless: true });
+const browser = await launchChromium();
 let failed = 0;
 
 for (const item of list) {

@@ -4,8 +4,14 @@
  *  - brak argumentu, nadmiarowy argument, nieznana opcja, opcja bez wartości, zła wartość
  *    albo brak pliku wejściowego: komunikat po polsku i kod 2, zanim skrypt uruchomi
  *    przeglądarkę albo cokolwiek zapisze,
- *  - -h / --help: sama instrukcja użycia, kod 0.
+ *  - -h / --help: sama instrukcja użycia, kod 0,
+ *  - brak Playwrighta albo przeglądarki Chromium (launchChromium): komunikat z poleceniem
+ *    instalacji i kod 1, bez nieobsłużonego wyjątku.
  * Kod 1 oznacza, że skrypt zadziałał i znalazł problem; kod 0, że problemów nie ma.
+ *
+ * Start skryptu z przeglądarką:
+ *   const { values, positionals } = parseCli({ usage, options, positionals: [1, 1], files: true });
+ *   const browser = await launchChromium();
  */
 import { parseArgs } from "node:util";
 import { statSync } from "node:fs";
@@ -27,10 +33,12 @@ function describe(error) {
 }
 
 /**
- * @param {{ usage: string, options?: Record<string, {type: "string" | "boolean"}>, positionals?: [number, number] }} spec
+ * Jedna funkcja na argumenty wszystkich skryptów. files: true = każdy argument pozycyjny
+ * to plik wejściowy, który musi istnieć (inaczej kod 2).
+ * @param {{ usage: string, options?: Record<string, {type: "string" | "boolean"}>, positionals?: [number, number], files?: boolean }} spec
  * @returns {{ values: Record<string, string | boolean | undefined>, positionals: string[] }}
  */
-export function parseCli({ usage, options = {}, positionals: [min, max] = [0, 0] }) {
+export function parseCli({ usage, options = {}, positionals: [min, max] = [0, 0], files = false }) {
   let parsed;
   try {
     parsed = parseArgs({
@@ -53,7 +61,41 @@ export function parseCli({ usage, options = {}, positionals: [min, max] = [0, 0]
   }
   if (positionals.length < min) usageError(usage, "brak wymaganego argumentu");
   if (positionals.length > max) usageError(usage, `nadmiarowy argument: ${positionals.slice(max).join(" ")}`);
+  if (files) positionals.forEach((file) => requireFile(usage, file));
   return { values, positionals };
+}
+
+const INSTALL = "npm install && npx playwright install chromium";
+
+/** Komunikat o braku narzędzia i kod 1 (skrypt nie mógł wykonać sprawdzenia). */
+function toolError(message) {
+  console.error(`BŁĄD: ${message}`);
+  process.exit(1);
+}
+
+/**
+ * Uruchamia headless Chromium przez Playwright. Brak pakietu playwright albo brak pobranej
+ * przeglądarki kończy skrypt kodem 1 z poleceniem instalacji (README.md, „Szybki start”).
+ */
+export async function launchChromium(options = {}) {
+  let chromium;
+  try {
+    ({ chromium } = await import("playwright"));
+  } catch (error) {
+    if (error.code === "ERR_MODULE_NOT_FOUND" && /playwright/.test(error.message)) {
+      toolError(`brak pakietu Playwright. Zainstaluj w katalogu repozytorium: ${INSTALL}`);
+    }
+    toolError(`nie udało się wczytać Playwrighta: ${error.message.split("\n")[0]}`);
+  }
+  try {
+    return await chromium.launch({ headless: true, ...options });
+  } catch (error) {
+    const first = error.message.split("\n").find((line) => line.trim()) || error.message;
+    if (/Executable doesn't exist|playwright install/i.test(error.message)) {
+      toolError(`brak przeglądarki Chromium dla Playwrighta. Pobierz ją: npx playwright install chromium (${first.trim()})`);
+    }
+    toolError(`nie udało się uruchomić Chromium: ${first.trim()}`);
+  }
 }
 
 /** Plik wejściowy musi istnieć; inaczej kod 2. */

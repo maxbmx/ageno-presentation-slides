@@ -106,12 +106,12 @@ node -e "const {chromium}=require('playwright');(async()=>{const b=await chromiu
 
 ## Umowa CLI
 
-Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/cli.mjs`):
+Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/cli.mjs`: `parseCli` dla argumentów, `launchChromium` dla przeglądarki):
 
 - argumenty pozycyjne to pliki wejściowe, opcje mają postać `--nazwa wartość` (`--out`, `--viewports`, `--site`, `--mountains`); `-h` albo `--help` wypisuje użycie,
 - komunikaty są po polsku,
 - **kod 0**: skrypt zadziałał i nie znalazł problemu; sama uwaga `text-lint.mjs` też daje 0,
-- **kod 1**: skrypt zadziałał i znalazł problem (błąd siatki, błąd tekstu, nieudany smoke-test, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania),
+- **kod 1**: skrypt zadziałał i znalazł problem (błąd siatki, błąd tekstu, nieudany smoke-test, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania) albo nie mógł sprawdzić, bo brakuje Playwrighta lub przeglądarki Chromium (komunikat podaje polecenie instalacji),
 - **kod 2**: złe wywołanie: brak albo nadmiar argumentu, nieznana opcja, opcja bez wartości, zła wartość (np. `--viewports 1366x`), brak pliku wejściowego. Skrypt kończy się wtedy, zanim uruchomi przeglądarkę albo cokolwiek zapisze.
 
 | Skrypt | Wywołanie |

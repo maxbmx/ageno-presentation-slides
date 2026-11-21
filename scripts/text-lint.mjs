@@ -12,17 +12,15 @@
  * Kod wyjścia: 0 = brak błędów (same uwagi też), 1 = są błędy, 2 = złe wywołanie (scripts/cli.mjs).
  * Wymaga: npm install && npx playwright install chromium (package.json)
  */
-import { chromium } from "playwright";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseCli, requireFile } from "./cli.mjs";
+import { launchChromium, parseCli } from "./cli.mjs";
 import { CANVAS } from "./constants.mjs";
 
 const USAGE = "node scripts/text-lint.mjs prezentacja.html";
-const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1] });
-requireFile(USAGE, input);
+const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1], files: true });
 
-const browser = await chromium.launch({ headless: true });
+const browser = await launchChromium();
 const page = await browser.newPage({ viewport: { width: CANVAS.width, height: CANVAS.height } });
 await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 
