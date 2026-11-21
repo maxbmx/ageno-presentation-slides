@@ -30,7 +30,7 @@ dist/2026-11-16-klient-temat.html   jeden plik do wysłania
 
 ## Szybki start
 
-Node 18 lub nowszy. Raz, w katalogu repozytorium, dla `screenshots.mjs`, `grid-audit.mjs`, `text-lint.mjs` i `qa-html-deck.mjs`:
+Node 18 lub nowszy. Raz, w katalogu repozytorium, dla `screenshots.mjs`, `grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs` i `pdf.mjs`:
 
 ```bash
 npm install && npx playwright install chromium
@@ -115,7 +115,7 @@ Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/
 - argumenty pozycyjne to pliki wejściowe, opcje mają postać `--nazwa wartość` (`--out`, `--viewports`, `--site`, `--mountains`); `-h` albo `--help` wypisuje użycie,
 - komunikaty są po polsku,
 - **kod 0**: skrypt zadziałał i nie znalazł problemu; sama uwaga `text-lint.mjs` też daje 0,
-- **kod 1**: skrypt zadziałał i znalazł problem (błąd siatki, błąd tekstu, nieudany smoke-test, niezgodny PDF, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania) albo nie mógł sprawdzić, bo brakuje Playwrighta lub przeglądarki Chromium (komunikat podaje polecenie instalacji),
+- **kod 1**: skrypt zadziałał i znalazł problem (plik bez slajdów `[data-slide]`, błąd siatki, błąd tekstu, nieudany smoke-test, niezgodny PDF, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania) albo nie mógł sprawdzić, bo brakuje Playwrighta lub przeglądarki Chromium (komunikat podaje polecenie instalacji),
 - **kod 2**: złe wywołanie: brak albo nadmiar argumentu, nieznana opcja, opcja bez wartości, zła wartość (np. `--viewports 1366x`), brak pliku wejściowego. Skrypt kończy się wtedy, zanim uruchomi przeglądarkę albo cokolwiek zapisze.
 
 | Skrypt | Wywołanie |

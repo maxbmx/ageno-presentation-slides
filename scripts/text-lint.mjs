@@ -9,7 +9,7 @@
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
  * Użycie: node scripts/text-lint.mjs prezentacja.html
- * Kod wyjścia: 0 = brak błędów (same uwagi też), 1 = są błędy, 2 = złe wywołanie (scripts/cli.mjs).
+ * Kod wyjścia: 0 = brak błędów (same uwagi też), 1 = są błędy albo brak slajdów [data-slide], 2 = złe wywołanie (scripts/cli.mjs).
  * Wymaga: npm install && npx playwright install chromium (package.json)
  */
 import path from "node:path";
@@ -56,7 +56,9 @@ const rules = [
   ["7", "błąd", /nie tylko\b.*\bale/iu, "„nie tylko X, ale Y”"],
   ["10", "uwaga", /(?<![\p{L}\p{N}])od [^.,]{1,40}? po /iu, "„od X po Y”: czy to prawdziwa skala?"],
   ["11", "błąd", /—/u, "pauza (em dash)"],
-  ["11", "błąd", /(?<![\p{N}]) [–-] |(?<![\p{N}]) [–-]$|^[–-] /u, "myślnik zamiast kropki lub przecinka"],
+  // Wyjątek tylko dla półpauzy w zakresie liczba – liczba (2026-10-01 – 2026-10-31, 10 – 20 osób);
+  // dywiz ze spacjami i półpauza przed słowem („Krok 1 - analiza”, „W 2026 – start”) to błąd.
+  ["11", "błąd", /(?<!\p{N}) – | - |(?<=\p{N}) – (?!\p{N})| [–-]$|^[–-] /u, "myślnik zamiast kropki lub przecinka"],
   ["11", "błąd", /[()]/u, "nawias"],
   ["12", "błąd", /:/u, "dwukropek w tytule lub nagłówku", true],
   ["16", "błąd", /\p{Extended_Pictographic}/u, "emoji"],
@@ -74,6 +76,11 @@ const rules = [
   ["daty", "błąd", word("(?:styczeń|stycznia|luty|lutego|marzec|marca|kwiecień|kwietnia|maj|maja|czerwiec|czerwca|lipiec|lipca|sierpień|sierpnia|wrzesień|września|październik|października|listopad|listopada|grudzień|grudnia|styczniu|lutym|marcu|kwietniu|maju|czerwcu|lipcu|sierpniu|wrześniu|październiku|listopadzie|grudniu) \\d{4}"), "miesiąc słownie zamiast YYYY-MM-DD"],
 ];
 const HEDGES = /(?<![\p{L}])(może|prawdopodobnie|potencjalnie|raczej|ewentualnie|być może|niekiedy)(?![\p{L}])/giu;
+
+if (!slides.length) {
+  console.error("BŁĄD: brak slajdów [data-slide] w pliku; nie ma czego sprawdzić (kontrakt DOM: references/nawigacja.md).");
+  process.exit(1);
+}
 
 let errors = 0;
 let warnings = 0;

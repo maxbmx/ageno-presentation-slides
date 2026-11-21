@@ -18,7 +18,7 @@
  * X liczony od lewej krawędzi kontenera (112), Y od góry slajdu.
  *
  * Użycie: node scripts/grid-audit.mjs prezentacja.html
- * Kod wyjścia: 0 = wszystkie slajdy OK, 1 = błąd siatki, 2 = złe wywołanie (scripts/cli.mjs).
+ * Kod wyjścia: 0 = wszystkie slajdy OK, 1 = błąd siatki albo brak slajdów [data-slide], 2 = złe wywołanie (scripts/cli.mjs).
  * Wymaga: npm install && npx playwright install chromium (package.json)
  */
 import path from "node:path";
@@ -119,6 +119,10 @@ const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
 }, { CONTAINER, FOOTER, GRID });
 
 await browser.close();
+if (!result.length) {
+  console.error("BŁĄD: brak slajdów [data-slide] w pliku; nie ma czego sprawdzić (kontrakt DOM: references/nawigacja.md).");
+  process.exit(1);
+}
 let failed = 0;
 for (const { slide, problems } of result) {
   if (problems.length) {

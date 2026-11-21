@@ -40,10 +40,45 @@ const slug = (s) =>
   s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ł/g, "l")
     .replace(/(logotyp|logo)/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "logo";
 
-async function download(url, file) {
+// Typ obrazu z nagłówka Content-Type → rozszerzenie pliku (te same typy, które osadza inline-assets.mjs).
+const IMAGE_EXT = {
+  "image/svg+xml": ".svg", "image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp",
+  "image/gif": ".gif", "image/avif": ".avif",
+};
+
+/** Rozszerzenie dla Content-Type obrazu albo null (HTML, nieznany typ, brak nagłówka). */
+export function imageExtension(contentType) {
+  const type = (contentType || "").split(";")[0].trim().toLowerCase();
+  return IMAGE_EXT[type] ?? null;
+}
+
+/**
+ * Pobiera obraz bajt w bajt. Sukces tylko przy HTTP 2xx i Content-Type z IMAGE_EXT; HTML
+ * (np. strona bramki z kodem 200) i inne typy są błędem, plik nie powstaje.
+ * @param {string} url
+ * @param {string} fileBase ścieżka bez rozszerzenia
+ * @param {string} [expectExt] wymagane rozszerzenie (plik o stałej nazwie, np. ".svg"); bez niego z Content-Type
+ * @returns {Promise<string>} ścieżka zapisanego pliku
+ */
+export async function downloadImage(url, fileBase, expectExt) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+  const type = res.headers.get("content-type") || "";
+  if (!res.ok) {
+    await res.body?.cancel();
+    throw new Error(`HTTP ${res.status}: ${url}`);
+  }
+  const ext = imageExtension(type);
+  if (!ext) {
+    await res.body?.cancel();
+    throw new Error(`odpowiedź nie jest obrazem (Content-Type: ${type || "brak"})${/text\/html/i.test(type) ? ", pewnie strona bramki albo błędu" : ""}: ${url}`);
+  }
+  if (expectExt && ext !== expectExt) {
+    await res.body?.cancel();
+    throw new Error(`oczekiwany plik ${expectExt}, serwer zwrócił ${type}: ${url}`);
+  }
+  const file = `${fileBase}${ext}`;
   await writeFile(file, Buffer.from(await res.arrayBuffer()));
+  return file;
 }
 
 // Adres obrazka z <img>: src, leniwe ładowanie (data-src, data-lazy-src) albo pierwszy wpis srcset.
@@ -70,7 +105,7 @@ async function main() {
   let failed = 0;
 
   try {
-    await download(MOUNTAINS, path.join(OUT, "ageno-mountains.svg"));
+    await downloadImage(MOUNTAINS, path.join(OUT, "ageno-mountains"), ".svg");
     console.log(`OK  góry → ${path.join(OUT, "ageno-mountains.svg")}`);
   } catch (error) {
     failed += 1;
@@ -80,7 +115,8 @@ async function main() {
   await mkdir(path.join(OUT, "people"), { recursive: true });
   for (const person of PEOPLE) {
     try {
-      await download(person.url, path.join(OUT, "people", person.file));
+      const ext = path.extname(person.file);
+      await downloadImage(person.url, path.join(OUT, "people", path.basename(person.file, ext)), ext === ".jpeg" ? ".jpg" : ext);
       console.log(`OK  people/${person.file}`);
     } catch (error) {
       failed += 1;
@@ -110,10 +146,12 @@ async function main() {
   }
 
   for (const [i, img] of images.entries()) {
-    const ext = path.extname(new URL(img.url).pathname) || ".svg";
-    const file = `logos/${String(i + 1).padStart(2, "0")}-${slug(img.alt || path.basename(img.url, ext))}${ext}`;
+    const urlExt = path.extname(new URL(img.url).pathname);
+    const base = `logos/${String(i + 1).padStart(2, "0")}-${slug(img.alt || path.basename(new URL(img.url).pathname, urlExt))}`;
     try {
-      await download(img.url, path.join(OUT, file));
+      // Rozszerzenie z Content-Type, nie z adresu (adres bez rozszerzenia albo z innym niż typ pliku).
+      const saved = await downloadImage(img.url, path.join(OUT, base));
+      const file = path.relative(OUT, saved).split(path.sep).join("/");
       list.push({ file, alt: img.alt, url: img.url });
       console.log(`OK  ${file}  (${img.alt})`);
     } catch (error) {

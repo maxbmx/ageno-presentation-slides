@@ -1248,7 +1248,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 
   // Sierotki (references/redakcja.md): twarda spacja (U+00A0) w tekście slajdów, żeby
   // jednoliterowe słowa, liczby z jednostkami, grupy cyfr, skróty i myślnik zakresu dat
-  // nie zostawały na końcu ani na początku wiersza. Działa przy każdym otwarciu i przed drukiem.
+  // nie zostawały na końcu ani na początku wiersza. Działa raz, przy otwarciu pliku; poprawiony
+  // tekst zostaje w DOM, więc druk i PDF dostają te same twarde spacje.
   const NB = "\u00A0";
   const ORPHAN_RULES = [
     [/(?<=^|[\s(\["'„])([aiouwzAIOUWZ])\s+/gu, `$1${NB}`],                         // a, i, o, u, w, z

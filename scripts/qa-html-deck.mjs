@@ -45,7 +45,12 @@ try {
     const page = await context.newPage();
     const consoleErrors = [];
     page.on('pageerror', (error) => consoleErrors.push(error.message));
-    page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+    // Błąd wczytania zasobu (np. net::ERR_FILE_NOT_FOUND) dostaje adres brakującego pliku.
+    page.on('console', (message) => {
+      if (message.type() !== 'error') return;
+      const url = message.location()?.url;
+      consoleErrors.push(url && !message.text().includes(url) ? `${message.text()} (${decodeURI(url)})` : message.text());
+    });
     await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts?.ready);
     await page.waitForTimeout(250);
