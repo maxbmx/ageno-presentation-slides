@@ -8,6 +8,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "test": "node --test test/*.test.mjs",
     "check": "node -e \"for (const f of require('fs').readdirSync('scripts').filter((f) => f.endsWith('.mjs'))) require('child_process').execFileSync(process.execPath, ['--check', 'scripts/' + f], { stdio: 'inherit' })\"",
     "verify": "node scripts/grid-audit.mjs assets/template.html && node scripts/text-lint.mjs assets/template.html",
     "assets": "node scripts/ageno-assets.mjs",

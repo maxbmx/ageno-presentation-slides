@@ -47,6 +47,7 @@ async function download(url, file) {
 }
 
 // Adres obrazka z <img>: src, leniwe ładowanie (data-src, data-lazy-src) albo pierwszy wpis srcset.
+// Eksport zostaje: parser jest testowany w test/scripts.test.mjs (strona 403, sekcja klientów).
 export function imagesInSection(html, base) {
   const start = html.search(SECTION_START);
   const endRel = start >= 0 ? html.slice(start).search(SECTION_END) : -1;

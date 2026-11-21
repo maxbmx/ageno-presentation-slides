@@ -9,6 +9,7 @@ Instrukcja dla agenta (`SKILL.md`) i skrypty, które składają prezentację Age
 - `assets/ageno-logo.svg` — logo, w szablonie już jako `<symbol id="ageno-logo">`.
 - `references/` — `ageno.md`, `tresc.md`, `redakcja.md`, `siatka.md`, `uklady.md`, `screeny.md`, `zdjecia.md`, `nawigacja.md`, `qa.md`.
 - `scripts/` — polecenia poniżej; `constants.mjs` (wspólne stałe) i `cli.mjs` (umowa CLI) to moduły pomocnicze.
+- `test/` — testy skryptów (`npm test`, bez dodatkowego runnera).
 - `package.json` — Playwright jako devDependency, skróty `npm run`; `.gitignore` — `node_modules`, `decks/`, `dist/`, katalogi QA.
 
 Katalog prezentacji jest konwencją ze `SKILL.md`. Skrypty czytają tylko pliki podane w poleceniu. `brief.md` nie jest parsowany.
@@ -41,6 +42,7 @@ Skróty `npm run` (argumenty po `--`, np. `npm run grid -- dist/plik.html`):
 
 | Skrót | Polecenie |
 | --- | --- |
+| `npm test` | testy `test/*.test.mjs` przez `node --test`: parser logotypów, odczyt PDF, kody `inline-assets.mjs`, reguły lintera (test lintera jest pomijany bez Playwrighta) |
 | `npm run check` | `node --check` wszystkich skryptów |
 | `npm run verify` | `grid-audit.mjs` i `text-lint.mjs` na `assets/template.html` (oczekiwane: kod 0) |
 | `npm run assets`, `screens`, `photos`, `inline` | `ageno-assets.mjs`, `screenshots.mjs`, `photos.mjs`, `inline-assets.mjs` |
