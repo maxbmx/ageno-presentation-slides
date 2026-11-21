@@ -5,6 +5,7 @@
  * deviceScaleFactor 2 daje ostry obraz na dużym ekranie.
  *
  * Użycie: node scripts/screenshots.mjs screens.json [--out ./screens]
+ * Kod wyjścia: 0 = wszystkie zrzuty, 1 = któryś zrzut się nie udał, 2 = złe wywołanie (scripts/cli.mjs).
  *
  * screens.json:
  * [
@@ -20,6 +21,7 @@
 import { chromium } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { parseCli, requireFile, usageError } from "./cli.mjs";
 
 const FRAMES = {
   full:   { frame: [1312, 608], viewport: [1312, 608], mobile: false },
@@ -28,17 +30,14 @@ const FRAMES = {
   mobile: { frame: [320, 640],  viewport: [400, 800],  mobile: true },
 };
 
-const args = process.argv.slice(2);
-const listPath = args.find((a) => !a.startsWith("--"));
-if (!listPath) {
-  console.error("Użycie: node scripts/screenshots.mjs screens.json [--out ./screens]");
-  process.exit(2);
-}
-const outIdx = args.indexOf("--out");
-const outDir = path.resolve(outIdx >= 0 ? args[outIdx + 1] : path.join(path.dirname(listPath), "screens"));
+const USAGE = "node scripts/screenshots.mjs screens.json [--out katalog]  (domyślnie screens/ obok JSON)";
+const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
+requireFile(USAGE, listPath);
+let list;
+try { list = JSON.parse(await readFile(listPath, "utf8")); } catch (error) { usageError(USAGE, `${listPath} nie jest poprawnym JSON: ${error.message}`); }
+if (!Array.isArray(list)) usageError(USAGE, `${listPath} ma zawierać listę (tablicę JSON)`);
+const outDir = path.resolve(values.out ?? path.join(path.dirname(listPath), "screens"));
 await mkdir(outDir, { recursive: true });
-
-const list = JSON.parse(await readFile(listPath, "utf8"));
 const browser = await chromium.launch({ headless: true });
 let failed = 0;
 

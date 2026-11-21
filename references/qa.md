@@ -20,6 +20,9 @@ node scripts/qa-html-deck.mjs dist/prezentacja.html --out decks/…/qa
 - `qa-html-deck.mjs`: 1600×900, 1366×768, 1280×720, 1280×800: przepełnienia, nawigacja,
   autoukrywanie strzałek, krańce, błędy konsoli, zrzut każdego slajdu.
 
+Kod 0 = bez problemu, 1 = problem do poprawienia, 2 = złe wywołanie (popraw polecenie, nie deck).
+Umowa CLI: `README.md`.
+
 PDF (ten sam wynik co „Zapisz jako PDF” w Chrome):
 
 ```bash
@@ -88,6 +91,7 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 ## 7. Regresja i przekazanie
 
 - [ ] Po każdej poprawce: ten slajd i sąsiednie; po ostatniej zmianie: całość od nowa.
-- [ ] Plik działa otwarty lokalnie, bez sieci (`inline-assets.mjs` bez ostrzeżeń).
+- [ ] Plik działa otwarty lokalnie, bez sieci (`inline-assets.mjs` zakończony kodem 0: brak obrazów
+      `http(s)`, nieznanych typów, brakujących plików i przekroczenia 15 MB).
 - [ ] Rozmiar poniżej 15 MB.
 - [ ] Brak błędów w konsoli.

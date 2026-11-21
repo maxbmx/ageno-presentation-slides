@@ -66,10 +66,10 @@ Bez klucza API. Skrypt czeka na przekierowanie unsplash.com na plik zdjęcia, ka
 Jeden plik do wysłania:
 
 ```bash
-node scripts/inline-assets.mjs decks/2026-11-16-klient-temat/index.html dist/2026-11-16-klient-temat.html
+node scripts/inline-assets.mjs decks/2026-11-16-klient-temat/index.html --out dist/2026-11-16-klient-temat.html
 ```
 
-Lokalne obrazy zamienia na data URI. Adres `http(s)` zostaje, skrypt wypisuje ostrzeżenie i kończy się kodem 0. Brak lokalnego pliku daje kod 1. Powyżej 15 MB jest ostrzeżenie, kod zostaje 0.
+Lokalne obrazy zamienia na data URI. Kod 1 (plik zapisany, ale nie do wysłania) przy: obrazie `http(s)`, nieznanym typie obrazu, braku lokalnego pliku, zewnętrznym arkuszu, skrypcie albo `@import` i rozmiarze powyżej 15 MB. Każdy przypadek ma osobny komunikat `BŁĄD:`. Do wysłania nadaje się tylko plik z kodem 0.
 
 W otwartym pliku strzałki przełączają slajdy, `F` włącza pełny ekran, `G` albo adres `#siatka` pokazuje kratkę. PDF: Chrome lub Edge, Drukuj, Zapisz jako PDF, strona 16:9, jeden slajd na stronę (`references/nawigacja.md`).
 
@@ -83,4 +83,24 @@ node scripts/qa-html-deck.mjs dist/2026-11-16-klient-temat.html --out decks/2026
 
 - `grid-audit.mjs` otwiera plik w oknie 1536 × 864 i sprawdza `data-grid`, wiersze tekstu, interlinię 32 lub 64 px (poza `strong` i stopką), granice kontenera i stopkę na y = 800. Kod 1, gdy slajd nie pasuje. Audyt `assets/template.html` kończy się kodem 0, 24 slajdy OK.
 - `text-lint.mjs` czyta widoczny tekst slajdów według `references/redakcja.md`. Kod 1 jest tylko przy błędzie. Sama uwaga zostawia kod 0. Szablon: 0 błędów i 0 uwag. Czego skrypt nie sprawdza do końca, jest w nagłówku `scripts/text-lint.mjs` i na liście w `references/qa.md`.
-- `qa-html-deck.mjs` sprawdza 1600×900, 1366×768, 1280×720 i 1280×800: przepełnienie, strzałki (w tym krańce i autoukrywanie) oraz błędy konsoli. Zapisuje zrzut każdego slajdu w każdym oknie i `qa-report.json`. Kod 1, gdy któryś z tych punktów nie przejdzie. Sam szablon, bez `ageno-mountains.svg` i `people/maksymilian-sleziak.png` obok pliku, kończy się kodem 1 przez `ERR_FILE_NOT_FOUND` w konsoli. Po złożeniu tych obrazów przez `inline-assets.mjs` ten sam szablon przechodzi kontrolę z kodem 0.
+- `qa-html-deck.mjs` sprawdza 1600×900, 1366×768, 1280×720 i 1280×800 (inne okna: `--viewports 1366x768,1920x1080`): przepełnienie, strzałki (w tym krańce i autoukrywanie) oraz błędy konsoli. Zapisuje zrzut każdego slajdu w każdym oknie i `qa-report.json` w katalogu `--out` (domyślnie `qa/` obok pliku HTML). Kod 1, gdy któryś z tych punktów nie przejdzie. Sam szablon, bez `ageno-mountains.svg` i `people/maksymilian-sleziak.png` obok pliku, kończy się kodem 1 przez `ERR_FILE_NOT_FOUND` w konsoli. Po złożeniu tych obrazów przez `inline-assets.mjs` ten sam szablon przechodzi kontrolę z kodem 0.
+
+## Umowa CLI
+
+Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/cli.mjs`):
+
+- argumenty pozycyjne to pliki wejściowe, opcje mają postać `--nazwa wartość` (`--out`, `--viewports`, `--site`, `--mountains`); `-h` albo `--help` wypisuje użycie,
+- komunikaty są po polsku,
+- **kod 0**: skrypt zadziałał i nie znalazł problemu; sama uwaga `text-lint.mjs` też daje 0,
+- **kod 1**: skrypt zadziałał i znalazł problem (błąd siatki, błąd tekstu, nieudany smoke-test, nieudane pobranie, plik z `inline-assets.mjs`, który nie nadaje się do wysłania),
+- **kod 2**: złe wywołanie: brak albo nadmiar argumentu, nieznana opcja, opcja bez wartości, zła wartość (np. `--viewports 1366x`), brak pliku wejściowego. Skrypt kończy się wtedy, zanim uruchomi przeglądarkę albo cokolwiek zapisze.
+
+| Skrypt | Wywołanie |
+| --- | --- |
+| `ageno-assets.mjs` | `[--out katalog] [--site url] [--mountains url]` |
+| `screenshots.mjs` | `screens.json [--out katalog]` |
+| `photos.mjs` | `photos.json [--out katalog]`; `src` w wypisanym HTML jest względem katalogu `photos.json` |
+| `inline-assets.mjs` | `wejscie.html --out wyjscie.html` |
+| `grid-audit.mjs` | `prezentacja.html` |
+| `text-lint.mjs` | `prezentacja.html` |
+| `qa-html-deck.mjs` | `prezentacja.html [--out katalog] [--viewports SZERxWYS,…]` |

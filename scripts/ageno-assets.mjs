@@ -11,6 +11,7 @@
  * Użycie: node scripts/ageno-assets.mjs [--out decks/…/] [--site https://ageno.pl/]
  *         [--mountains <adres svg>]
  * Bez zależności (Node 18+). Wymaga dostępu do ageno.pl.
+ * Kod wyjścia: 0 = wszystko pobrane, 1 = coś się nie udało, 2 = złe wywołanie (scripts/cli.mjs).
  *
  * Status HTTP strony głównej jest sprawdzany przed parsowaniem: przy statusie innym niż 200
  * (np. 403 z bramki Cloudflare „Just a moment…”) body nie jest czytane, a komunikat podaje status.
@@ -20,15 +21,16 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { parseCli, requireUrl } from "./cli.mjs";
 
-const args = process.argv.slice(2);
-const opt = (name, fallback) => {
-  const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : fallback;
-};
-const SITE = opt("--site", "https://ageno.pl/");
-const MOUNTAINS = opt("--mountains", "https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg");
-const OUT = path.resolve(opt("--out", "."));
+const USAGE = "node scripts/ageno-assets.mjs [--out katalog] [--site https://ageno.pl/] [--mountains <adres svg>]";
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+const { values } = isMain
+  ? parseCli({ usage: USAGE, options: { out: { type: "string" }, site: { type: "string" }, mountains: { type: "string" } } })
+  : { values: {} };
+const SITE = isMain ? requireUrl(USAGE, "site", values.site ?? "https://ageno.pl/") : "https://ageno.pl/";
+const MOUNTAINS = isMain ? requireUrl(USAGE, "mountains", values.mountains ?? "https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg") : "";
+const OUT = path.resolve(values.out ?? ".");
 // Osoby na slajd kontaktowy: plik = slug imienia i nazwiska, jak w szablonie (people/<slug>.png).
 const PEOPLE = [
   { file: "maksymilian-sleziak.png", url: "https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png" },
@@ -131,4 +133,4 @@ async function main() {
   process.exit(failed ? 1 : 0);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) await main();
+if (isMain) await main();

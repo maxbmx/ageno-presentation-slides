@@ -47,7 +47,7 @@ z błędną tezą jest gorszy niż brak decku.
 | `scripts/screenshots.mjs` | Zrzuty Playwright w proporcjach ramek | Krok 4 |
 | `scripts/ageno-assets.mjs` | Pobiera z ageno.pl góry (slajd tytułowy i kontaktowy), logotypy klientów i zdjęcia osób (bez zmian w plikach) | Krok 4 |
 | `scripts/photos.mjs` | Pobiera wybrane zdjęcia z Unsplash w kadrze 752 × 864 (2×) | Krok 4 |
-| `scripts/inline-assets.mjs` | Osadza lokalne obrazy, pilnuje 15 MB | Krok 5 |
+| `scripts/inline-assets.mjs` | Osadza lokalne obrazy; kod 1 przy obrazie `http(s)`, nieznanym typie, braku pliku i ponad 15 MB | Krok 5 |
 | `scripts/grid-audit.mjs` | Audyt siatki każdego slajdu | Krok 6 |
 | `scripts/text-lint.mjs` | Kontrola tekstu slajdów według `redakcja.md` | Krok 6 |
 | `scripts/qa-html-deck.mjs` | Nawigacja, przepełnienia, zrzuty w 4 rozdzielczościach | Krok 6 |
@@ -110,7 +110,9 @@ tylko w tym układzie, zawsze z podpisem `@autor`. Szczegóły: `references/zdje
    (`--c-text`, `--c-accent`, `--c-on-accent`, `--c-muted`). Tła i geometrii nie ruszaj.
 6. Uzupełnij `<title>` i `aria-label` prezentacji. Zredaguj wszystkie teksty według
    `references/redakcja.md`.
-7. Złóż jeden plik: `node scripts/inline-assets.mjs decks/…/index.html dist/YYYY-MM-DD-klient-temat.html`.
+7. Złóż jeden plik: `node scripts/inline-assets.mjs decks/…/index.html --out dist/YYYY-MM-DD-klient-temat.html`.
+   Do wysłania nadaje się tylko wynik z kodem 0. Kody wyjścia wszystkich skryptów (0 bez problemu,
+   1 problem znaleziony, 2 złe wywołanie): `README.md`, sekcja „Umowa CLI”.
 
 ### 6. Kontrola
 

@@ -54,7 +54,7 @@ Gdy użytkownik dostarcza gotowe pliki:
 ## Osadzanie
 
 - W trakcie pracy: `<img src="screens/home.jpg" alt="…">` w `index.html` decku.
-- Na koniec `scripts/inline-assets.mjs` zamienia lokalne obrazy na data URI i pilnuje limitu 15 MB.
+- Na koniec `scripts/inline-assets.mjs` zamienia lokalne obrazy na data URI; plik ponad 15 MB kończy go kodem 1.
 - Za duży plik: mniej screenów, mniejsza jakość JPEG (75), ramka `half` zamiast `full`.
 
 ## Wygląd

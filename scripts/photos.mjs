@@ -5,6 +5,8 @@
  * Kadruje po stronie Unsplash do 1504 × 1728 px (2 × ramka 752 × 864) i zapisuje JPEG.
  *
  * Użycie: node scripts/photos.mjs photos.json [--out ./screens]
+ * src w wypisanym HTML jest liczony względem katalogu photos.json (tam leży index.html decku).
+ * Kod wyjścia: 0 = wszystkie zdjęcia, 1 = któreś się nie pobrało, 2 = złe wywołanie (scripts/cli.mjs).
  *
  * photos.json:
  * [
@@ -22,17 +24,17 @@
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { parseCli, requireFile, usageError } from "./cli.mjs";
 
 const W = 1504, H = 1728;
-const args = process.argv.slice(2);
-const listPath = args.find((a) => !a.startsWith("--"));
-if (!listPath) {
-  console.error("Użycie: node scripts/photos.mjs photos.json [--out ./screens]");
-  process.exit(2);
-}
-const outIdx = args.indexOf("--out");
-const outDir = path.resolve(outIdx >= 0 ? args[outIdx + 1] : path.join(path.dirname(listPath), "screens"));
-await mkdir(outDir, { recursive: true });
+const USAGE = "node scripts/photos.mjs photos.json [--out katalog]  (domyślnie screens/ obok JSON)";
+const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1] });
+requireFile(USAGE, listPath);
+const deckDir = path.dirname(path.resolve(listPath));
+const outDir = path.resolve(values.out ?? path.join(deckDir, "screens"));
+// src w wypisywanym HTML: względem katalogu decku (index.html obok photos.json), zgodnie z --out.
+const srcDir = path.relative(deckDir, outDir).split(path.sep).join("/");
+const srcFor = (name) => `${srcDir ? `${srcDir}/` : ""}${name}.jpg`;
 
 // Id zdjęcia Unsplash ma 11 znaków i kończy ostatni segment adresu (/photos/<slug>-<id>).
 const photoId = (url) => {
@@ -48,7 +50,10 @@ const isHtml = (res) => /text\/html/i.test(res.headers.get("content-type") || ""
 const BLOCKED = "pobieranie zablokowane przez bramkę anty-botową Unsplash; pliku nie zapisano. "
   + "Zostaw zaślepkę i przekaż użytkownikowi photos.json z poleceniem do uruchomienia u siebie (references/zdjecia.md)";
 
-const list = JSON.parse(await readFile(listPath, "utf8"));
+let list;
+try { list = JSON.parse(await readFile(listPath, "utf8")); } catch (error) { usageError(USAGE, `${listPath} nie jest poprawnym JSON: ${error.message}`); }
+if (!Array.isArray(list)) usageError(USAGE, `${listPath} ma zawierać listę (tablicę JSON)`);
+await mkdir(outDir, { recursive: true });
 let failed = 0;
 for (const item of list) {
   const missing = ["name", "url", "author", "alt"].filter((k) => !item[k]);
@@ -94,7 +99,7 @@ for (const item of list) {
     const handle = item.author.replace(/^@/, "");
     console.log(`OK  ${item.name} → ${file}`);
     console.log(`    <figure class="photo" data-grid="32y" style="--focus: ${item.focus ?? "center"};">
-      <img src="screens/${item.name}.jpg" alt="${item.alt}">
+      <img src="${srcFor(item.name)}" alt="${item.alt}">
       <figcaption class="photo-credit"><a href="https://unsplash.com/@${handle}">@${handle}</a></figcaption>
     </figure>`);
   } catch (error) {

@@ -9,18 +9,17 @@
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
  * Użycie: node scripts/text-lint.mjs prezentacja.html
- * Kod wyjścia 1, gdy są błędy.
+ * Kod wyjścia: 0 = brak błędów (same uwagi też), 1 = są błędy, 2 = złe wywołanie (scripts/cli.mjs).
  * Wymaga: npm install --no-save playwright && npx playwright install chromium
  */
 import { chromium } from "playwright";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { parseCli, requireFile } from "./cli.mjs";
 
-const input = process.argv[2];
-if (!input) {
-  console.error("Użycie: node scripts/text-lint.mjs prezentacja.html");
-  process.exit(2);
-}
+const USAGE = "node scripts/text-lint.mjs prezentacja.html";
+const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1] });
+requireFile(USAGE, input);
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1536, height: 864 } });
