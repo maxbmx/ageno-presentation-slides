@@ -52,7 +52,8 @@ z błędną tezą jest gorszy niż brak decku.
 | `scripts/text-lint.mjs` | Kontrola tekstu slajdów według `redakcja.md` | Krok 6 |
 | `scripts/qa-html-deck.mjs` | Nawigacja, przepełnienia, zrzuty w 4 rozdzielczościach | Krok 6 |
 
-Skrypty wymagają Node i Playwrighta (`npm install --no-save playwright && npx playwright install chromium`).
+Skrypty wymagają Node 18+; `screenshots.mjs`, `grid-audit.mjs`, `text-lint.mjs` i `qa-html-deck.mjs` także Playwrighta
+(raz: `npm install && npx playwright install chromium`, wersja w `package.json`).
 
 ## Workflow
 

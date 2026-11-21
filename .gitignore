@@ -1,0 +1,10 @@
+# Zależności (node_modules bywa symlinkiem, dlatego wzorzec bez ukośnika na końcu)
+node_modules
+
+# Prezentacje i wyniki pracy (nie należą do skilla)
+decks/
+dist/
+
+# Wyniki kontroli (qa-html-deck.mjs: domyślnie qa/ obok pliku; stary domyślny katalog)
+qa/
+qa-presentation/

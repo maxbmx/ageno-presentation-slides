@@ -16,7 +16,7 @@
  *
  * Pola: name, url, frame (full | wide | half | mobile) – wymagane;
  * hide (selektory ukrywane przez CSS, np. banery), waitFor (selektor), scrollY (px), delay (ms) – opcjonalne.
- * Wymaga: npm install --no-save playwright && npx playwright install chromium
+ * Wymaga: npm install && npx playwright install chromium (package.json)
  */
 import { chromium } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";

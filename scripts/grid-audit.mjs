@@ -18,7 +18,7 @@
  *
  * Użycie: node scripts/grid-audit.mjs prezentacja.html
  * Kod wyjścia: 0 = wszystkie slajdy OK, 1 = błąd siatki, 2 = złe wywołanie (scripts/cli.mjs).
- * Wymaga: npm install --no-save playwright && npx playwright install chromium
+ * Wymaga: npm install && npx playwright install chromium (package.json)
  */
 import { chromium } from "playwright";
 import path from "node:path";

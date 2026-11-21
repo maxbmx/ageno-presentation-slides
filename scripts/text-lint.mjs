@@ -10,7 +10,7 @@
  *
  * Użycie: node scripts/text-lint.mjs prezentacja.html
  * Kod wyjścia: 0 = brak błędów (same uwagi też), 1 = są błędy, 2 = złe wywołanie (scripts/cli.mjs).
- * Wymaga: npm install --no-save playwright && npx playwright install chromium
+ * Wymaga: npm install && npx playwright install chromium (package.json)
  */
 import { chromium } from "playwright";
 import path from "node:path";

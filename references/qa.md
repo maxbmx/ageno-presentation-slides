@@ -6,7 +6,7 @@ sprawdzono, jeśli tego nie zrobiono.
 ## 1. Automat
 
 ```bash
-npm install --no-save playwright && npx playwright install chromium   # raz
+npm install && npx playwright install chromium   # raz (wersja Playwrighta z package.json)
 node scripts/grid-audit.mjs dist/prezentacja.html
 node scripts/text-lint.mjs dist/prezentacja.html
 node scripts/qa-html-deck.mjs dist/prezentacja.html --out decks/…/qa

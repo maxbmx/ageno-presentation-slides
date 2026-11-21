@@ -8,7 +8,8 @@ Instrukcja dla agenta (`SKILL.md`) i skrypty, które składają prezentację Age
 - `assets/template.html` — start każdej prezentacji: 24 układy, style, nawigacja, druk do PDF.
 - `assets/ageno-logo.svg` — logo, w szablonie już jako `<symbol id="ageno-logo">`.
 - `references/` — `ageno.md`, `tresc.md`, `redakcja.md`, `siatka.md`, `uklady.md`, `screeny.md`, `zdjecia.md`, `nawigacja.md`, `qa.md`.
-- `scripts/` — polecenia poniżej. W repozytorium nie ma `package.json` ani `.gitignore`.
+- `scripts/` — polecenia poniżej; `constants.mjs` (wspólne stałe) i `cli.mjs` (umowa CLI) to moduły pomocnicze.
+- `package.json` — Playwright jako devDependency, skróty `npm run`; `.gitignore` — `node_modules`, `decks/`, `dist/`, katalogi QA.
 
 Katalog prezentacji jest konwencją ze `SKILL.md`. Skrypty czytają tylko pliki podane w poleceniu. `brief.md` nie jest parsowany.
 
@@ -29,10 +30,20 @@ dist/2026-11-16-klient-temat.html
 Node 18 lub nowszy. Raz, w katalogu repozytorium, dla `screenshots.mjs`, `grid-audit.mjs`, `text-lint.mjs` i `qa-html-deck.mjs`:
 
 ```bash
-npm install --no-save playwright && npx playwright install chromium
+npm install && npx playwright install chromium
 ```
 
-Polecenie tworzy `node_modules/` i nie zapisuje `package.json`. `ageno-assets.mjs`, `photos.mjs` i `inline-assets.mjs` nie potrzebują Playwrighta.
+`npm install` instaluje Playwrighta w wersji z `package.json` (`^1.65.1`) do `node_modules/`, drugie polecenie pobiera przeglądarkę. `ageno-assets.mjs`, `photos.mjs` i `inline-assets.mjs` nie potrzebują Playwrighta.
+
+Skróty `npm run` (argumenty po `--`, np. `npm run grid -- dist/plik.html`):
+
+| Skrót | Polecenie |
+| --- | --- |
+| `npm run check` | `node --check` wszystkich skryptów |
+| `npm run verify` | `grid-audit.mjs` i `text-lint.mjs` na `assets/template.html` (oczekiwane: kod 0) |
+| `npm run assets`, `screens`, `photos`, `inline` | `ageno-assets.mjs`, `screenshots.mjs`, `photos.mjs`, `inline-assets.mjs` |
+| `npm run grid`, `lint`, `qa` | `grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs` |
+| `npm run browsers` | `playwright install chromium` |
 
 ```bash
 mkdir -p decks/2026-11-16-klient-temat
