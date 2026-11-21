@@ -68,7 +68,7 @@ Screeny, gdy mają być w prezentacji. Ramki `full`, `wide`, `half`, `mobile` i 
 node scripts/screenshots.mjs decks/2026-11-16-klient-temat/screens.json
 ```
 
-Wynik to `screens/<name>.jpg` obok JSON, w podwójnej rozdzielczości viewportu ramki.
+Wynik to `screens/<name>.jpg` obok JSON (albo w katalogu `--out`), w podwójnej rozdzielczości viewportu ramki, JPEG o jakości 80.
 
 Zdjęcie górskie tylko w układzie „Zdjęcie + treść”. Wybór i kształt `photos.json`: `references/zdjecia.md`.
 
@@ -97,7 +97,7 @@ node scripts/qa-html-deck.mjs dist/2026-11-16-klient-temat.html --out decks/2026
 ```
 
 - `grid-audit.mjs` otwiera plik w oknie 1536 × 864 i sprawdza `data-grid`, wiersze tekstu, interlinię (wielokrotność 32 px, poza `strong` i stopką), granice kontenera (zgłasza każdy element poza kontenerem) i stopkę na y = 800, z tolerancją 0,1 px. Kod 1, gdy slajd nie pasuje. Audyt `assets/template.html` kończy się kodem 0, 24 slajdy OK.
-- `text-lint.mjs` czyta widoczny tekst slajdów według `references/redakcja.md`. Kod 1 jest tylko przy błędzie. Sama uwaga zostawia kod 0. Szablon: 0 błędów i 0 uwag. Czego skrypt nie sprawdza do końca, jest w nagłówku `scripts/text-lint.mjs` i na liście w `references/qa.md`.
+- `text-lint.mjs` czyta widoczny tekst slajdów według `references/redakcja.md`. Kod 1 jest tylko przy błędzie. Sama uwaga zostawia kod 0. Szablon: 0 błędów i 0 uwag. Które reguły sprawdza, a których nie: tabela w `references/redakcja.md`, sekcja „Kontrola automatyczna” (i nagłówek `scripts/text-lint.mjs`).
 - `qa-html-deck.mjs` sprawdza 1600×900, 1366×768, 1280×720 i 1280×800 (inne okna: `--viewports 1366x768,1920x1080`): przepełnienie, strzałki (w tym krańce i autoukrywanie) oraz błędy konsoli. Zapisuje zrzut każdego slajdu w każdym oknie i `qa-report.json` w katalogu `--out` (domyślnie `qa/` obok pliku HTML). Kod 1, gdy któryś z tych punktów nie przejdzie. Sam szablon, bez `ageno-mountains.svg` i `people/maksymilian-sleziak.png` obok pliku, kończy się kodem 1 przez `ERR_FILE_NOT_FOUND` w konsoli. Po złożeniu tych obrazów przez `inline-assets.mjs` ten sam szablon przechodzi kontrolę z kodem 0.
 
 PDF (ten sam wynik co „Zapisz jako PDF” w Chrome; zasady druku: `references/nawigacja.md`, lista kontrolna PDF: `references/qa.md`):
