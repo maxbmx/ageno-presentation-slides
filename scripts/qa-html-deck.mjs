@@ -44,7 +44,7 @@ try {
     await page.waitForTimeout(250);
 
     const slideCount = await page.locator('[data-slide]').count();
-    if (slideCount < 1) throw new Error('No [data-slide] elements found. Follow references/html-presentation.md DOM contract.');
+    if (slideCount < 1) throw new Error('No [data-slide] elements found. Follow the DOM contract in references/nawigacja.md.');
     const activeIndex = async () => page.locator('[data-slide].is-active').evaluate((el) => Number(el.getAttribute('data-slide-index') ?? [...el.parentElement.querySelectorAll('[data-slide]')].indexOf(el)));
     const activeCount = async () => page.locator('[data-slide].is-active').count();
     if (await activeCount() !== 1) throw new Error(`Expected exactly one active slide; found ${await activeCount()}.`);

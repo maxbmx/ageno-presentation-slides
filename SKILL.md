@@ -99,8 +99,9 @@ tylko w tym układzie, zawsze z podpisem `@autor`. Szczegóły: `references/zdje
 2. Buduj slajdy z klas szablonu (`.stack`, `.grid-2`, `.grid-3`, `.grid-1-2`, `.card`, `.facts`, `.table`,
    `.gantt`, `.photo`, `.shot-*`, `.mt-*`).
    Nowego CSS dodawaj jak najmniej i tylko z tokenami.
-3. Każdy blok układu oznacz `data-grid="32"` (wnętrza o szerokości z siatki 8 px: `data-grid="8"`),
-   a blok o zmiennej wysokości także `data-snap`.
+3. Każdy blok układu oznacz `data-grid="32"` (wnętrza o szerokości z siatki 8 px: `data-grid="8"`;
+   zdjęcie `.photo` dochodzące do krawędzi slajdu: `data-grid="32y"`, tylko pion),
+   a blok o zmiennej wysokości także `data-snap`. Opis: `references/siatka.md`, sekcja „Oznaczenia”.
 4. Slajd tytułowy i slajd „Kontakt” zawsze z dużym logo Ageno (blok `.brand-logo` z szablonu,
    zostaw bez zmian). Stopka: małe logo Ageno wstawia skrypt na każdym slajdzie bez `.brand-logo`
    (na tytułowym i kontaktowym go nie ma), ty wpisujesz źródło lub opis screenu w `data-source`,

@@ -119,7 +119,15 @@ Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, 
 | --- | --- |
 | `data-grid="32"` | X, Y, szerokość, wysokość na 32 px |
 | `data-grid="8"` | X i szerokość na 8 px, Y i wysokość na 32 px |
+| `data-grid="32y"` | tylko Y i wysokość na 32 px; X i szerokości audyt nie sprawdza |
 | `data-snap` | wysokość dosuwana do 32 px |
+| `.bleed` / `data-bleed` | warstwa z grafiką celowo wychodzącą poza slajd; audyt pomija ją przy kontroli przewijania |
+
+`data-grid="32y"` jest tylko dla bloków, które dochodzą do krawędzi slajdu i dlatego nie mogą
+mieć X i szerokości z siatki kontenera. W szablonie to zdjęcie `.photo` w układzie
+„Zdjęcie + treść” (slajdy 15–16): 752 × 864, w px slajdu od x = 784 do prawej krawędzi slajdu albo od lewej
+krawędzi do x = 752 (wewnętrzna krawędź na linii siatki). Pion zostaje na kratce. Zwykłych bloków w kontenerze tak nie oznaczaj: zgub X i szerokość
+z audytu, a błąd o 8 px przejdzie niezauważony.
 
 Wiersze tekstu (`h1–h3`, `p`, `li`, `figcaption`, `blockquote`, `dt`, `dd`) audyt sprawdza bez
 oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.

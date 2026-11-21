@@ -7,11 +7,13 @@
  * Reguły:
  *  - [data-grid="32"]: X, Y, szerokość i wysokość podzielne przez 32,
  *  - [data-grid="8"]:  X i szerokość przez 8, Y i wysokość przez 32,
+ *  - [data-grid="32y"]: tylko Y i wysokość przez 32 (blok dochodzący do krawędzi slajdu, np. .photo),
  *  - wiersze tekstu (h1–h3, p, li, figcaption, blockquote, dt, dd): Y i wysokość przez 32,
  *  - interlinia każdego tekstu: 32 lub 64 px (poza <strong> i stopką),
  *  - nic w kontenerze nie wychodzi poza 112–1424 × 64–768,
  *  - stopka na y = 800,
- *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w .bleed albo oznacz data-bleed).
+ *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w warstwie .bleed z szablonu
+ *    albo oznacz atrybutem data-bleed; obie formy audyt traktuje tak samo).
  * X liczony od lewej krawędzi kontenera (112), Y od góry slajdu.
  *
  * Użycie: node scripts/grid-audit.mjs prezentacja.html
@@ -101,8 +103,9 @@ const result = await page.evaluate(() => {
 
     const footer = slide.querySelector(".slide-footer");
     if (footer && Math.abs(rel(footer).y - FOOTER_Y) > TOL) problems.push(`stopka na y=${rel(footer).y.toFixed(2)}, oczekiwane ${FOOTER_Y}`);
-    // Grafiki celowo wychodzące poza slajd (data-bleed, np. góry na slajdzie tytułowym) nie liczą się.
-    const bleed = [...slide.querySelectorAll("[data-bleed]")];
+    // Grafiki celowo wychodzące poza slajd (warstwa .bleed albo [data-bleed], np. góry na slajdzie
+    // tytułowym i „Kontakt”) nie liczą się do przewijania.
+    const bleed = [...slide.querySelectorAll(".bleed, [data-bleed]")];
     bleed.forEach((el) => { el.dataset.auditDisplay = el.style.display; el.style.display = "none"; });
     if (slide.scrollHeight > slide.clientHeight + 1 || slide.scrollWidth > slide.clientWidth + 1) problems.push("przewijanie wewnątrz slajdu");
     bleed.forEach((el) => { el.style.display = el.dataset.auditDisplay; delete el.dataset.auditDisplay; });
