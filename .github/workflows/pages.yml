@@ -1,0 +1,81 @@
+# Podgląd na GitHub Pages: index.html = złożony examples/przyklad.html, template.html = złożony szablon.
+# Oba pliki są samowystarczalne (inline-assets.mjs) i otwierają się jak prawdziwa prezentacja.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      # package-lock.json jest w .gitignore, dlatego npm install, nie npm ci.
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Siatka i tekst (szablon i przykład)
+        run: |
+          for f in assets/template.html examples/przyklad.html; do
+            node scripts/grid-audit.mjs "$f"
+            node scripts/text-lint.mjs "$f"
+          done
+      # Grafiki Ageno trafiają do $RUNNER_TEMP, poza repozytorium, więc nie wchodzą do commita.
+      # Zasada: brak grafik nigdy nie przerywa budowania. Gdy ageno.pl zablokuje pobieranie albo
+      # zmieni listę logotypów, inline-assets.mjs kończy się kodem 1 z samymi komunikatami
+      # „BŁĄD: brak pliku …”. Wtedy plik nie jest w pełni samowystarczalny: brakujące obrazy
+      # zostają ścieżkami, a strona pokazuje zaślepki („brak ageno-mountains.svg”, „brak zdjęcia”,
+      # pola logotypów z nazwą klienta) i workflow zgłasza ::warning::. Każdy inny błąd
+      # inline-assets.mjs (obraz http(s), nieznany typ obrazu, zewnętrzny CSS/JS/@import,
+      # ponad 15 MB, złe wywołanie) przerywa budowanie.
+      - name: Złożenie strony
+        run: |
+          BUILD="$RUNNER_TEMP/build"
+          SITE="$RUNNER_TEMP/site"
+          ERR="$RUNNER_TEMP/inline.err"
+          mkdir -p "$BUILD" "$SITE"
+          cp examples/przyklad.html "$BUILD/index.html"
+          cp assets/template.html "$BUILD/template.html"
+          node scripts/ageno-assets.mjs --out "$BUILD" \
+            || echo "::warning::Nie udało się pobrać wszystkich grafik z ageno.pl."
+          for f in index.html template.html; do
+            rc=0
+            node scripts/inline-assets.mjs "$BUILD/$f" --out "$SITE/$f" 2> "$ERR" || rc=$?
+            cat "$ERR" >&2
+            [ "$rc" = 0 ] && continue
+            if [ "$rc" = 1 ] && grep -q '^BŁĄD: brak pliku ' "$ERR" \
+               && ! grep '^BŁĄD:' "$ERR" | grep -qv '^BŁĄD: brak pliku '; then
+              echo "::warning::$f: brak części grafik, strona pokazuje zaślepki."
+            else
+              exit 1
+            fi
+          done
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ runner.temp }}/site
+
+  deploy:
+    # workflow_dispatch z innej gałęzi buduje i sprawdza, ale nie nadpisuje Pages.
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
