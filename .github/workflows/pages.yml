@@ -35,29 +35,42 @@ jobs:
             node scripts/text-lint.mjs "$f"
           done
       # Grafiki Ageno trafiają do $RUNNER_TEMP, poza repozytorium, więc nie wchodzą do commita.
-      # Gdy ageno.pl zablokuje pobieranie (ageno-assets.mjs z kodem 1), strona i tak powstaje:
-      # brakujące obrazy zostają ścieżkami względnymi, a pliki pokazują swoje zaślepki
-      # („brak ageno-mountains.svg”, „brak zdjęcia”, pola logotypów z nazwą klienta). Tylko wtedy
-      # kod 1 z inline-assets.mjs nie przerywa budowania. Po udanym pobraniu każdy błąd
-      # inline-assets.mjs przerywa budowanie (np. zmieniona lista logotypów na ageno.pl).
+      # Zasada: brak grafik nigdy nie przerywa budowania. Gdy ageno.pl zablokuje pobieranie albo
+      # zmieni listę logotypów, inline-assets.mjs kończy się kodem 1 z samymi komunikatami
+      # „BŁĄD: brak pliku …”. Wtedy plik nie jest w pełni samowystarczalny: brakujące obrazy
+      # zostają ścieżkami, a strona pokazuje zaślepki („brak ageno-mountains.svg”, „brak zdjęcia”,
+      # pola logotypów z nazwą klienta) i workflow zgłasza ::warning::. Każdy inny błąd
+      # inline-assets.mjs (obraz http(s), nieznany typ obrazu, zewnętrzny CSS/JS/@import,
+      # ponad 15 MB, złe wywołanie) przerywa budowanie.
       - name: Złożenie strony
         run: |
           BUILD="$RUNNER_TEMP/build"
           SITE="$RUNNER_TEMP/site"
+          ERR="$RUNNER_TEMP/inline.err"
           mkdir -p "$BUILD" "$SITE"
           cp examples/przyklad.html "$BUILD/index.html"
           cp assets/template.html "$BUILD/template.html"
-          if node scripts/ageno-assets.mjs --out "$BUILD"; then ok=1; else ok=0
-            echo "::warning::Nie udało się pobrać wszystkich grafik z ageno.pl; strona ma zaślepki."
-          fi
+          node scripts/ageno-assets.mjs --out "$BUILD" \
+            || echo "::warning::Nie udało się pobrać wszystkich grafik z ageno.pl."
           for f in index.html template.html; do
-            node scripts/inline-assets.mjs "$BUILD/$f" --out "$SITE/$f" || [ "$ok" = 0 ]
+            rc=0
+            node scripts/inline-assets.mjs "$BUILD/$f" --out "$SITE/$f" 2> "$ERR" || rc=$?
+            cat "$ERR" >&2
+            [ "$rc" = 0 ] && continue
+            if [ "$rc" = 1 ] && grep -q '^BŁĄD: brak pliku ' "$ERR" \
+               && ! grep '^BŁĄD:' "$ERR" | grep -qv '^BŁĄD: brak pliku '; then
+              echo "::warning::$f: brak części grafik, strona pokazuje zaślepki."
+            else
+              exit 1
+            fi
           done
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: ${{ runner.temp }}/site
 
   deploy:
+    # workflow_dispatch z innej gałęzi buduje i sprawdza, ale nie nadpisuje Pages.
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -65,4 +78,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

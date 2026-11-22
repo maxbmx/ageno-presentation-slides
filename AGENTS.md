@@ -19,4 +19,5 @@ npm run pdf -- dist/2026-11-16-klient-temat.html
 ```
 
 Kod 0 = OK, 1 = znaleziony problem, 2 = złe wywołanie. Do oddania nadaje się tylko deck,
-dla którego `inline`, `grid`, `lint` i `qa` kończą się kodem 0.
+dla którego `inline`, `grid`, `lint`, `qa` i `pdf` kończą się kodem 0, a zrzuty i PDF są
+obejrzane (`references/qa.md`).

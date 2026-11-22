@@ -7,7 +7,7 @@ według listy na końcu.
 ## Wynik
 
 Jeden plik HTML ze slajdami 16:9, zbudowany z `template.html`, działający bez sieci.
-Kolejność pracy: źródła → plan → slajdy → kontrola → przekazanie. Język domyślnie polski.
+Kolejność pracy: źródła → plan → screeny → slajdy → kontrola → przekazanie. Język domyślnie polski.
 
 1. **Wejście.** Cel, odbiorca i materiały są wymagane. Resztę załóż i wypisz. Pytaj tylko
    o to, bez czego deck byłby błędny, jedno pytanie naraz.
@@ -15,8 +15,10 @@ Kolejność pracy: źródła → plan → slajdy → kontrola → przekazanie. J
    Nie wymyślaj liczb, cytatów, klientów, wyników ani decyzji. Lukę oznacz, sprzeczność pokaż.
 3. **Plan.** Tabela: nr, rola, teza, dowód, układ, screen. Przy więcej niż kilku slajdach pokaż
    plan przed kodem. Zsumuj wysokości (niżej); nie mieści się = podziel slajd.
-4. **Slajdy.** Z układów szablonu (niżej).
-5. **Kontrola** ręczna i **przekazanie**.
+4. **Screeny i grafiki.** Przed slajdami zbierz od użytkownika screeny i logo klienta, a grafiki
+   z ageno.pl zostaw jako zaślepki (sekcja „Grafiki w czacie”).
+5. **Slajdy.** Z układów szablonu (niżej).
+6. **Kontrola** ręczna i **przekazanie**.
 
 ## Szablon
 

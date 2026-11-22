@@ -8,7 +8,7 @@ Instrukcja dla agenta (`SKILL.md`) i skrypty, które składają prezentację Age
 - **Codex.** Otwórz repozytorium jako katalog roboczy. `AGENTS.md` kieruje do `SKILL.md` i poleceń `npm`, a prezentacje trafiają do `decks/` i `dist/` (oba w `.gitignore`).
 - **ChatGPT i claude.ai (projekt).** Wklej `INSTRUKCJE.md` do instrukcji projektu i dodaj `assets/template.html` do jego plików. Skrypty tam nie działają: kontrola jest ręczna według listy w `INSTRUKCJE.md`, a grafiki z ageno.pl osadza się potem lokalnie przez `ageno-assets.mjs` i `inline-assets.mjs`.
 
-Podgląd: po każdym pushu do `main` workflow `.github/workflows/pages.yml` publikuje na GitHub Pages złożony przykład `examples/przyklad.html` (`index.html`) i złożony szablon (`template.html`).
+Podgląd: po każdym pushu do `main` workflow `.github/workflows/pages.yml` publikuje na GitHub Pages złożony przykład `examples/przyklad.html` (`index.html`) i złożony szablon (`template.html`). Gdy grafik z ageno.pl nie da się pobrać, strona i tak powstaje, ale pliki nie są wtedy w pełni samowystarczalne i pokazują zaślepki.
 
 ## Struktura
 
