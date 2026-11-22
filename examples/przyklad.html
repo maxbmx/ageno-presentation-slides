@@ -642,7 +642,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
     <!-- 2. Teza + 3 liczby -->
     <section data-slide class="slide" aria-hidden="true">
       <div class="container stack">
-        <h2 data-grid="32">Większość zamówień hurtowych trafia do działu sprzedaży e-mailem</h2>
+        <h2 data-grid="32">Większość zamówień B2B trafia do działu sprzedaży e-mailem lub telefonicznie</h2>
         <div class="grid-3 mt-64" data-grid="32" data-snap>
           <div class="stack-tight" data-grid="32" data-snap>
             <p class="number"><span class="mark">64%</span></p>
@@ -667,12 +667,12 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
     <!-- 17. Problem i rozwiązanie -->
     <section data-slide class="slide" aria-hidden="true">
       <div class="container stack">
-        <h2 data-grid="32">Platforma B2B przenosi zamówienia z poczty do panelu klienta</h2>
+        <h2 data-grid="32">Panel B2B zastępuje zamówienia e-mailem i telefonem</h2>
         <div class="pairs" data-grid="32" data-snap>
           <h3>Problem</h3>
           <h3>Rozwiązanie</h3>
-          <p class="pair pair-problem">Handlowiec przepisuje każde zamówienie z e-maila do systemu ERP.</p>
-          <p class="pair">Klient składa zamówienie w panelu, a system ERP przyjmuje je bez przepisywania.</p>
+          <p class="pair pair-problem">Handlowiec przepisuje każde zamówienie z e-maila do ERP.</p>
+          <p class="pair">Klient składa zamówienie w panelu B2B, a ERP przyjmuje je bez przepisywania.</p>
           <p class="pair pair-problem">Klient nie widzi swoich cen i rabatów przed złożeniem zamówienia.</p>
           <p class="pair">Panel pokazuje ceny i rabaty z umowy klienta, pobrane z ERP.</p>
           <p class="pair pair-problem">Stan magazynu klient sprawdza telefonicznie u handlowca.</p>
@@ -704,7 +704,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <p class="eyebrow"><span class="mark">Rekomendowany</span></p>
             <h3>MVP i rozwój etapami</h3>
             <dl class="facts">
-              <dt>Zakres</dt><dd>Panel zamówień, ceny z ERP, stany magazynu</dd>
+              <dt>Zakres</dt><dd>Panel B2B, ceny z ERP, stany magazynu</dd>
               <dt>Czas</dt><dd>2026-12-01 – 2027-07-31</dd>
               <dt>Koszt</dt><dd>420 000 zł netto</dd>
               <dt>Ryzyko</dt><dd>Część funkcji dopiero w etapie 2</dd>
@@ -738,9 +738,9 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <ul class="points">
               <li>Klient składa zamówienie w panelu B2B.</li>
               <li>Panel pokazuje ceny i rabaty z umowy klienta.</li>
-              <li>System ERP przyjmuje zamówienia przez API.</li>
+              <li>ERP przyjmuje zamówienia przez API.</li>
               <li>Karta produktu pokazuje stan magazynu.</li>
-              <li>Handlowiec zakłada konta klientów w panelu.</li>
+              <li>Handlowiec zakłada konta klientów w panelu B2B.</li>
             </ul>
           </div>
           <div class="stack" data-grid="32" data-snap>
@@ -799,7 +799,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <tr><th scope="col">Pozycja</th><th scope="col" class="num">Czas</th><th scope="col" class="num">Kwota netto, przykład</th></tr>
           </thead>
           <tbody>
-            <tr><td>Analiza wymagań i projekt panelu</td><td class="num">5 tyg.</td><td class="num">60 000 zł</td></tr>
+            <tr><td>Analiza wymagań i projekt panelu B2B</td><td class="num">5 tyg.</td><td class="num">60 000 zł</td></tr>
             <tr><td>Budowa panelu B2B</td><td class="num">14 tyg.</td><td class="num">150 000 zł</td></tr>
             <tr><td>Integracja z ERP</td><td class="num">10 tyg.</td><td class="num">140 000 zł</td></tr>
             <tr><td>Testy akceptacyjne i uruchomienie</td><td class="num">6 tyg.</td><td class="num">70 000 zł</td></tr>
@@ -831,7 +831,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           </thead>
           <tbody>
             <tr><td>Niekompletne ceny i rabaty w ERP</td><td><strong>wysoki</strong></td><td>Przegląd danych cenowych przed integracją</td><td>Klient</td></tr>
-            <tr><td>Opóźnione testowe API systemu ERP</td><td><strong>wysoki</strong></td><td>Testowe API dostępne do 2027-01-15</td><td>Klient</td></tr>
+            <tr><td>Opóźnione testowe API ERP</td><td><strong>wysoki</strong></td><td>Testowe API dostępne do 2027-01-15</td><td>Klient</td></tr>
             <tr><td>Nowe wymagania w trakcie budowy</td><td>średni</td><td>Nowe funkcje trafiają do etapu 2</td><td>Ageno</td></tr>
             <tr><td>Mało zamówień w panelu po starcie</td><td>średni</td><td>Pilotaż z 20 klientami i szkolenie handlowców</td><td>Klient</td></tr>
           </tbody>
@@ -858,8 +858,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           </thead>
           <tbody>
             <tr><td>Analiza i specyfikacja wymagań</td><td>odpowiada</td><td>akceptuje</td></tr>
-            <tr><td>Dane cenowe i testowe API systemu ERP</td><td>wspiera</td><td>odpowiada</td></tr>
-            <tr><td>Budowa panelu i testy techniczne</td><td>odpowiada</td><td></td></tr>
+            <tr><td>Dane cenowe i testowe API ERP</td><td>wspiera</td><td>odpowiada</td></tr>
+            <tr><td>Budowa panelu B2B i testy techniczne</td><td>odpowiada</td><td></td></tr>
             <tr><td>Testy akceptacyjne</td><td>wspiera</td><td>odpowiada</td></tr>
             <tr><td>Szkolenie handlowców</td><td>odpowiada</td><td>wspiera</td></tr>
             <tr><td>Decyzja o uruchomieniu</td><td>rekomenduje</td><td>decyduje</td></tr>
@@ -932,7 +932,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           <ul class="points">
             <li>Zarząd Firmy Przykładowej wybiera wariant B i budżet 420 000 zł netto do 2026-11-27.</li>
             <li>Zespół Ageno zaczyna analizę wymagań 2026-12-01.</li>
-            <li>Klient udostępnia testowe API systemu ERP do 2027-01-15.</li>
+            <li>Klient udostępnia testowe API ERP do 2027-01-15.</li>
           </ul>
         </div>
       </div>
