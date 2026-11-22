@@ -1,0 +1,68 @@
+# Podgląd na GitHub Pages: index.html = złożony examples/przyklad.html, template.html = złożony szablon.
+# Oba pliki są samowystarczalne (inline-assets.mjs) i otwierają się jak prawdziwa prezentacja.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      # package-lock.json jest w .gitignore, dlatego npm install, nie npm ci.
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Siatka i tekst (szablon i przykład)
+        run: |
+          for f in assets/template.html examples/przyklad.html; do
+            node scripts/grid-audit.mjs "$f"
+            node scripts/text-lint.mjs "$f"
+          done
+      # Grafiki Ageno trafiają do $RUNNER_TEMP, poza repozytorium, więc nie wchodzą do commita.
+      # Gdy ageno.pl zablokuje pobieranie (ageno-assets.mjs z kodem 1), strona i tak powstaje:
+      # brakujące obrazy zostają ścieżkami względnymi, a pliki pokazują swoje zaślepki
+      # („brak ageno-mountains.svg”, „brak zdjęcia”, pola logotypów z nazwą klienta). Tylko wtedy
+      # kod 1 z inline-assets.mjs nie przerywa budowania. Po udanym pobraniu każdy błąd
+      # inline-assets.mjs przerywa budowanie (np. zmieniona lista logotypów na ageno.pl).
+      - name: Złożenie strony
+        run: |
+          BUILD="$RUNNER_TEMP/build"
+          SITE="$RUNNER_TEMP/site"
+          mkdir -p "$BUILD" "$SITE"
+          cp examples/przyklad.html "$BUILD/index.html"
+          cp assets/template.html "$BUILD/template.html"
+          if node scripts/ageno-assets.mjs --out "$BUILD"; then ok=1; else ok=0
+            echo "::warning::Nie udało się pobrać wszystkich grafik z ageno.pl; strona ma zaślepki."
+          fi
+          for f in index.html template.html; do
+            node scripts/inline-assets.mjs "$BUILD/$f" --out "$SITE/$f" || [ "$ok" = 0 ]
+          done
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

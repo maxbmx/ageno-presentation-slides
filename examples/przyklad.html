@@ -1,0 +1,1180 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<title>Platforma B2B na Magento 2, prezentacja przykładowa</title>
+<style>
+/* =====================================================================
+   Ageno – prezentacja HTML na siatce 8 / 32 px
+   Płótno slajdu 1536 × 864 px (48 × 27 kratek), skalowane do okna.
+   Wszystkie wymiary wewnątrz slajdu są w px logicznych płótna.
+   Tokenów geometrii nie zmieniaj. Tło zawsze #f7f7f7 (--c-bg), także w marce klienta.
+   Marka klienta = tylko --c-text, --c-muted, --c-accent, --c-on-accent. Logo Ageno bez zmian.
+   ===================================================================== */
+:root {
+  color-scheme: only light;
+
+  /* Kolory */
+  --c-bg: #f7f7f7;        /* stałe tło każdego slajdu, nie zmieniać */
+  --c-card: #ffffff;
+  --c-text: #231430;        /* ciemny fiolet z logo Ageno */
+  --c-muted: #5e5b52;
+  --c-accent: #ff6b00;      /* pomarańcz z logo Ageno, jeden akcent */
+  --c-on-accent: #231430;   /* tekst na akcencie, kontrast 6:1 */
+  --c-bar: #e2ddca;        /* paski harmonogramu; kluczowy etap w --c-accent */
+  --c-nav-hover: rgb(0 0 0 / 0.05);
+  /* Kratka w tle: domyślnie ukryta. Żeby ją pokazać: rgb(70 130 220 / 0.1).
+     Podgląd siatki niezależnie od tego: klawisz G albo adres #siatka. */
+  --grid-line: transparent;
+  --grid-debug-8: rgb(255 0 80 / 0.07);
+  --grid-debug-32: rgb(255 0 80 / 0.3);
+  --grid-debug-axis: rgb(0 110 255 / 0.8);
+
+  /* Kroje: wyłącznie systemowe */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+
+  /* Geometria płótna */
+  --slide-w: 1536px;
+  --slide-h: 864px;
+  --unit: 8px;
+  --module: 32px;
+  --x0: 112px;          /* lewa krawędź kontenera = początek X */
+  --y0: 64px;           /* górna krawędź kontenera */
+  --w: 1312px;          /* 41 kratek */
+  --h: 704px;           /* 22 kratki: treść kończy się na y = 768 */
+  --footer-y: 800px;    /* stopka: jeden wiersz 32 px */
+  --gutter: 32px;
+  --col-2: 640px;       /* 20 kratek */
+  --col-3: 416px;       /* 13 kratek */
+  --col-2of3: 864px;    /* 27 kratek */
+
+  /* Ramki screenów (szer. × wys.) */
+  --shot-full-w: 1312px;   --shot-full-h: 608px;
+  --shot-wide-w: 864px;    --shot-wide-h: 544px;
+  --shot-half-w: 640px;    --shot-half-h: 416px;
+  --shot-mobile-w: 320px;  --shot-mobile-h: 640px;
+
+  /* Typografia: interlinia 32 albo 64 px */
+  --fs-title: 56px;  --lh-title: 64px;  --ls-title: -0.033em;
+  --fs-h2: 40px;     --lh-h2: 64px;     --ls-h2: -0.03em;
+  --fs-number: 56px; --lh-number: 64px; --ls-number: -0.035em;
+  --fs-lead: 24px;   --lh-lead: 32px;
+  --fs-h3: 24px;     --lh-h3: 32px;     --ls-h3: -0.024em;
+  --fs-body: 20px;   --lh-body: 32px;
+  --fs-small: 16px;  --lh-small: 32px;
+  --fs-meta: 14px;   --lh-meta: 32px;
+  --ls-eyebrow: 0.145em;
+
+  --transition: 200ms;
+  --shift: 48px;
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--c-bg); }
+body {
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+h1, h2, h3, p, figure, ul, ol, li, blockquote, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+img { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
+h1, h2, h3 { font-weight: 700; text-wrap: balance; }
+p, li, dd, td, figcaption { text-wrap: pretty; }   /* bez jednego słowa w ostatnim wierszu */
+body { hyphens: manual; }                          /* bez automatycznego dzielenia wyrazów */
+.nowrap { white-space: nowrap; }                   /* wyrażenie, które ma zostać w jednym wierszu */
+strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
+
+/* ---------- Scena i slajd ---------- */
+[data-presentation] { position: fixed; inset: 0; overflow: hidden; background: var(--c-bg); }
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--slide-w);
+  height: var(--slide-h);
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  transform-origin: center center;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--c-bg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition) ease, transform var(--transition) ease,
+              visibility 0s linear var(--transition);
+}
+.slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity var(--transition) ease, transform var(--transition) ease, visibility 0s;
+}
+.slide.from-right { transform: translateX(var(--shift)); transition: none; }
+.slide.from-left  { transform: translateX(calc(-1 * var(--shift))); transition: none; }
+.slide.to-left    { transform: translateX(calc(-1 * var(--shift))); }
+.slide.to-right   { transform: translateX(var(--shift)); }
+
+/* Kratka w tle (kolor z --grid-line, domyślnie ukryta): pod treścią. Faza X = lewa krawędź kontenera. */
+.slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--module) var(--module);
+  background-position: var(--x0) 0;
+}
+
+.container {
+  position: absolute;
+  z-index: 2;
+  left: var(--x0);
+  top: var(--y0);
+  width: var(--w);
+  height: var(--h);
+}
+
+.slide-footer {
+  position: absolute;
+  z-index: 2;
+  left: var(--x0);
+  top: var(--footer-y);
+  width: var(--w);
+  height: var(--module);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gutter);
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+}
+/* Małe logo Ageno w stopce każdego slajdu bez .brand-logo, czyli poza tytułowym (1) i „Kontakt” (24);
+   wstawia je skrypt. Wysokość 24 px w wierszu 32 px (align-items: center), offset 4 px. */
+.footer-logo { display: block; flex: none; height: 24px; width: auto; }
+.slide-footer [data-source] { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slide-footer [data-slide-number] { flex: none; margin-left: auto; }
+
+/* ---------- Układ ---------- */
+.stack > * + * { margin-top: var(--module); }
+.stack-tight > * + * { margin-top: 0; }
+.mt-64 { margin-top: 64px; }
+.mt-96 { margin-top: 96px; }
+.mt-128 { margin-top: 128px; }
+.mt-192 { margin-top: 192px; }
+
+.grid-2, .grid-3, .grid-1-2, .grid-2-1 { display: grid; column-gap: var(--gutter); align-items: start; }
+.grid-2   { grid-template-columns: repeat(2, var(--col-2)); }
+.grid-3   { grid-template-columns: repeat(3, var(--col-3)); }
+.grid-1-2 { grid-template-columns: var(--col-3) var(--col-2of3); }
+.grid-2-1 { grid-template-columns: var(--col-2of3) var(--col-3); }
+.grid-2 > *, .grid-3 > *, .grid-1-2 > *, .grid-2-1 > * { min-width: 0; }
+.w-2of3 { width: var(--col-2of3); }
+
+/* Blok o zmiennej wysokości: skrypt dopisuje resztę do pełnej kratki. */
+[data-snap] { margin-bottom: var(--snap, 0px); }
+
+.card { background: var(--c-card); padding: var(--module); }
+
+/* ---------- Typografia ---------- */
+.title  { font-size: var(--fs-title); line-height: var(--lh-title); letter-spacing: var(--ls-title); }
+h2, .h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); letter-spacing: var(--ls-h2); }
+h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: var(--ls-h3); }
+.lead   { font-size: var(--fs-lead); line-height: var(--lh-lead); }
+.small, .caption { font-size: var(--fs-small); line-height: var(--lh-small); }
+.eyebrow {
+  color: var(--c-muted);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+.number {
+  font-size: var(--fs-number);
+  line-height: var(--lh-number);
+  letter-spacing: var(--ls-number);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.meta { font-family: var(--font-mono); font-size: var(--fs-meta); line-height: var(--lh-meta); color: var(--c-muted); }
+.mark { background: var(--c-accent); color: var(--c-on-accent); padding-inline: var(--unit); }
+
+/* Lista punktów: znacznik 8 × 8 px w akcencie, na środku pierwszej kratki 32 × 32
+   (12 + 8 + 12 = 32 w poziomie i w pionie). Tekst zaczyna się od następnej kratki. */
+.points li { position: relative; padding-left: var(--module); }
+.points li::before {
+  content: "";
+  position: absolute;
+  left: calc((var(--module) - var(--unit)) / 2);
+  top: calc((var(--lh-body) - var(--unit)) / 2);
+  width: var(--unit);
+  height: var(--unit);
+  background: var(--c-accent);
+}
+
+/* ---------- Tabela ----------
+   Wiersz 64 px: 16 + 32 + 16. Bez linii: wiersze rozdziela tło co drugiego.
+   Szerokości kolumn w <colgroup>, zawsze wielokrotności 32 px, suma = szerokość tabeli. */
+.table { border-collapse: collapse; border-spacing: 0; table-layout: fixed; }
+.table th, .table td { padding: 16px; text-align: left; vertical-align: top; }
+.table th {
+  color: var(--c-muted);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 600;
+}
+.table td { font-size: var(--fs-body); line-height: var(--lh-body); }
+.table tbody tr:nth-child(odd) { background: var(--c-card); }
+.table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.table td strong { font-size: 1em; line-height: inherit; }
+
+/* ---------- Logo Ageno ----------
+   Zawsze na slajdzie tytułowym, w lewym górnym rogu kontenera (x 0, y 64).
+   Ramka 208 × 64 (data-grid="8"), logo wysokości 64 px, oryginalne proporcje i kolory. */
+.brand-logo { width: 208px; height: 64px; }
+.brand-logo svg { display: block; height: 64px; width: auto; }
+/* Logo klienta (opcjonalne): slajd tytułowy, ten sam wiersz co logo Ageno, wyrównane do prawej */
+.title-client-logo { position: absolute; top: 0; right: 0; height: 64px; width: auto; max-width: 416px; object-fit: contain; }
+/* Góry Ageno na slajdzie tytułowym: po lewej, wychodzą poza lewą i dolną krawędź slajdu.
+   Grafika: ageno-mountains.svg (scripts/ageno-assets.mjs), proporcje bez zmian.
+   Tekst tytułowy przesunięty w prawo, do kolumny 864 px (x 560). */
+/* Warstwa przycinająca grafikę do slajdu: grafika wychodzi poza krawędź, ale slajd się nie przewija */
+.bleed { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.title-mountains {
+  position: absolute;
+  left: -96px;
+  bottom: -64px;
+  width: 656px;
+  height: 640px;
+  object-fit: contain;
+  object-position: left bottom;
+  pointer-events: none;
+}
+.title-mountains-missing {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 528px;
+  height: 448px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-card);
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+}
+.title-text { margin-left: 448px; width: var(--col-2of3); }
+
+/* Slajd kontaktowy: te same góry Ageno po prawej, wychodzą poza prawą i dolną krawędź. */
+.contact-mountains {
+  position: absolute;
+  right: -96px;
+  bottom: -64px;
+  width: 896px;
+  height: 768px;
+  object-fit: contain;
+  object-position: right bottom;
+  pointer-events: none;
+}
+.contact-mountains-missing {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 672px;
+  height: 512px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-card);
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+}
+.contact-text { width: var(--col-2); }
+.slide-contact .slide-footer { width: var(--col-2); }   /* stopka po lewej, z dala od gór */
+/* Osoba: portret 256 × 256 w kole (jedyne zaokrąglenie w decku: kadr zdjęcia, nie pudełko),
+   obok imię, służbowy e-mail i info@ageno.pl od drugiej kratki portretu. Bez numeru telefonu. */
+.person { display: grid; grid-template-columns: 256px 352px; column-gap: var(--gutter); align-items: start; }
+.person-photo { width: 256px; height: 256px; border-radius: 50%; overflow: hidden; background: var(--c-card); }
+.person-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.person-photo-missing {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+}
+.person-details { margin-top: 64px; }
+.person-name { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: var(--ls-h3); font-weight: 700; }
+.person-details a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
+}
+
+/* Logotypy klientów: 5 kolumn po 256 px z odstępem 8 px (= 1312), wiersz 128 px.
+   Pliki logo bez zmian: wszystkie mają ten sam obszar roboczy, więc w równych polach są równe. */
+.logo-wall { display: grid; grid-template-columns: repeat(5, 256px); column-gap: var(--unit); row-gap: var(--module); }
+.logo-cell { height: 128px; }
+.logo-cell img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+/* ---------- Screeny ---------- */
+.shot { overflow: hidden; background: var(--c-card); }
+.shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.shot-full   { width: var(--shot-full-w);   height: var(--shot-full-h); }
+.shot-wide   { width: var(--shot-wide-w);   height: var(--shot-wide-h); }
+.shot-half   { width: var(--shot-half-w);   height: var(--shot-half-h); }
+.shot-mobile { width: var(--shot-mobile-w); height: var(--shot-mobile-h); }
+.shot-edge   { outline: 1px solid rgb(0 0 0 / 0.08); outline-offset: -1px; }
+.shot-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+  color: var(--c-muted);
+}
+
+/* ---------- Nawigacja ---------- */
+.deck-nav button {
+  position: absolute;
+  z-index: 10;
+  top: calc(var(--slide-h) / 2 - var(--module));
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--c-text);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition) ease, background-color var(--transition) ease;
+  display: grid;
+  place-items: center;
+}
+.deck-nav [data-nav="prev"] { left: 24px; }
+.deck-nav [data-nav="next"] { right: 24px; }
+.deck-nav svg { width: 24px; height: 24px; }
+[data-presentation].show-nav .deck-nav button,
+.deck-nav button:hover,
+.deck-nav button:focus-visible { opacity: 1; }
+.deck-nav button:hover { background: var(--c-nav-hover); }
+.deck-nav button:focus-visible { outline: 3px solid var(--c-text); outline-offset: 3px; }
+.deck-nav button[disabled] { visibility: hidden; pointer-events: none; }
+@media (hover: none) {
+  .deck-nav button { opacity: 0.6; }
+}
+
+/* ---------- Tryb diagnostyczny: klawisz G albo adres #siatka ---------- */
+.is-debug .slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-debug-32) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-debug-32) 1px, transparent 1px),
+    linear-gradient(to right, var(--grid-debug-8) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-debug-8) 1px, transparent 1px);
+  background-size: var(--module) var(--module), var(--module) var(--module),
+                   var(--unit) var(--unit), var(--unit) var(--unit);
+  background-position: var(--x0) 0;
+}
+.is-debug .container, .is-debug .slide-footer { outline: 1px solid var(--grid-debug-axis); }
+.is-debug [data-grid^="32"] { outline: 1px dashed var(--grid-debug-axis); outline-offset: -1px; }
+.is-debug [data-grid^="8"] { outline: 1px dashed var(--grid-debug-32); outline-offset: -1px; }
+
+/* ---------- Warianty, zakres, wycena, case study ---------- */
+/* Warianty: karty w .grid-2 / .grid-3 równej wysokości, te same wiersze w każdej (dl.facts). */
+.options { align-items: stretch; }
+.facts dt {
+  color: var(--c-muted);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 600;
+}
+.facts dd { font-size: var(--fs-body); line-height: var(--lh-body); }
+.facts dd + dt { margin-top: var(--module); }
+/* Zakres: „poza zakresem” ma przygaszony znacznik */
+.points-out li::before { background: var(--c-muted); }
+/* Wycena: wiersz sumy */
+.table tfoot td { font-weight: 700; }
+/* Case study: miejsce na logo klienta, wysokość jednego wiersza */
+.client-logo { height: var(--module); width: 192px; }
+.client-logo img, .client-logo svg { height: var(--module); width: auto; display: block; }
+.logo-placeholder {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+  color: var(--c-muted);
+  background: var(--c-card);
+  padding-inline: var(--unit);
+}
+
+/* Problem i rozwiązanie: pary w jednym wierszu siatki, więc stoją na tej samej wysokości.
+   Znacznik problemu przygaszony, rozwiązania w akcencie (jak .points). */
+.pairs { display: grid; grid-template-columns: repeat(2, var(--col-2)); column-gap: var(--gutter); row-gap: var(--module); align-items: start; }
+.pair { position: relative; padding-left: var(--module); }
+.pair::before {
+  content: "";
+  position: absolute;
+  left: calc((var(--module) - var(--unit)) / 2);
+  top: calc((var(--lh-body) - var(--unit)) / 2);
+  width: var(--unit);
+  height: var(--unit);
+  background: var(--c-accent);
+}
+.pair-problem::before { background: var(--c-muted); }
+/* Opinie: karty równej wysokości, cytat 24 / 32, podpis 16 / 32 */
+.quotes { align-items: stretch; }
+.quote-text { font-size: var(--fs-lead); line-height: var(--lh-lead); }
+
+/* ---------- Harmonogram (timeline) ----------
+   Kolumna nazw 320 px + odstęp 32 + oś czasu 960 px = 1312.
+   --periods: liczba okresów (4, 5, 6, 8 albo 10), szerokość okresu --p = 960 / --periods
+   (zawsze wielokrotność 8 px). Pasek: --start (numer okresu od 0) i --span (liczba okresów).
+   Wiersz 64 px: pasek 32 + odstęp 32. Kolumny okresów rozdziela tło (co drugi biały), nie linie. */
+.gantt { --p: calc(960px / var(--periods, 8)); position: relative; }
+.gantt::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 352px;
+  width: 960px;
+  background-image: linear-gradient(to right, var(--c-card) 50%, transparent 50%);
+  background-size: calc(var(--p) * 2) 100%;
+}
+.gantt > * { position: relative; z-index: 1; }
+.gantt-scale { display: flex; margin-left: 352px; }
+.gantt-scale li {
+  width: var(--p);
+  padding-left: var(--unit);
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.gantt-rows { margin-top: var(--module); }
+.gantt-row { display: grid; grid-template-columns: 320px 960px; column-gap: var(--gutter); height: 64px; }
+.gantt-name {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gantt-track { position: relative; height: var(--module); }
+.gantt-bar {
+  position: absolute;
+  top: 0;
+  left: calc(var(--start, 0) * var(--p));
+  width: calc(var(--span, 1) * var(--p));
+  height: var(--module);
+  background: var(--c-bar);
+}
+.gantt-bar.is-key { background: var(--c-accent); }
+/* Tekst tylko dla czytników ekranu (np. daty paska harmonogramu) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Zdjęcie + treść (zdjęcie górskie z Unsplash) ----------
+   Zdjęcie na pełną wysokość, od krawędzi slajdu: 752 × 864 px. Wewnętrzna krawędź na linii
+   siatki (x 784 albo 752), treść w kolumnie 544 px po drugiej stronie, odstęp 128 px.
+   .photo-right = zdjęcie z prawej, .photo-left = z lewej. Punkt kadru: --focus. */
+.photo {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  width: 752px;
+  height: var(--slide-h);
+  overflow: hidden;
+  background: #3a4246;            /* zaślepka do czasu wstawienia zdjęcia */
+}
+.photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, center); }
+.photo-right .photo { left: 784px; }
+.photo-left .photo  { left: 0; }
+.photo-right .container, .photo-right .slide-footer { width: 544px; }
+.photo-left .container, .photo-left .slide-footer { left: 880px; width: 544px; }
+.photo-credit {
+  position: absolute;
+  bottom: var(--module);          /* wiersz stopki: y 800–832 */
+  height: var(--module);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+}
+.photo-right .photo-credit { right: var(--x0); }
+.photo-left .photo-credit  { left: var(--x0); }
+.photo-credit a { color: inherit; text-decoration: none; }
+.photo-credit a:hover { text-decoration: underline; }
+.photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-meta);
+}
+/* Strzałka nad zdjęciem: biała, żeby była widoczna na ciemnym tle */
+[data-photo-side="right"] .deck-nav [data-nav="next"],
+[data-photo-side="left"] .deck-nav [data-nav="prev"] { color: #ffffff; }
+[data-photo-side="right"] .deck-nav [data-nav="next"]:hover,
+[data-photo-side="left"] .deck-nav [data-nav="prev"]:hover { background: rgb(255 255 255 / 0.15); }
+
+/* ---------- Druk i PDF ----------
+   Każdy slajd to osobna strona 1536 × 864 px (16:9, w PDF 16 × 9 cali), bez marginesów.
+   Bez skalowania, nawigacji, animacji i nakładek trybu diagnostycznego.
+   Zapis: Chrome lub Edge → Drukuj (Cmd/Ctrl + P) → Zapisz jako PDF. */
+@page { size: 1536px 864px; margin: 0; }
+@media print {
+  html, body {
+    height: auto;
+    overflow: visible;
+    background: var(--c-bg);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  [data-presentation] { position: static; inset: auto; overflow: visible; }
+  .stage { position: static; transform: none; width: var(--slide-w); height: auto; }
+  .slide {
+    position: relative;
+    inset: auto;
+    width: var(--slide-w);
+    height: var(--slide-h);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+  }
+  .slide:last-of-type { break-after: auto; page-break-after: auto; }
+  .deck-nav { display: none !important; }
+  .slide::after { display: none !important; }
+  .container, .slide-footer, [data-grid] { outline: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .slide.is-active { transform: none !important; }
+  .slide { transition: opacity 120ms linear, visibility 0s linear 120ms; }
+  .slide.is-active { transition: opacity 120ms linear, visibility 0s; }
+  .deck-nav button { transition: none; }
+}
+</style>
+</head>
+<body>
+<!-- Logo Ageno zdefiniowane raz; slajd tytułowy i stopki używają go przez <use href="#ageno-logo"> -->
+<svg width="0" height="0" style="position: absolute;" aria-hidden="true" focusable="false">
+  <symbol id="ageno-logo" viewBox="0 0 894 279" fill="none"><clipPath id="ageno-logo-clip"><path d="m0 0h894v279h-894z"/></clipPath><g clip-path="url(#ageno-logo-clip)"><path d="m158.223 209.911h-39.51l19.755-34.87 19.755-34.87 19.754 34.87 19.755 34.87zm-.325 69.373h.307 158.023l-79.003-139.463-79.002-139.462281-79.0032 139.462281-79.019849 139.463h79.310549l19.4471-34.31 19.7554-34.871 19.755 34.871z" fill="#ff6b00"/><path d="m837.02 187.643c4.344 0 8.295-.787 11.836-2.377 3.557-1.591 6.567-3.758 9.065-6.503 2.497-2.744 4.429-5.977 5.798-9.683 1.385-3.705 2.069-7.725 2.069-12.06s-.684-8.355-2.069-12.06c-1.386-3.706-3.318-6.922-5.798-9.684-2.498-2.744-5.508-4.911-9.065-6.502-3.558-1.59-7.492-2.377-11.836-2.377-4.345 0-8.296.787-11.836 2.377-3.558 1.591-6.602 3.758-9.134 6.502-2.548 2.745-4.498 5.978-5.883 9.684-1.386 3.705-2.07 7.725-2.07 12.06s.684 8.355 2.07 12.06c1.385 3.706 3.335 6.922 5.883 9.683 2.549 2.745 5.593 4.912 9.134 6.503 3.54 1.59 7.491 2.377 11.836 2.377zm0 24.12c-8.159 0-15.685-1.346-22.577-4.037-6.893-2.692-12.88-6.45-17.959-11.257-5.08-4.806-9.065-10.574-11.922-17.286-2.856-6.712-4.293-14.088-4.293-22.128s1.437-15.416 4.293-22.128c2.857-6.712 6.842-12.48 11.922-17.287 5.079-4.806 11.083-8.564 17.959-11.256 6.892-2.692 14.418-4.038 22.577-4.038 8.056 0 15.547 1.346 22.491 4.038s12.931 6.45 17.959 11.256c5.029 4.807 8.98 10.575 11.836 17.287s4.293 14.088 4.293 22.128-1.437 15.416-4.293 22.128-6.807 12.48-11.836 17.286c-5.028 4.807-11.015 8.565-17.959 11.257-6.944 2.691-14.435 4.037-22.491 4.037zm-92.002-1.905-44.829-61.228v61.228h-27.349v-105.799h28.136l42.93 58.222v-58.222h27.503v105.799zm-162.486 0v-105.799h77.737v23.789h-50.388v16.5h49.276v23.788h-49.276v17.934h50.388v23.788zm-63.284 1.905c-7.321 0-14.282-1.276-20.901-3.81-6.619-2.535-12.452-6.188-17.48-10.942-5.029-4.754-9.031-10.487-12.007-17.216-2.959-6.712-4.447-14.298-4.447-22.758 0-8.354 1.505-15.923 4.532-22.687 3.028-6.764 7.133-12.532 12.315-17.286 5.2-4.755 11.255-8.408 18.199-10.942 6.944-2.535 14.384-3.811 22.337-3.811 5.935 0 11.289.717 16.061 2.15 4.772 1.434 9.013 3.339 12.725 5.716s6.944 5.121 9.698 8.25c2.754 3.111 5.028 6.327 6.841 9.596l-22.885 11.903c-2.018-3.496-4.96-6.607-8.825-9.351-3.866-2.745-8.398-4.125-13.598-4.125-4.344 0-8.312.769-11.921 2.307s-6.722 3.67-9.373 6.432c-2.651 2.744-4.686 5.995-6.123 9.753s-2.138 7.796-2.138 12.13c0 4.335.718 8.355 2.138 12.061 1.437 3.705 3.472 6.921 6.123 9.683 2.651 2.744 5.781 4.911 9.373 6.502 3.609 1.591 7.577 2.377 11.921 2.377 5.935 0 10.896-1.451 14.864-4.37 3.968-2.901 6.858-6.379 8.671-10.382h-27.828v-23.946h57.863c0 10.05-1.3 18.965-3.9 26.725-2.6 7.778-6.329 14.333-11.203 19.664-4.875 5.348-10.776 9.403-17.72 12.217-6.961 2.762-14.726 4.16-23.312 4.16zm-105.89-80.751-13.512 39.816h26.87zm26.066 78.846-5.251-15.224h-41.801l-5.251 15.224h-30.992l39.903-105.799h34.498l39.903 105.799z" fill="#231430"/></g></symbol>
+</svg>
+<main data-presentation aria-roledescription="prezentacja" aria-label="Platforma B2B na Magento 2, prezentacja przykładowa">
+  <div class="stage">
+
+    <!-- Przykład: fikcyjny klient „Firma Przykładowa”, wszystkie dane klienta i kwoty są przykładowe.
+         Fakty o Ageno tylko z references/ageno.md. Układy skopiowane z assets/template.html (numer w komentarzu). -->
+
+    <!-- 1. Tytułowy -->
+    <section data-slide class="slide is-active" aria-hidden="false">
+      <div class="bleed" aria-hidden="true">
+        <img class="title-mountains" src="ageno-mountains.svg" alt="" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+        <div class="title-mountains-missing" hidden>brak ageno-mountains.svg</div>
+      </div>
+      <div class="container">
+        <div class="brand-logo" data-grid="8">
+          <svg viewBox="0 0 894 279" role="img" aria-label="Ageno"><use href="#ageno-logo"></use></svg>
+        </div>
+        <div class="title-text stack mt-128" data-grid="32" data-snap>
+          <p class="eyebrow">Ageno · Firma Przykładowa · 2026-11-24</p>
+          <h1 class="title">Platforma B2B na <span class="nowrap">Magento 2</span> z MVP do 2027-07-31</h1>
+          <p class="lead">Prezentacja przykładowa z fikcyjnym klientem. Do decyzji: wariant projektu i budżet etapu 1.</p>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source></span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 2. Teza + 3 liczby -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Większość zamówień hurtowych trafia do działu sprzedaży e-mailem</h2>
+        <div class="grid-3 mt-64" data-grid="32" data-snap>
+          <div class="stack-tight" data-grid="32" data-snap>
+            <p class="number"><span class="mark">64%</span></p>
+            <p class="caption">Zamówienia B2B złożone e-mailem lub telefonicznie, 2026-01-01 – 2026-10-31.</p>
+          </div>
+          <div class="stack-tight" data-grid="32" data-snap>
+            <p class="number">1,5 dnia</p>
+            <p class="caption">Średni czas potwierdzenia zamówienia, 2026-01-01 – 2026-10-31.</p>
+          </div>
+          <div class="stack-tight" data-grid="32" data-snap>
+            <p class="number">9 osób</p>
+            <p class="caption">Handlowcy, którzy ręcznie przepisują zamówienia do ERP, stan na 2026-10-31.</p>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Dane przykładowe, raport sprzedaży, 2026-01-01 – 2026-10-31</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 17. Problem i rozwiązanie -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Platforma B2B przenosi zamówienia z poczty do panelu klienta</h2>
+        <div class="pairs" data-grid="32" data-snap>
+          <h3>Problem</h3>
+          <h3>Rozwiązanie</h3>
+          <p class="pair pair-problem">Handlowiec przepisuje każde zamówienie z e-maila do systemu ERP.</p>
+          <p class="pair">Klient składa zamówienie w panelu, a system ERP przyjmuje je bez przepisywania.</p>
+          <p class="pair pair-problem">Klient nie widzi swoich cen i rabatów przed złożeniem zamówienia.</p>
+          <p class="pair">Panel pokazuje ceny i rabaty z umowy klienta, pobrane z ERP.</p>
+          <p class="pair pair-problem">Stan magazynu klient sprawdza telefonicznie u handlowca.</p>
+          <p class="pair">Karta produktu pokazuje stan magazynu, aktualizowany co 15 minut.</p>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Dane przykładowe, notatki z warsztatów, 2026-11-11</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 8. Warianty -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Wariant B z MVP do 2027-07-31 jako rekomendowany</h2>
+        <div class="grid-3 options" data-grid="32" data-snap>
+          <div class="card stack" data-grid="32">
+            <p class="eyebrow">Wariant A</p>
+            <h3>Pełna platforma od razu</h3>
+            <dl class="facts">
+              <dt>Zakres</dt><dd>Wszystkie funkcje B2B w jednym wdrożeniu</dd>
+              <dt>Czas</dt><dd>2026-12-01 – 2027-12-31</dd>
+              <dt>Koszt</dt><dd>780 000 zł netto</dd>
+              <dt>Ryzyko</dt><dd>Pierwsze zamówienia w panelu po 2027-12-31</dd>
+            </dl>
+          </div>
+          <div class="card stack" data-grid="32">
+            <p class="eyebrow"><span class="mark">Rekomendowany</span></p>
+            <h3>MVP i rozwój etapami</h3>
+            <dl class="facts">
+              <dt>Zakres</dt><dd>Panel zamówień, ceny z ERP, stany magazynu</dd>
+              <dt>Czas</dt><dd>2026-12-01 – 2027-07-31</dd>
+              <dt>Koszt</dt><dd>420 000 zł netto</dd>
+              <dt>Ryzyko</dt><dd>Część funkcji dopiero w etapie 2</dd>
+            </dl>
+          </div>
+          <div class="card stack" data-grid="32">
+            <p class="eyebrow">Wariant C</p>
+            <h3>Moduł B2B w obecnym sklepie</h3>
+            <dl class="facts">
+              <dt>Zakres</dt><dd>Zamówienia B2B w sklepie B2C, bez cen z ERP</dd>
+              <dt>Czas</dt><dd>2026-12-01 – 2027-04-30</dd>
+              <dt>Koszt</dt><dd>260 000 zł netto</dd>
+              <dt>Ryzyko</dt><dd>Handlowcy nadal ręcznie poprawiają ceny</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Kwoty przykładowe, ceny netto w PLN, szacunek z 2026-11-20</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 9. Zakres -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Etap 1 obejmuje zamówienia, ceny i stany magazynu z ERP</h2>
+        <div class="grid-2" data-grid="32" data-snap>
+          <div class="stack" data-grid="32" data-snap>
+            <h3>W zakresie</h3>
+            <ul class="points">
+              <li>Klient składa zamówienie w panelu B2B.</li>
+              <li>Panel pokazuje ceny i rabaty z umowy klienta.</li>
+              <li>System ERP przyjmuje zamówienia przez API.</li>
+              <li>Karta produktu pokazuje stan magazynu.</li>
+              <li>Handlowiec zakłada konta klientów w panelu.</li>
+            </ul>
+          </div>
+          <div class="stack" data-grid="32" data-snap>
+            <h3>Poza zakresem</h3>
+            <ul class="points points-out">
+              <li>Płatności online przechodzą do etapu 2.</li>
+              <li>Aplikacja mobilna przechodzi do etapu 2.</li>
+              <li>Obecny sklep B2C działa bez zmian.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Dane przykładowe</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 13. Harmonogram (timeline) -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Planowane uruchomienie MVP do 2027-07-31</h2>
+        <div class="gantt" data-grid="32" style="--periods: 8;" aria-label="Harmonogram projektu">
+          <ol class="gantt-scale" aria-label="Okresy">
+            <li>2026-12-01</li><li>2027-01-01</li><li>2027-02-01</li><li>2027-03-01</li>
+            <li>2027-04-01</li><li>2027-05-01</li><li>2027-06-01</li><li>2027-07-01</li>
+          </ol>
+          <ul class="gantt-rows">
+            <li class="gantt-row"><span class="gantt-name">Analiza wymagań B2B</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 0; --span: 2;"><span class="sr-only">2026-12-01 – 2027-01-31</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Projekt panelu B2B</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 1; --span: 2;"><span class="sr-only">2027-01-01 – 2027-02-28</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Integracja z ERP</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 2; --span: 3;"><span class="sr-only">2027-02-01 – 2027-04-30</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Budowa panelu B2B</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 2; --span: 4;"><span class="sr-only">2027-02-01 – 2027-05-31</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Testy akceptacyjne</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 5; --span: 2;"><span class="sr-only">2027-05-01 – 2027-06-30</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Code freeze</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 6; --span: 1;"><span class="sr-only">2027-06-01 – 2027-06-30</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">MVP</span><span class="gantt-track"><span class="gantt-bar is-key" data-grid="8" style="--start: 7; --span: 1;"><span class="sr-only">2027-07-01 – 2027-07-31</span></span></span></li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Harmonogram przykładowy, 2026-12-01 – 2027-07-31</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 10. Wycena -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 id="wycena-teza" data-grid="32">Etap 1 za 420 000 zł netto, najwięcej kosztuje budowa panelu B2B</h2>
+        <table class="table" aria-labelledby="wycena-teza" data-grid="32">
+          <colgroup>
+            <col style="width: 704px">
+            <col style="width: 288px">
+            <col style="width: 320px">
+          </colgroup>
+          <thead>
+            <tr><th scope="col">Pozycja</th><th scope="col" class="num">Czas</th><th scope="col" class="num">Kwota netto, przykład</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Analiza wymagań i projekt panelu</td><td class="num">5 tyg.</td><td class="num">60 000 zł</td></tr>
+            <tr><td>Budowa panelu B2B</td><td class="num">14 tyg.</td><td class="num">150 000 zł</td></tr>
+            <tr><td>Integracja z ERP</td><td class="num">10 tyg.</td><td class="num">140 000 zł</td></tr>
+            <tr><td>Testy akceptacyjne i uruchomienie</td><td class="num">6 tyg.</td><td class="num">70 000 zł</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td>Razem</td><td class="num">35 tyg.</td><td class="num"><span class="mark">420 000 zł</span></td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Kwoty przykładowe. Ceny netto w PLN, oferta ważna do 2026-12-31</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 18. Ryzyka i działania -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 id="ryzyka-teza" data-grid="32">Największe ryzyko to niekompletne dane cenowe w ERP</h2>
+        <table class="table" aria-labelledby="ryzyka-teza" data-grid="32">
+          <colgroup>
+            <col style="width: 448px">
+            <col style="width: 160px">
+            <col style="width: 480px">
+            <col style="width: 224px">
+          </colgroup>
+          <thead>
+            <tr><th scope="col">Ryzyko</th><th scope="col">Wpływ</th><th scope="col">Działanie</th><th scope="col">Właściciel</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Niekompletne ceny i rabaty w ERP</td><td><strong>wysoki</strong></td><td>Przegląd danych cenowych przed integracją</td><td>Klient</td></tr>
+            <tr><td>Opóźnione testowe API systemu ERP</td><td><strong>wysoki</strong></td><td>Testowe API dostępne do 2027-01-15</td><td>Klient</td></tr>
+            <tr><td>Nowe wymagania w trakcie budowy</td><td>średni</td><td>Nowe funkcje trafiają do etapu 2</td><td>Ageno</td></tr>
+            <tr><td>Mało zamówień w panelu po starcie</td><td>średni</td><td>Pilotaż z 20 klientami i szkolenie handlowców</td><td>Klient</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Rejestr ryzyk projektu, stan na 2026-11-20, dane przykładowe</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 19. Role i odpowiedzialności -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 id="role-teza" data-grid="32">Ageno odpowiada za platformę, klient za dane i odbiór</h2>
+        <table class="table" aria-labelledby="role-teza" data-grid="32">
+          <colgroup>
+            <col style="width: 672px">
+            <col style="width: 320px">
+            <col style="width: 320px">
+          </colgroup>
+          <thead>
+            <tr><th scope="col">Zadanie</th><th scope="col">Ageno</th><th scope="col">Klient</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Analiza i specyfikacja wymagań</td><td>odpowiada</td><td>akceptuje</td></tr>
+            <tr><td>Dane cenowe i testowe API systemu ERP</td><td>wspiera</td><td>odpowiada</td></tr>
+            <tr><td>Budowa panelu i testy techniczne</td><td>odpowiada</td><td></td></tr>
+            <tr><td>Testy akceptacyjne</td><td>wspiera</td><td>odpowiada</td></tr>
+            <tr><td>Szkolenie handlowców</td><td>odpowiada</td><td>wspiera</td></tr>
+            <tr><td>Decyzja o uruchomieniu</td><td>rekomenduje</td><td>decyduje</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Dane przykładowe</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 2. Teza + 3 liczby (fakty o Ageno z references/ageno.md, „Liczby”) -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Ponad 90% nowych projektów Ageno pochodzi z rekomendacji</h2>
+        <div class="grid-3 mt-64" data-grid="32" data-snap>
+          <div class="stack-tight" data-grid="32" data-snap>
+            <p class="number"><span class="mark">ponad 90%</span></p>
+            <p class="caption">Nowe projekty z rekomendacji, stan na 2026-11-17.</p>
+          </div>
+          <div class="stack-tight" data-grid="32" data-snap>
+            <p class="number">100+</p>
+            <p class="caption">Klienci Ageno, stan na 2026-11-17.</p>
+          </div>
+          <div class="stack-tight" data-grid="32" data-snap>
+            <p class="number">10+</p>
+            <p class="caption">Lata doświadczenia Ageno, stan na 2026-11-17.</p>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>ageno.pl, stan na 2026-11-17</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 20. Decyzje do podjęcia -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 id="decyzje-teza" data-grid="32">Start projektu 2026-12-01 wymaga trzech decyzji</h2>
+        <table class="table" aria-labelledby="decyzje-teza" data-grid="32">
+          <colgroup>
+            <col style="width: 768px">
+            <col style="width: 288px">
+            <col style="width: 256px">
+          </colgroup>
+          <thead>
+            <tr><th scope="col">Decyzja</th><th scope="col">Decyduje</th><th scope="col">Termin</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Wybór wariantu projektu</td><td>zarząd klienta</td><td><span class="mark">2026-11-27</span></td></tr>
+            <tr><td>Akceptacja budżetu etapu 1</td><td>zarząd klienta</td><td>2026-11-27</td></tr>
+            <tr><td>Wskazanie właściciela projektu</td><td>klient</td><td>2026-11-30</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Dane przykładowe</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 22. Rekomendacja -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container">
+        <div class="w-2of3 stack mt-128" data-grid="32" data-snap>
+          <p class="eyebrow">Rekomendacja</p>
+          <h2>Wariant B z uruchomieniem MVP do 2027-07-31</h2>
+          <ul class="points">
+            <li>Zarząd Firmy Przykładowej wybiera wariant B i budżet 420 000 zł netto do 2026-11-27.</li>
+            <li>Zespół Ageno zaczyna analizę wymagań 2026-12-01.</li>
+            <li>Klient udostępnia testowe API systemu ERP do 2027-01-15.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>Dane przykładowe, kwoty przykładowe</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 23. Klienci Ageno (logotypy z ageno.pl, scripts/ageno-assets.mjs).
+         onerror: bez pobranego pliku komórka wraca do zaślepki szablonu (.logo-placeholder z nazwą klienta). -->
+    <section data-slide class="slide" aria-hidden="true">
+      <div class="container stack">
+        <h2 data-grid="32">Klienci Ageno</h2>
+        <p class="lead w-2of3" data-grid="32" data-snap>Ponad 100 klientów, m.in. z branży sportowej, modowej, produkcyjnej, motoryzacyjnej i wyposażenia wnętrz.</p>
+        <ul class="logo-wall mt-64" data-grid="32" aria-label="Logotypy klientów">
+          <li class="logo-cell"><img src="logos/01-martes-sport.svg" alt="Martes Sport" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/04-safety-first.svg" alt="Safety First" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/07-avionaut.svg" alt="Avionaut" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/03-pro.svg" alt="PRO" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/02-eurofirany.svg" alt="Eurofirany" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/06-henry-schein.svg" alt="Henry Schein" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/08-nobile.svg" alt="Nobile" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/20-marrodent.svg" alt="Marrodent" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/05-kontakt-simon.svg" alt="Kontakt-Simon" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/14-iguana-group.svg" alt="Iguana" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+        </ul>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>ageno.pl, stan na 2026-11-17</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <!-- 24. Kontakt (slajd zamykający) -->
+    <section data-slide class="slide slide-contact" aria-hidden="true">
+      <div class="bleed" aria-hidden="true">
+        <img class="contact-mountains" src="ageno-mountains.svg" alt="" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+        <div class="contact-mountains-missing" hidden>brak ageno-mountains.svg</div>
+      </div>
+      <div class="container">
+        <div class="brand-logo" data-grid="8">
+          <svg viewBox="0 0 894 279" role="img" aria-label="Ageno"><use href="#ageno-logo"></use></svg>
+        </div>
+        <div class="contact-text stack mt-128" data-grid="32" data-snap>
+          <h2 class="title">Pytania i kontakt</h2>
+          <p class="lead">Bezpośredni kontakt w sprawie oferty i projektu.</p>
+        </div>
+        <div class="person mt-64" data-grid="32">
+          <div class="person-photo" data-grid="32">
+            <img src="people/maksymilian-sleziak.png" alt="Maksymilian Śleziak" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+            <div class="person-photo-missing" hidden>brak zdjęcia</div>
+          </div>
+          <div class="person-details stack-tight" data-grid="32">
+            <p class="person-name">Maksymilian Śleziak</p>
+            <p><a class="nowrap" href="mailto:maksymilian.sleziak@ageno.pl">maksymilian.sleziak@ageno.pl</a></p>
+            <p><a class="nowrap" href="mailto:info@ageno.pl">info@ageno.pl</a></p>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span data-source>ageno.pl</span>
+        <span data-slide-number></span>
+      </footer>
+    </section>
+
+    <nav class="deck-nav" aria-label="Nawigacja prezentacji">
+      <button type="button" data-nav="prev" aria-label="Poprzedni slajd" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <button type="button" data-nav="next" aria-label="Następny slajd">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </nav>
+  </div>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+
+  // Sierotki (references/redakcja.md): twarda spacja (U+00A0) w tekście slajdów, żeby
+  // jednoliterowe słowa, liczby z jednostkami, grupy cyfr, skróty i myślnik zakresu dat
+  // nie zostawały na końcu ani na początku wiersza. Działa raz, przy otwarciu pliku; poprawiony
+  // tekst zostaje w DOM, więc druk i PDF dostają te same twarde spacje.
+  const NB = "\u00A0";
+  const ORPHAN_RULES = [
+    [/(?<=^|[\s(\["'„])([aiouwzAIOUWZ])\s+/gu, `$1${NB}`],                         // a, i, o, u, w, z
+    [/(\d)\s+(?=\d{3}(?!\d))/gu, `$1${NB}`],                                       // 48 200, 1 200 000
+    [/(\d)\s+(?=(zł|PLN|EUR|USD|tys\.|mln|mld|tyg\.|dni|dnia|godz\.|h|min|szt\.|osób|osoby|lat|r\.|%|px)(?![\p{L}]))/gu, `$1${NB}`],
+    [/(?<=^|\s)(np\.|m\.in\.|tj\.|ok\.|nr|ul\.|dr|mgr|inż\.|tzw\.)\s+/gu, `$1${NB}`], // skrót + słowo
+    [/\s+([–—])\s/gu, `${NB}$1 `],                                                    // myślnik zostaje z poprzednim słowem
+  ];
+  const fixOrphans = (scope) => {
+    const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (node.parentElement.closest("script, style, code, pre")) continue;
+      let text = node.nodeValue;
+      for (const [re, to] of ORPHAN_RULES) text = text.replace(re, to);
+      if (text !== node.nodeValue) node.nodeValue = text;
+    }
+  };
+  const deck = document.querySelector("[data-presentation]");
+  const stage = deck.querySelector(".stage");
+  const slides = [...deck.querySelectorAll("[data-slide]")];
+  const prev = deck.querySelector('[data-nav="prev"]');
+  const next = deck.querySelector('[data-nav="next"]');
+  const SLIDE_W = 1536, SLIDE_H = 864, DURATION = 200, HIDE_AFTER = 1800, SWIPE = 50;
+  let index = Math.max(0, slides.findIndex((s) => s.classList.contains("is-active")));
+
+  fixOrphans(deck);
+
+  // Numeracja, etykiety i małe logo Ageno w stopce (poza slajdami z dużym logo: tytułowy i „Kontakt”)
+  slides.forEach((slide, i) => {
+    const footer = slide.querySelector(".slide-footer");
+    if (footer && !slide.querySelector(".brand-logo") && !footer.querySelector(".footer-logo")) {
+      footer.insertAdjacentHTML("afterbegin",
+        '<svg class="footer-logo" viewBox="0 0 894 279" role="img" aria-label="Ageno"><use href="#ageno-logo"></use></svg>');
+    }
+    slide.dataset.slideIndex = String(i);
+    slide.setAttribute("aria-label", `Slajd ${i + 1} z ${slides.length}`);
+    const num = slide.querySelector("[data-slide-number]");
+    if (num) num.textContent = `${String(i + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+    const active = i === index;
+    slide.classList.toggle("is-active", active);
+    slide.setAttribute("aria-hidden", active ? "false" : "true");
+  });
+
+  // Skalowanie płótna do okna, wolne pola w kolorze tła
+  const fit = () => {
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    stage.style.setProperty("--scale", String(scale));
+  };
+
+  const updateNav = () => {
+    prev.disabled = index === 0;
+    next.disabled = index === slides.length - 1;
+    const s = slides[index];
+    deck.dataset.photoSide = s.classList.contains("photo-right") ? "right" : s.classList.contains("photo-left") ? "left" : "";
+  };
+
+  // Przejście. Kolejne wejście w trakcie animacji najpierw kończy bieżące przejście
+  // (bez nakładania slajdów), potem przechodzi dalej: każde naciśnięcie = jeden slajd.
+  let finish = null;
+  const go = (dir) => {
+    const target = index + dir;
+    if (target < 0 || target >= slides.length) return;
+    if (finish) finish();
+    const from = slides[index];
+    const to = slides[target];
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    to.classList.add(dir > 0 ? "from-right" : "from-left");
+    void to.offsetWidth; // start nowego slajdu z boku
+    to.classList.remove("from-right", "from-left");
+    to.classList.add("is-active");
+    to.setAttribute("aria-hidden", "false");
+    from.classList.remove("is-active");
+    from.classList.add(dir > 0 ? "to-left" : "to-right");
+    from.setAttribute("aria-hidden", "true");
+    index = target;
+    updateNav();
+    let timer;
+    finish = () => {
+      window.clearTimeout(timer);
+      from.classList.remove("to-left", "to-right");
+      finish = null;
+    };
+    timer = window.setTimeout(finish, reduce ? 130 : DURATION);
+  };
+
+  prev.addEventListener("click", () => go(-1));
+  next.addEventListener("click", () => go(1));
+
+  // Strzałki: widoczne po ruchu myszy, znikają po 1,8 s bezczynności
+  let hideTimer;
+  const scheduleHide = () => {
+    window.clearTimeout(hideTimer);
+    hideTimer = window.setTimeout(() => {
+      const held = [prev, next].some((b) => b.matches(":hover") || b === document.activeElement);
+      if (held) scheduleHide();
+      else deck.classList.remove("show-nav");
+    }, HIDE_AFTER);
+  };
+  deck.addEventListener("mousemove", () => { deck.classList.add("show-nav"); scheduleHide(); });
+  [prev, next].forEach((b) => {
+    b.addEventListener("mouseenter", () => { deck.classList.add("show-nav"); scheduleHide(); });
+    b.addEventListener("focus", () => { deck.classList.add("show-nav"); scheduleHide(); });
+  });
+
+  // Klawiatura
+  const editable = (el) => el && (el.isContentEditable || el.closest("input, textarea, select, [contenteditable]"));
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    else (deck.requestFullscreen ? deck.requestFullscreen() : Promise.reject()).catch(() => {});
+  };
+  const toggleDebug = (force) => root.classList.toggle("is-debug", force);
+  document.addEventListener("keydown", (e) => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || editable(e.target)) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+    else if (e.key === "f" || e.key === "F") { e.preventDefault(); toggleFullscreen(); }
+    else if (e.key === "g" || e.key === "G") { e.preventDefault(); toggleDebug(); }
+  });
+  document.addEventListener("fullscreenchange", fit);
+
+  // Dotyk: przesunięcie poziome z progiem, bez tapnięć i ruchu pionowego
+  let touch = null;
+  deck.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1 || e.target.closest("button, a, input, textarea, select")) { touch = null; return; }
+    touch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (!touch) return;
+    const dx = e.changedTouches[0].clientX - touch.x;
+    const dy = e.changedTouches[0].clientY - touch.y;
+    touch = null;
+    if (Math.abs(dx) >= SWIPE && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  // Tryb diagnostyczny z adresu
+  const fromHash = () => toggleDebug(location.hash === "#siatka");
+  window.addEventListener("hashchange", fromHash);
+  fromHash();
+
+  // Snap: wysokość bloków [data-snap] w górę do 32 px.
+  // offsetHeight i ResizeObserver mierzą w px płótna, niezależnie od scale().
+  if ("ResizeObserver" in window) {
+    const ro = new ResizeObserver((entries) => {
+      for (const { target } of entries) {
+        const h = target.offsetHeight;
+        const rest = Math.ceil((h - 0.05) / 32) * 32 - h;
+        target.style.setProperty("--snap", `${Math.max(0, rest)}px`);
+      }
+    });
+    deck.querySelectorAll("[data-snap]").forEach((el) => ro.observe(el));
+  }
+
+  window.addEventListener("resize", fit);
+  fit();
+  updateNav();
+})();
+</script>
+</body>
+</html>
