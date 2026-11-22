@@ -2,11 +2,22 @@
 
 Instrukcja dla agenta (`SKILL.md`) i skrypty, które składają prezentację Ageno w jeden plik HTML. Slajdy są 16:9, płótno ma 1536 × 864 px, siatka 8 / 32 px. CSS i JS są w pliku od razu, obrazy po `scripts/inline-assets.mjs`. Agent układa treść z materiałów, osoba lokalnie uruchamia te same polecenia. Język slajdów jest domyślnie polski. Fakty o Ageno bierz z `references/ageno.md`.
 
+## Użycie w Claude, Codex i ChatGPT
+
+- **Claude Code.** Skill nazywa się tak jak pole `name` w `SKILL.md`, więc sklonuj repozytorium do katalogu `~/.claude/skills/ageno-presentation/` (wszystkie projekty) albo `.claude/skills/ageno-presentation/` (jeden projekt). W tym katalogu raz uruchom `npm install && npx playwright install chromium`. Claude wczytuje skill sam, gdy prośba dotyczy prezentacji, albo po poleceniu `/ageno-presentation`.
+- **Codex.** Otwórz repozytorium jako katalog roboczy. `AGENTS.md` kieruje do `SKILL.md` i poleceń `npm`, a prezentacje trafiają do `decks/` i `dist/` (oba w `.gitignore`).
+- **ChatGPT i claude.ai (projekt).** Wklej `INSTRUKCJE.md` do instrukcji projektu i dodaj `assets/template.html` do jego plików. Skrypty tam nie działają: kontrola jest ręczna według listy w `INSTRUKCJE.md`, a grafiki z ageno.pl osadza się potem lokalnie przez `ageno-assets.mjs` i `inline-assets.mjs`.
+
+Podgląd: po każdym pushu do `main` workflow `.github/workflows/pages.yml` publikuje na GitHub Pages złożony przykład `examples/przyklad.html` (`index.html`) i złożony szablon (`template.html`).
+
 ## Struktura
 
 - `SKILL.md` — kolejność: źródła, plan, screeny, slajdy, kontrola.
 - `assets/template.html` — start każdej prezentacji: 24 układy, style, nawigacja, druk do PDF.
 - `assets/ageno-logo.svg` — logo, w szablonie już jako `<symbol id="ageno-logo">`.
+- `examples/przyklad.html` — przykładowa prezentacja z fikcyjnym klientem, zbudowana z układów szablonu.
+- `AGENTS.md` — wskazówki dla Codex; `INSTRUKCJE.md` — reguły do projektu w ChatGPT lub claude.ai.
+- `.github/workflows/pages.yml` — testy i podgląd na GitHub Pages.
 - `references/` — `ageno.md`, `tresc.md`, `redakcja.md`, `siatka.md`, `uklady.md`, `screeny.md`, `zdjecia.md`, `nawigacja.md`, `qa.md`.
 - `scripts/` — polecenia poniżej; `constants.mjs` (wspólne stałe) i `cli.mjs` (umowa CLI) to moduły pomocnicze.
 - `test/` — testy skryptów (`npm test`, bez dodatkowego runnera).
