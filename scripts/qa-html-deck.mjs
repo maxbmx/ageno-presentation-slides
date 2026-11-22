@@ -1,36 +1,43 @@
 #!/usr/bin/env node
 /**
- * Smoke-test and screenshot a standalone HTML slide deck.
- * Requires: npm install --no-save playwright && npx playwright install chromium
- * Usage: node scripts/qa-html-deck.mjs ./presentation.html [--out ./qa] [--viewports 1600x900,1366x768,1280x720,1280x800]
+ * Smoke-test prezentacji HTML: przepełnienia, nawigacja (strzałki, krańce, autoukrywanie),
+ * błędy konsoli i zrzut każdego slajdu w każdym oknie. Raport: <out>/qa-report.json.
+ *
+ * Użycie: node scripts/qa-html-deck.mjs prezentacja.html [--out katalog] [--viewports 1600x900,1366x768,1280x720,1280x800]
+ * Domyślne okna: QA_VIEWPORTS z constants.mjs.
+ * Domyślne --out: qa/ obok pliku HTML.
+ * Kod wyjścia: 0 = bez problemów, 1 = przepełnienie, błąd nawigacji albo konsoli,
+ * 2 = złe wywołanie, także zły --viewports (scripts/cli.mjs), przed uruchomieniem przeglądarki.
+ * Wymaga: npm install && npx playwright install chromium
  */
-import { chromium } from 'playwright';
-import { mkdir, readFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { launchChromium, parseCli, usageError } from './cli.mjs';
+import { NAV, QA_VIEWPORTS } from './constants.mjs';
 
-const args = process.argv.slice(2);
-const input = args.find((a) => !a.startsWith('--'));
-if (!input) {
-  console.error('Usage: node scripts/qa-html-deck.mjs presentation.html [--out ./qa] [--viewports 1600x900,1366x768,1280x720,1280x800]');
-  process.exit(2);
-}
-const arg = (name, fallback) => {
-  const i = args.indexOf(name);
-  return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
-};
-const outDir = path.resolve(arg('--out', './qa-presentation'));
-const viewports = arg('--viewports', '1600x900,1366x768,1280x720,1280x800')
-  .split(',').map((s) => s.trim()).map((s) => {
-    const [width, height] = s.split('x').map(Number);
-    if (!width || !height) throw new Error(`Invalid viewport: ${s}`);
-    return { width, height, label: `${width}x${height}` };
-  });
+const DEFAULT_VIEWPORTS = QA_VIEWPORTS.map(([w, h]) => `${w}x${h}`).join(',');
+// Oczekiwanie po przejściu slajdu i po czasie autoukrywania strzałek, z zapasem.
+const AFTER_TRANSITION = NAV.transitionMs + 60;
+const AFTER_HIDE = NAV.hideAfterMs + 100;
+const USAGE = `node scripts/qa-html-deck.mjs prezentacja.html [--out katalog] [--viewports ${DEFAULT_VIEWPORTS}]`;
+const { values, positionals: [input] } = parseCli({
+  usage: USAGE,
+  options: { out: { type: 'string' }, viewports: { type: 'string' } },
+  positionals: [1, 1],
+  files: true,
+});
+const viewports = (values.viewports ?? DEFAULT_VIEWPORTS).split(',').map((s) => s.trim()).map((s) => {
+  const m = s.match(/^(\d+)x(\d+)$/);
+  const [width, height] = m ? [Number(m[1]), Number(m[2])] : [0, 0];
+  if (!width || !height) usageError(USAGE, `zły rozmiar okna w --viewports: „${s}” (oczekiwane SZERxWYS, np. 1366x768)`);
+  return { width, height, label: `${width}x${height}` };
+});
 const htmlPath = path.resolve(input);
-await readFile(htmlPath); // fail early if file is missing or unreadable
+const outDir = path.resolve(values.out ?? path.join(path.dirname(htmlPath), 'qa'));
 await mkdir(outDir, { recursive: true });
 
-const browser = await chromium.launch({ headless: true });
+const browser = await launchChromium();
 const report = { file: htmlPath, viewports: [], errors: [] };
 try {
   for (const viewport of viewports) {
@@ -38,44 +45,49 @@ try {
     const page = await context.newPage();
     const consoleErrors = [];
     page.on('pageerror', (error) => consoleErrors.push(error.message));
-    page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+    // Błąd wczytania zasobu (np. net::ERR_FILE_NOT_FOUND) dostaje adres brakującego pliku.
+    page.on('console', (message) => {
+      if (message.type() !== 'error') return;
+      const url = message.location()?.url;
+      consoleErrors.push(url && !message.text().includes(url) ? `${message.text()} (${decodeURI(url)})` : message.text());
+    });
     await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts?.ready);
     await page.waitForTimeout(250);
 
     const slideCount = await page.locator('[data-slide]').count();
-    if (slideCount < 1) throw new Error('No [data-slide] elements found. Follow references/html-presentation.md DOM contract.');
+    if (slideCount < 1) throw new Error('Brak elementów [data-slide]. Kontrakt DOM: references/nawigacja.md.');
     const activeIndex = async () => page.locator('[data-slide].is-active').evaluate((el) => Number(el.getAttribute('data-slide-index') ?? [...el.parentElement.querySelectorAll('[data-slide]')].indexOf(el)));
     const activeCount = async () => page.locator('[data-slide].is-active').count();
-    if (await activeCount() !== 1) throw new Error(`Expected exactly one active slide; found ${await activeCount()}.`);
+    if (await activeCount() !== 1) throw new Error(`Oczekiwany dokładnie jeden aktywny slajd, jest ${await activeCount()}.`);
 
     const viewportReport = { viewport: viewport.label, slides: slideCount, screenshots: [], overflow: [], consoleErrors: [], navigation: [] };
 
-    // Verify the auto-hide behaviour once per viewport.
+    // Autoukrywanie strzałek, raz na okno.
     const nextButton = page.locator('button[data-nav="next"]');
     const prevButton = page.locator('button[data-nav="prev"]');
     if (await nextButton.count()) {
       await page.mouse.move(Math.round(viewport.width / 2), Math.round(viewport.height / 2));
-      await page.waitForTimeout(260);
+      await page.waitForTimeout(AFTER_TRANSITION);
       const shownOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
-      if (shownOpacity < 0.5) viewportReport.navigation.push('Next arrow did not become visible after mouse movement.');
-      await page.waitForTimeout(1900);
+      if (shownOpacity < 0.5) viewportReport.navigation.push('Strzałka „Następny” nie pokazała się po ruchu myszy.');
+      await page.waitForTimeout(AFTER_HIDE);
       const hiddenOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
-      if (hiddenOpacity > 0.1) viewportReport.navigation.push('Next arrow did not auto-hide after 1.8 seconds of inactivity.');
+      if (hiddenOpacity > 0.1) viewportReport.navigation.push('Strzałka „Następny” nie zniknęła po 1,8 s bezczynności.');
       await page.mouse.move(Math.round(viewport.width / 2), Math.round(viewport.height / 2));
       await page.waitForTimeout(100);
       const box = await nextButton.boundingBox();
       if (box) {
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-        await page.waitForTimeout(1900);
+        await page.waitForTimeout(AFTER_HIDE);
         const hoverOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
-        if (hoverOpacity < 0.5) viewportReport.navigation.push('Next arrow disappeared while hovered.');
+        if (hoverOpacity < 0.5) viewportReport.navigation.push('Strzałka „Następny” zniknęła mimo najechania kursorem.');
       }
       await page.mouse.move(-1, -1);
-      await page.waitForTimeout(1900);
+      await page.waitForTimeout(AFTER_HIDE);
     }
 
-    // Hide navigation only for visual baselines; interaction checks run separately.
+    // Strzałki ukryte tylko na zrzutach; nawigację sprawdza osobny krok.
     await page.addStyleTag({ content: 'button[data-nav] { opacity: 0 !important; visibility: hidden !important; }' });
     for (let i = 0; i < slideCount; i += 1) {
       const current = await activeIndex();
@@ -91,46 +103,46 @@ try {
         };
       });
       const issues = [];
-      if (metrics.scrollWidth > metrics.clientWidth + 2) issues.push('horizontal overflow inside slide');
-      if (metrics.scrollHeight > metrics.clientHeight + 2) issues.push('vertical overflow inside slide');
-      if (metrics.left < -2 || metrics.top < -2 || metrics.right > viewport.width + 2 || metrics.bottom > viewport.height + 2) issues.push('slide exceeds viewport bounds');
+      if (metrics.scrollWidth > metrics.clientWidth + 2) issues.push('przepełnienie w poziomie wewnątrz slajdu');
+      if (metrics.scrollHeight > metrics.clientHeight + 2) issues.push('przepełnienie w pionie wewnątrz slajdu');
+      if (metrics.left < -2 || metrics.top < -2 || metrics.right > viewport.width + 2 || metrics.bottom > viewport.height + 2) issues.push('slajd wychodzi poza okno');
       if (issues.length) viewportReport.overflow.push({ slide: current, issues, metrics });
 
       const filename = `${viewport.label}-slide-${String(i + 1).padStart(2, '0')}.png`;
-      await page.mouse.move(0, 0); // keep hover controls out of the visual baseline
+      await page.mouse.move(0, 0); // kursor poza kontrolkami na zrzucie
       await page.waitForTimeout(80);
       await page.screenshot({ path: path.join(outDir, filename), animations: 'disabled' });
       viewportReport.screenshots.push(filename);
 
       if (i < slideCount - 1) {
         await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(260);
-        if (await activeCount() !== 1) throw new Error(`Viewport ${viewport.label}: active slide count changed after ArrowRight.`);
+        await page.waitForTimeout(AFTER_TRANSITION);
+        if (await activeCount() !== 1) throw new Error(`Okno ${viewport.label}: po ArrowRight zmieniła się liczba aktywnych slajdów.`);
         const next = await activeIndex();
-        if (next === current) throw new Error(`Viewport ${viewport.label}: ArrowRight did not advance from slide ${current}.`);
+        if (next === current) throw new Error(`Okno ${viewport.label}: ArrowRight nie przełączył dalej ze slajdu ${current}.`);
       }
     }
 
-    // Verify reverse navigation and both boundaries.
+    // Nawigacja wstecz i oba krańce.
     if (await nextButton.count() && !await nextButton.isDisabled().catch(() => false)) {
-      viewportReport.navigation.push('Next button should be disabled on the last slide.');
+      viewportReport.navigation.push('Przycisk „Następny” powinien mieć disabled na ostatnim slajdzie.');
     }
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(260);
-    if (await activeCount() !== 1) throw new Error(`Viewport ${viewport.label}: invalid active slide state after ArrowLeft.`);
+    await page.waitForTimeout(AFTER_TRANSITION);
+    if (await activeCount() !== 1) throw new Error(`Okno ${viewport.label}: po ArrowLeft zły stan aktywnego slajdu.`);
     for (let i = 0; i < Math.max(0, slideCount - 2); i += 1) {
       await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(230);
+      await page.waitForTimeout(AFTER_TRANSITION);
     }
     const firstIndex = await activeIndex();
     if (await prevButton.count() && !await prevButton.isDisabled().catch(() => false)) {
-      viewportReport.navigation.push('Previous button should be disabled on the first slide.');
+      viewportReport.navigation.push('Przycisk „Poprzedni” powinien mieć disabled na pierwszym slajdzie.');
     }
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(230);
-    if (await activeIndex() !== firstIndex) viewportReport.navigation.push('ArrowLeft moved before the first slide.');
+    await page.waitForTimeout(AFTER_TRANSITION);
+    if (await activeIndex() !== firstIndex) viewportReport.navigation.push('ArrowLeft przeszedł przed pierwszy slajd.');
 
-    // Check page-level overflow; slide-level overflow is checked above.
+    // Przepełnienie strony; przepełnienie slajdu sprawdzone wyżej.
     const pageOverflow = await page.evaluate(() => ({
       horizontal: document.documentElement.scrollWidth > window.innerWidth + 2,
       vertical: document.documentElement.scrollHeight > window.innerHeight + 2,
@@ -152,4 +164,5 @@ const reportPath = path.join(outDir, 'qa-report.json');
 await (await import('node:fs/promises')).writeFile(reportPath, JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
 const failed = report.errors.length || report.viewports.some((v) => v.overflow?.length || v.consoleErrors?.length || v.navigation?.length);
+console.log(failed ? `\nQA: są problemy, raport: ${reportPath}` : `\nQA: bez problemów, raport i zrzuty: ${outDir}`);
 process.exit(failed ? 1 : 0);

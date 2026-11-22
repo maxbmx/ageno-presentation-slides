@@ -48,10 +48,10 @@ Tytuł to wniosek, nie temat, zapisany krótko, bez „my” i bez dwukropka
 - słabo: „Wyniki sprzedaży” (temat), „Pokażemy, jak rośnie sprzedaż” (deklaracja),
 - lepiej: „Wzrost sprzedaży skoncentrowany w dwóch kanałach”.
 
-Plan opisuj jako plan, nie jako rezultat: „Planowane uruchomienie MVP do 2027-07-31”,
-nie „MVP gotowe do 2027-07-31”.
+Plan opisuj jako plan, nie jako rezultat (`references/redakcja.md`, S7).
 
-Jeśli źródła nie uzasadniają tezy, daj neutralny tytuł. Teza mieści się w 2 wierszach (40 / 64).
+Jeśli źródła nie uzasadniają tezy, daj neutralny tytuł. Długość tezy: `references/siatka.md`
+(maks. 2 wiersze).
 
 ## Gęstość
 

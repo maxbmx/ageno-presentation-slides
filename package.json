@@ -1,0 +1,27 @@
+{
+  "name": "ageno-presentation-slides",
+  "version": "2.3.0",
+  "description": "Skill i skrypty do prezentacji Ageno w jednym pliku HTML (slajdy 16:9, siatka 8 / 32 px).",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node -e \"for (const f of require('fs').readdirSync('scripts').filter((f) => f.endsWith('.mjs'))) require('child_process').execFileSync(process.execPath, ['--check', 'scripts/' + f], { stdio: 'inherit' })\"",
+    "verify": "node scripts/grid-audit.mjs assets/template.html && node scripts/text-lint.mjs assets/template.html",
+    "assets": "node scripts/ageno-assets.mjs",
+    "screens": "node scripts/screenshots.mjs",
+    "photos": "node scripts/photos.mjs",
+    "inline": "node scripts/inline-assets.mjs",
+    "grid": "node scripts/grid-audit.mjs",
+    "lint": "node scripts/text-lint.mjs",
+    "qa": "node scripts/qa-html-deck.mjs",
+    "pdf": "node scripts/pdf.mjs",
+    "browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

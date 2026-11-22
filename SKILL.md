@@ -3,7 +3,7 @@ name: ageno-presentation
 description: Tworzy prezentacje Ageno jako jeden samodzielny plik HTML ze slajdami 16:9 na siatce 8 / 32 px, ze zrzutami ekranu stron i aplikacji, na podstawie dostarczonych materiałów (brief, notatki, raporty, dane, oferta, linki, logo). Użyj zawsze, gdy użytkownik prosi o prezentację, slajdy, deck, pitch dla klienta, prezentację oferty, wdrożenia, audytu lub wyników, chce zamienić notatki albo raport na slajdy, pokazać screeny sklepu lub aplikacji na slajdach, dodać zdjęcie na slajd, chce wersję PDF decku, pokazać harmonogram projektu, warianty, zakres, wycenę, case study, ryzyka, role, decyzje lub opinie klientów, albo poprawia istniejący deck z atrybutami data-slide / data-grid, nawet jeśli nie użyje słowa „HTML”.
 metadata:
   author: Ageno
-  version: "2.2.0"
+  version: "2.3.0"
   output: standalone-html
 ---
 
@@ -11,150 +11,94 @@ metadata:
 
 Prezentacja ma pomóc odbiorcy zrozumieć temat i podjąć decyzję. Kolejność jest stała:
 **źródła → plan → screeny → slajdy → kontrola**. Nie zaczynaj od kodu: dobrze ułożony deck
-z błędną tezą jest gorszy niż brak decku.
+z błędną tezą jest gorszy niż brak decku. Szczegóły są w plikach z tabeli niżej; ten plik ich
+nie powtarza, więc w każdym kroku otwórz wskazany plik.
 
-## Zasady nadrzędne
+## Czego nie wolno złamać
 
-1. **Źródła przed narracją.** Nie wymyślaj liczb, cytatów, klientów, wyników, funkcji ani decyzji.
-   Luki i sprzeczności oznacz.
-2. **Jeden slajd, jedna teza.** Tytuł slajdu to wniosek, nie temat.
-3. **Jeden plik.** Wynik działa lokalnie bez sieci: CSS, JS, screeny i logo są w środku.
-   Bez CDN, `@import` i zewnętrznych fontów.
-4. **Siatka 32 px.** Każda krawędź bloku i każdy wiersz tekstu leży na kratce. Kratka w tle
-   jest ukryta, ale układ i tak musi do niej pasować: `G` ją pokazuje, audyt ją sprawdza.
-5. **Sprawdzaj, nie deklaruj.** Renderuj i audytuj wszystkie slajdy przed oddaniem.
-6. **Daty zawsze YYYY-MM-DD.** Na slajdach, w źródłach, nazwach plików i folderów; okres
-   jako zakres `2026-10-01 – 2026-10-31`. Szczegóły: `references/redakcja.md`.
-7. **Brzmienie jak materiał konsultingowy dla zarządu.** Neutralnie, konkretnie, bez „my”
-   i bez wzorców typowych dla AI. Zasady: `references/redakcja.md` (S1–S7, reguły 3–35),
-   kontrola: `scripts/text-lint.mjs`.
+1. **Źródła przed narracją.** Nie wymyślaj liczb, cytatów, klientów, wyników, funkcji ani decyzji;
+   luki i sprzeczności oznacz (`references/tresc.md`). Fakty o Ageno tylko z `references/ageno.md`.
+2. **Jeden slajd, jedna teza.** Tytuł slajdu to wniosek, nie temat (`references/tresc.md`).
+3. **Jeden plik HTML, działa bez sieci** (`references/nawigacja.md`, „Jeden plik”).
+4. **Siatka 32 px na płótnie 1536 × 864**: każda krawędź bloku i każdy wiersz na kratce
+   (`references/siatka.md`).
+5. **Szablon jako start**: slajdy powstają z 24 układów `assets/template.html`, nie od zera
+   (`references/uklady.md`).
+6. **Marka Ageno**: tło, kolory i logo według `references/siatka.md` („Kolory”, „Logo”).
+7. **Daty YYYY-MM-DD i język decku** według `references/redakcja.md`.
+8. **Sprawdzaj, nie deklaruj**: przed oddaniem automat, oględziny i lista z `references/qa.md`.
 
 ## Pliki skilla
 
 | Plik | Co zawiera | Kiedy czytać |
 | --- | --- | --- |
+| `README.md` | Instalacja, wszystkie polecenia, umowa CLI (kody 0 / 1 / 2), struktura katalogu decku | Przed pierwszym poleceniem (krok 4–6) |
+| `assets/template.html` | Gotowy deck: tokeny, siatka, 24 układy jako przykłady, skalowanie, nawigacja, snap, tryb `G`, druk do PDF | Zawsze: kopiuj jako start |
 | `assets/ageno-logo.svg` | Oryginalne logo Ageno (już wstawione w szablon) | Gdy logo trzeba wstawić gdzie indziej |
-| `assets/template.html` | Gotowy deck: tokeny, siatka, wszystkie 24 układy slajdów jako przykłady, skalowanie, nawigacja, snap, tryb diagnostyczny, druk do PDF | Zawsze: kopiuj jako start |
-| `references/redakcja.md` | Język decku: styl (S1–S7), wzorce do usunięcia (reguły 3–35, stałe numery), daty, korekta | Krok 5 przy pisaniu tekstów i krok 6 |
-| `references/ageno.md` | Fakty o Ageno: marka i grafiki, liczby, klienci i logotypy, realizacje, opinie, oferta, słownik, poufność; z mapą, który układ z nich korzysta | Krok 1 i przy każdym slajdzie o Ageno |
-| `references/tresc.md` | Rejestr źródeł, narracja, tytuły, gęstość | Krok 2–3 |
-| `references/siatka.md` | Płótno 1536 × 864, kolumny, budżet wysokości, typografia, lista punktów, kolory, błędy, decyzje projektowe | Przed układaniem slajdów |
-| `references/uklady.md` | Katalog 24 układów (numer slajdu w szablonie, kiedy użyć, wysokość), zasady każdego układu, karta, tło | Krok 3 (wybór układu) i 5 |
-| `references/screeny.md` | Ramki screenów, `screens.json`, zasady zrzutów i osadzania | Gdy deck ma screeny |
-| `references/zdjecia.md` | Wyjątek dla zdjęć z Unsplash, dobór zdjęć górskich, pobieranie, podpis autora | Gdy deck ma slajd „Zdjęcie + treść” |
-| `references/nawigacja.md` | Kontrakt DOM, sterowanie, druk do PDF | Przed zmianą skryptu lub struktury, przy PDF |
-| `references/qa.md` | Procedura i lista kontrolna | Krok 6 |
-| `scripts/screenshots.mjs` | Zrzuty Playwright w proporcjach ramek | Krok 4 |
-| `scripts/ageno-assets.mjs` | Pobiera z ageno.pl góry (slajd tytułowy i kontaktowy), logotypy klientów i zdjęcia osób (bez zmian w plikach) | Krok 4 |
-| `scripts/photos.mjs` | Pobiera wybrane zdjęcia z Unsplash w kadrze 752 × 864 (2×) | Krok 4 |
-| `scripts/inline-assets.mjs` | Osadza lokalne obrazy, pilnuje 15 MB | Krok 5 |
-| `scripts/grid-audit.mjs` | Audyt siatki każdego slajdu | Krok 6 |
-| `scripts/text-lint.mjs` | Kontrola tekstu slajdów według `redakcja.md` | Krok 6 |
-| `scripts/qa-html-deck.mjs` | Nawigacja, przepełnienia, zrzuty w 4 rozdzielczościach | Krok 6 |
-
-Skrypty wymagają Node i Playwrighta (`npm install --no-save playwright && npx playwright install chromium`).
+| `references/ageno.md` | Fakty o Ageno: marka i grafiki, liczby, klienci, realizacje, opinie, oferta, osoby, słownik, poufność | Krok 1 i przy każdym slajdzie o Ageno |
+| `references/tresc.md` | Rejestr źródeł, narracja, plan slajdów, tytuły, gęstość | Krok 2–3 |
+| `references/siatka.md` | Płótno, kolumny, budżet wysokości, typografia, kolory, logo, oznaczenia `data-grid`, błędy, decyzje projektowe | Krok 3 i 5 |
+| `references/uklady.md` | Katalog 24 układów (numer slajdu, kiedy użyć, wysokość) i zasady każdego układu | Krok 3 (wybór układu) i 5 |
+| `references/redakcja.md` | Język: styl S1–S7, reguły 3–35, daty, korekta, sierotki, co sprawdza linter | Krok 5 przy tekstach i krok 6 |
+| `references/screeny.md` | Ramki screenów, `screens.json`, zrzuty i osadzanie | Gdy deck ma screeny |
+| `references/zdjecia.md` | Zdjęcia górskie z Unsplash: dobór, pobieranie, podpis autora | Gdy deck ma slajd „Zdjęcie + treść” |
+| `references/nawigacja.md` | Jeden plik, kontrakt DOM, sterowanie, druk do PDF | Przed zmianą skryptu lub struktury, przy PDF, krok 7 |
+| `references/qa.md` | Procedura kontroli i lista kontrolna | Krok 6 |
+| `scripts/` | Skrypty z `README.md`; stałe w `constants.mjs`, umowa CLI w `cli.mjs` | Krok 4–6 |
 
 ## Workflow
 
 ### 1. Wejście
 
 Zbierz: cel i odbiorcę (wymagane), materiały źródłowe (wymagane), listę ekranów do pokazania,
-logo klienta, jeśli ma być w decku (oryginalny plik od użytkownika), język (domyślnie polski). Brakujące rzeczy, które da
-się bezpiecznie założyć, załóż i wypisz. Pytaj tylko o to, bez czego prezentacja byłaby
-błędna, i zadawaj jedno pytanie naraz.
-
-Fakty o Ageno (liczby, realizacje, logotypy, nazwy usług) bierz tylko z `references/ageno.md`.
-Pozycji oznaczonej **[uzupełnić]** nie zgaduj: zapytaj albo pomiń.
+logo klienta, jeśli ma być w decku (oryginalny plik od użytkownika), język (domyślnie polski).
+Brakujące rzeczy, które da się bezpiecznie założyć, załóż i wypisz. Pytaj tylko o to, bez czego
+prezentacja byłaby błędna, i zadawaj jedno pytanie naraz. Pozycji oznaczonej w `references/ageno.md`
+jako **[uzupełnić]** nie zgaduj: zapytaj albo pomiń.
 
 ### 2. Rejestr źródeł
 
 Przeczytaj wszystkie materiały i rozdziel fakty, decyzje, opinie, hipotezy, rekomendacje,
-braki i sprzeczności. Szczegóły: `references/tresc.md`.
+braki i sprzeczności (`references/tresc.md`).
 
 ### 3. Plan slajdów
 
-Tabela: nr, rola, teza, dowód, układ, screen. Dla każdego slajdu zsumuj wysokości elementów
-(budżet 704 px, `references/siatka.md`). Nie mieści się = podziel slajd. Przy decku dłuższym
-niż kilka slajdów albo niejasnych źródłach pokaż plan użytkownikowi przed kodem.
+Tabela: nr, rola, teza, dowód, układ, screen (`references/tresc.md`). Układ wybierz z katalogu
+w `references/uklady.md` i zsumuj wysokości (budżet: `references/siatka.md`); nie mieści się =
+podziel slajd. Przy decku dłuższym niż kilka slajdów albo niejasnych źródłach pokaż plan
+użytkownikowi przed kodem.
 
-### 4. Screeny i zdjęcia
+### 4. Screeny i grafiki
 
-Każdemu screenowi z planu przypisz ramkę (`full`, `wide`, `half`, `mobile`) i zrób zrzut
-w jej proporcjach (`scripts/screenshots.mjs`) albo użyj plików użytkownika.
-Szczegóły: `references/screeny.md`.
-
-Grafiki Ageno do każdego decku: `node scripts/ageno-assets.mjs --out decks/…/` pobiera
-`ageno-mountains.svg` (slajd tytułowy i kontaktowy), logotypy klientów do `logos/` z listą
-`logos.json` (slajd „Klienci Ageno”) i zdjęcia osób do `people/` (slajd „Kontakt”).
-
-Slajdom „Zdjęcie + treść” sam dobierz pasujące zdjęcie górskie z Unsplash (klimat Ageno),
-chyba że użytkownik poda własne, i pobierz je `scripts/photos.mjs`. Zdjęcia ze stocku
-tylko w tym układzie, zawsze z podpisem `@autor`. Szczegóły: `references/zdjecia.md`.
+Załóż katalog decku `decks/YYYY-MM-DD-klient-temat/` (struktura: `README.md`). Pobierz grafiki
+Ageno (`scripts/ageno-assets.mjs`, `references/ageno.md`), zrób zrzuty w proporcjach ramek albo
+użyj plików użytkownika (`references/screeny.md`), a slajdom „Zdjęcie + treść” dobierz zdjęcie
+górskie z Unsplash (`references/zdjecia.md`). Polecenia: `README.md`.
 
 ### 5. Slajdy
 
 1. Skopiuj `assets/template.html` jako `index.html` decku. Slajd tytułowy zostaw i zmień tylko
-   jego teksty (logo Ageno zostaje). Dalsze slajdy buduj z przykładowych układów: kopiuj potrzebny
-   slajd, wypełnij treścią, nieużyte przykłady usuń. Style i skrypt zostaw.
-2. Buduj slajdy z klas szablonu (`.stack`, `.grid-2`, `.grid-3`, `.grid-1-2`, `.card`, `.facts`, `.table`,
-   `.gantt`, `.photo`, `.shot-*`, `.mt-*`).
-   Nowego CSS dodawaj jak najmniej i tylko z tokenami.
-3. Każdy blok układu oznacz `data-grid="32"` (wnętrza o szerokości z siatki 8 px: `data-grid="8"`),
-   a blok o zmiennej wysokości także `data-snap`.
-4. Slajd tytułowy zawsze z dużym logo Ageno (blok `.brand-logo` z szablonu, zostaw bez zmian).
-   Stopka: małe logo Ageno wstawia skrypt, ty wpisujesz źródło lub opis screenu w `data-source`,
-   numer też wypełnia skrypt. Logo klienta (jeśli jest) na slajdzie tytułowym po prawej.
-5. Tło każdego slajdu zawsze `#f7f7f7`, kolory z logo Ageno (tekst `#231430`, akcent `#ff6b00`). Marka klienta: zmień tylko kolor tekstu i akcentu
-   (`--c-text`, `--c-accent`, `--c-on-accent`, `--c-muted`). Tła i geometrii nie ruszaj.
-6. Uzupełnij `<title>` i `aria-label` prezentacji. Zredaguj wszystkie teksty według
+   jego teksty. Dalsze slajdy kopiuj z przykładowych układów, wypełnij treścią, nieużyte usuń.
+   Style i skrypt zostaw (`references/uklady.md`).
+2. Buduj z klas szablonu; nowego CSS jak najmniej i tylko z tokenami (`references/siatka.md`).
+3. Każdy blok oznacz `data-grid` (`32`, `8` albo `32y`), blok o zmiennej wysokości także
+   `data-snap` (`references/siatka.md`, „Oznaczenia”).
+4. Logo Ageno i klienta według `references/siatka.md`, „Logo”. W stopce wpisz źródło lub opis
+   screenu w `data-source`; numer i małe logo wstawia skrypt.
+5. Uzupełnij `<title>` i `aria-label` prezentacji. Zredaguj wszystkie teksty według
    `references/redakcja.md`.
-7. Złóż jeden plik: `node scripts/inline-assets.mjs decks/…/index.html dist/YYYY-MM-DD-klient-temat.html`.
+6. Złóż jeden plik `dist/YYYY-MM-DD-klient-temat.html` przez `scripts/inline-assets.mjs`;
+   do wysłania nadaje się tylko wynik z kodem 0 (`README.md`, „Umowa CLI”).
 
 ### 6. Kontrola
 
-Uruchom `grid-audit.mjs`, `text-lint.mjs` i `qa-html-deck.mjs`, sprawdź PDF, obejrzyj zrzut każdego slajdu, przejdź listę
-w `references/qa.md`. Po każdej poprawce sprawdź slajd i sąsiadów, po ostatniej zmianie całość.
+Przejdź `references/qa.md`: automat (siatka, tekst, smoke-test, PDF), oględziny zrzutu każdego
+slajdu i stron PDF oraz lista kontrolna. Po każdej poprawce sprawdź slajd i sąsiadów, po ostatniej zmianie całość.
 
 ### 7. Przekazanie
 
 Podaj krótko:
 1. plik HTML i liczbę slajdów,
-2. sterowanie: strzałki, `F` pełny ekran, `G` siatka; PDF: Chrome → Drukuj → Zapisz jako PDF
-   (strona 16:9, jeden slajd = jedna strona),
+2. sterowanie i zapis do PDF (`references/nawigacja.md`),
 3. jakie testy faktycznie wykonano i w jakich rozdzielczościach,
 4. założenia, luki w danych, zasłonięte dane, rzeczy niezweryfikowane.
-
-## Logo
-
-- **Logo Ageno** jest zawsze na slajdzie tytułowym: lewy górny róg kontenera, wysokość 64 px,
-  ramka 208 × 64. Na każdym kolejnym slajdzie małe logo (24 px) stoi w stopce przed źródłem;
-  wstawia je skrypt szablonu. Logo jest zdefiniowane raz w szablonie (`<symbol id="ageno-logo">`)
-  i używane przez `<use>`; oryginał: `assets/ageno-logo.svg`.
-  Nie usuwaj go, nie przesuwaj i nie zmieniaj kolorów (#ff6b00, #231430), także w prezentacji
-  w marce klienta. Nie powtarzaj go na kolejnych slajdach.
-- **Logo klienta** dostarcza użytkownik przy danej prezentacji; skill go nie przechowuje.
-  Miejsce: slajd tytułowy, ten sam wiersz co logo Ageno, wyrównane do prawej
-  (`.title-client-logo`, wysokość 64 px), oraz układ „Case study”.
-  Używaj dokładnie tego pliku (najlepiej SVG): bez odrysowywania, zmiany proporcji i kolorów.
-  Brak logo klienta = wariant bez niego, nie tekstowe pseudo-logo, i nie szukaj go w sieci bez zgody.
-- Wstawiając SVG do HTML, nadaj identyfikatorom w środku (`clipPath`, gradienty) unikalne nazwy,
-  żeby dwa loga się nie gryzły.
-
-## Struktura projektu prezentacji
-
-```
-decks/2026-11-16-klient-temat/
-├── brief.md        ← cel, odbiorca, rejestr źródeł, plan slajdów
-├── screens.json    ← lista zrzutów
-├── photos.json     ← wybrane zdjęcia z Unsplash
-├── ageno-mountains.svg ← góry Ageno na slajd tytułowy
-├── logos/, logos.json  ← logotypy klientów z ageno.pl
-├── people/         ← zdjęcia osób na slajd kontaktowy
-├── screens/        ← zrzuty, zdjęcia i logo klienta
-├── index.html      ← deck z szablonu, obrazy jako ścieżki
-└── qa/             ← zrzuty i raporty QA
-dist/2026-11-16-klient-temat.html   ← jeden plik do wysłania
-```
-
-Gdy pracujesz bez systemu plików użytkownika (np. w czacie), dostarcz od razu jeden plik HTML
-z obrazami osadzonymi jako data URI.

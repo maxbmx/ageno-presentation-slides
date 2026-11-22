@@ -14,10 +14,13 @@ wymiary w slajdzie są w px logicznych i nie ma progów responsywnych.
 | Strefa | X | Y | Rozmiar |
 | --- | --- | --- | --- |
 | Kontener treści `.container` | 112 → 1424 | 64 → 768 | 1312 × 704 (41 × 22 kratki) |
-| Stopka `.slide-footer` | 112 → 1424 | 800 → 832 | jeden wiersz 32 px |
+| Stopka `.slide-footer` | 112 → 1424 | 800 → 832 | jeden wiersz 32 px; małe logo 24 px na y = 804 |
 | Strzałki nawigacji | marginesy 0–112 i 1424–1536 | środek wysokości | poza treścią |
 
 Początek współrzędnych: **X = lewa krawędź kontenera (112), Y = góra slajdu (0)**.
+
+Te same liczby dla skryptów są w `scripts/constants.mjs` (płótno, kontener, stopka, budżet,
+siatka, ramki screenów, skala, jakość JPEG). Zmiana liczby tutaj bez zmiany tam, i odwrotnie, jest błędem.
 
 ## Kolumny
 
@@ -55,6 +58,21 @@ Kolumny tylko tokenami. `1fr`, procenty i `gap` spoza tokenów dają szerokości
 | Liczba + 2 wiersze opisu | 64 + 64 |
 
 Zsumuj przed kodowaniem. Przekroczenie 704 = podziel slajd.
+
+## Ramki screenów
+
+Screen stoi w jednej z czterech ramek. Zrzut robi się w viewporcie o tych samych proporcjach,
+z `deviceScaleFactor: 2` (ostry obraz także na projektorze 4K), zapis JPEG o jakości 80
+(ta sama wartość dla zdjęć z Unsplash). Zrzuty i osadzanie: `references/screeny.md`.
+
+| Ramka (`frame`) | Klasa | Wymiar na slajdzie | Viewport zrzutu | Do czego |
+| --- | --- | --- | --- | --- |
+| `full` | `.shot-full` | 1312 × 608 | 1312 × 608 | pełny ekran desktop |
+| `wide` | `.shot-wide` | 864 × 544 | 1296 × 816 | screen obok tekstu |
+| `half` | `.shot-half` | 640 × 416 | 1280 × 832 | dwa screeny obok siebie |
+| `mobile` | `.shot-mobile` | 320 × 640 | 400 × 800 | telefon w kolumnie 416 |
+
+Zdjęcie w układzie „Zdjęcie + treść”: ramka 752 × 864, plik 1504 × 1728 (2×).
 
 ## Typografia
 
@@ -103,6 +121,31 @@ Tło całej prezentacji jest zawsze `#f7f7f7`: bez pasów, kolorowych i ciemnych
 Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, `--c-on-accent`,
 `--c-muted`) z jego brandbooka. Tła i wymiarów nie ruszaj.
 
+## Logo
+
+- **Logo Ageno, duże** (`.brand-logo`, `data-grid="8"`): ramka 208 × 64, logo wysokości 64 px,
+  lewy górny róg kontenera. Zawsze na slajdzie tytułowym i na ostatnim slajdzie „Kontakt”,
+  na innych slajdach nie.
+- **Logo Ageno, małe** (`.footer-logo`, 24 px): w stopce przed źródłem na każdym slajdzie bez
+  `.brand-logo`; wstawia je skrypt szablonu. Slajd z dużym logo nie ma małego.
+- Logo jest zdefiniowane raz w szablonie (`<symbol id="ageno-logo">`) i używane przez `<use>`;
+  oryginał: `assets/ageno-logo.svg`. Nie usuwaj go, nie przesuwaj i nie zmieniaj kolorów
+  (`#ff6b00`, `#231430`), także w prezentacji w marce klienta.
+- **Logo klienta** dostarcza użytkownik przy danej prezentacji; skill go nie przechowuje.
+  Miejsce: slajd tytułowy, ten sam wiersz co logo Ageno, wyrównane do prawej
+  (`.title-client-logo`, wysokość 64 px, maks. 416 px szerokości), oraz układ „Case study”.
+  Używaj dokładnie tego pliku (najlepiej SVG): bez odrysowywania, zmiany proporcji i kolorów.
+  Brak logo klienta = wariant bez niego, nie tekstowe pseudo-logo; nie szukaj go w sieci bez zgody.
+- Wstawiając SVG do HTML, nadaj identyfikatorom w środku (`clipPath`, gradienty) unikalne nazwy,
+  żeby dwa loga się nie gryzły.
+
+### Wyjątek: małe logo w stopce
+
+Małe logo stoi pośrodku wiersza stopki 32 px (`align-items: center`): góra na y = 804, dół
+na y = 828, po 4 px odstępu z każdej strony. To jedyny element poza kratką 32 px; wiersz stopki
+(800 → 832) zostaje na siatce. Logo nie ma `data-grid` i audyt go nie mierzy. Nie zmieniaj jego
+wysokości ani nie wyrównuj go do kratki.
+
 ## Czego nie robić
 
 - Ramek, linii podziału, cieni i zaokrągleń pudełek. Na slajdzie nie ma żadnych linii, bo
@@ -119,10 +162,19 @@ Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, 
 | --- | --- |
 | `data-grid="32"` | X, Y, szerokość, wysokość na 32 px |
 | `data-grid="8"` | X i szerokość na 8 px, Y i wysokość na 32 px |
+| `data-grid="32y"` | tylko Y i wysokość na 32 px; X i szerokości audyt nie sprawdza |
 | `data-snap` | wysokość dosuwana do 32 px |
+| `.bleed` / `data-bleed` | warstwa z grafiką celowo wychodzącą poza slajd; audyt pomija ją przy kontroli przewijania |
+
+`data-grid="32y"` jest tylko dla bloków, które dochodzą do krawędzi slajdu i dlatego nie mogą
+mieć X i szerokości z siatki kontenera. W szablonie to zdjęcie `.photo` w układzie
+„Zdjęcie + treść” (slajdy 15–16): 752 × 864, w px slajdu od x = 784 do prawej krawędzi slajdu albo od lewej
+krawędzi do x = 752 (wewnętrzna krawędź na linii siatki). Pion zostaje na kratce. Zwykłych bloków w kontenerze tak nie oznaczaj: zgub X i szerokość
+z audytu, a błąd o 8 px przejdzie niezauważony.
 
 Wiersze tekstu (`h1–h3`, `p`, `li`, `figcaption`, `blockquote`, `dt`, `dd`) audyt sprawdza bez
 oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
+
 
 ## Najczęstsze błędy
 
@@ -146,10 +198,10 @@ oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 | Tło każdego slajdu zawsze `#f7f7f7`, bez pasów | spójny wygląd wszystkich prezentacji |
 | Kratka w tle ukryta (`--grid-line: transparent`), kod zostaje | czysty slajd; podgląd klawiszem `G` |
 | Slajd tytułowy z górami Ageno po lewej, wychodzącymi poza slajd; tekst w kolumnie po prawej | grafika z ageno.pl łączy deck z marką |
-| Slajd kończący z 10 logotypami klientów z ageno.pl, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
+| Przedostatni slajd z 10 logotypami klientów z ageno.pl, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
 | Ostatni slajd „Kontakt” z portretem w kole i górami Ageno po prawej | rozmowa kończy się konkretną osobą; koło to kadr zdjęcia, jedyny wyjątek od zakazu zaokrągleń |
 | Kolory z logo Ageno: tekst `#231430`, akcent `#ff6b00` | prezentacja rozpoznawalna jako Ageno, spójna z logo |
-| Logo Ageno: duże na slajdzie tytułowym, małe (24 px) w stopce każdego kolejnego slajdu | prezentacje Ageno zawsze podpisane marką |
+| Logo Ageno: duże na slajdzie tytułowym i „Kontakt”, małe (24 px) w stopce pozostałych slajdów | prezentacje Ageno zawsze podpisane marką |
 | Marka klienta zmienia tylko kolor tekstu i akcentu | geometria, tło i logo Ageno zostają |
 | Zdjęcia ze stocku tylko w układzie „Zdjęcie + treść”: górskie, z Unsplash, z podpisem `@autor` | górski klimat Ageno; reszta slajdów zostaje rzeczowa |
 | Daty zawsze YYYY-MM-DD, okresy jako zakres dat | jednoznaczne i sortowalne; jedna konwencja we wszystkich deckach |

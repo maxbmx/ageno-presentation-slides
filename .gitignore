@@ -1,0 +1,23 @@
+# Zależności (node_modules bywa symlinkiem, dlatego wzorzec bez ukośnika na końcu)
+node_modules
+package-lock.json
+
+# Prezentacje i wyniki pracy (nie należą do skilla)
+decks/
+dist/
+
+# Grafiki pobierane przez skrypty.
+# ageno-assets.mjs bez --out zapisuje w katalogu bieżącym: logos/, logos.json,
+# people/ i ageno-mountains.svg (z --out decks/…/ i tak lądują w decks/).
+# photos.mjs i screenshots.mjs domyślnie zapisują JPEG-i w screens/ obok JSON.
+logos/
+logos.json
+people/
+screens/
+ageno-mountains.svg
+*.jpg
+*.jpeg
+
+# Wyniki kontroli (qa-html-deck.mjs: domyślnie qa/ obok pliku; stary domyślny katalog)
+qa/
+qa-presentation/

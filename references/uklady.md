@@ -30,7 +30,7 @@ sprawdza je przy każdym teście.
 | 20 | Decyzje do podjęcia | domknięcie spotkania konkretem | teza + 32 + 64 + wiersze × 64 (maks. 5) |
 | 21 | Opinie klientów | dowód współpracy głosem klientów | teza 64 + 32 + karty (maks. 3) |
 | 22 | Rekomendacja | decyzja, kolejne kroki | 128 + treść |
-| 23 | Klienci Ageno (logotypy) | slajd kończący | teza 64 + 32 + lead 64 + 64 + 2 × 128 + 32 = 512 |
+| 23 | Klienci Ageno (logotypy) | przedostatni slajd, przed kontaktem | teza 64 + 32 + lead 64 + 64 + 2 × 128 + 32 = 512 |
 | 24 | Kontakt | slajd zamykający, zawsze ostatni | logo 64 + 128 + tytuł 64 + 32 + lead 32 + 64 + portret 256 = 640 |
 
 Slajd tytułowy jest obowiązkowy i zawsze pierwszy. Pozostałe wybieraj według planu slajdów;
@@ -131,9 +131,13 @@ kluczowa w `.mark`). Liczby tylko potwierdzone, z okresem w stopce. Bez logo: us
 (24 / 32).
 
 **Zdjęcie + treść.** Jedyny układ, w którym wolno użyć zdjęcia ze stocku (Unsplash, motyw
-górski). Zdjęcie 752 × 864 na pełną wysokość od krawędzi slajdu, treść w kolumnie 544 px po
-drugiej stronie, podpis `@autor` z linkiem w dolnym rogu zdjęcia. Klasa `.photo-right` albo
-`.photo-left`. Dobór zdjęcia, podpis i pobieranie: `references/zdjecia.md`.
+górski). Zdjęcie 752 × 864 na pełną wysokość od krawędzi slajdu (`data-grid="32y"`,
+`references/siatka.md`), treść w kolumnie 544 px po drugiej stronie, odstęp 128 px. Klasa
+`.photo-right` albo `.photo-left`.
+- Strona tekstu: nadtytuł, teza 40 / 64, 2–3 punkty `.points` (do 3 wierszy każdy), stopka
+  jak na każdym slajdzie bez dużego logo.
+- Kilka takich slajdów w decku: zmieniaj stronę zdjęcia między kolejnymi.
+- Dobór zdjęcia, pobieranie, podpis `@autor` i `alt`: `references/zdjecia.md`.
 
 **Tytułowy.** Góry Ageno (`ageno-mountains.svg`, `references/ageno.md`) zawsze po lewej,
 wychodzą poza lewą i dolną krawędź slajdu; leżą w warstwie `.bleed`, która przycina je do
@@ -142,7 +146,7 @@ tytuł i lead w kolumnie `.title-text` (864 px, x = 560), logo klienta opcjonaln
 w wierszu logo. Bez pliku gór szablon pokazuje zaślepkę „brak ageno-mountains.svg”: przed
 oddaniem decku plik musi być obok `index.html`.
 
-**Klienci Ageno (logotypy).** Slajd kończący, przed kontaktem. Teza „Klienci Ageno”, jedno zdanie
+**Klienci Ageno (logotypy).** Przedostatni slajd, przed kontaktem. Teza „Klienci Ageno”, jedno zdanie
 o skali i branżach z `references/ageno.md`, pod nim 10 logotypów w dwóch wierszach po 5
 (`.logo-wall`, pola 256 × 128 z odstępem 8 px). Logotypy pobiera `scripts/ageno-assets.mjs`
 ze strony głównej ageno.pl; pliki wstawiaj bez zmian (bez przycinania i skalowania obszaru
@@ -150,10 +154,10 @@ roboczego, bez zmiany kolorów), bo równe obszary robocze dają równe logotypy
 podpisów i tła pod logotypami. Źródło i data stanu w stopce. Mniej niż 10 logotypów:
 jeden pełny wiersz 5, nie zostawiaj dziur.
 
-**Kontakt.** Zawsze ostatni slajd. Duże logo Ageno w lewym górnym rogu (bez małego logo
-w stopce), tytuł „Pytania i kontakt” (56 / 64), jedno zdanie leadu, pod nim osoba: portret
-256 × 256 w kole, obok imię i nazwisko, e-mail jako link `mailto:` i telefon jako link `tel:`
-w `.nowrap`. Dane i zdjęcie tylko z sekcji „Osoby” w `references/ageno.md`. Po prawej te same
+**Kontakt.** Slajd zamykający, zawsze ostatni. Duże logo Ageno (`references/siatka.md`, „Logo”), tytuł „Pytania i kontakt” (56 / 64), jedno zdanie leadu, pod nim osoba: portret
+256 × 256 w kole, obok imię i nazwisko, służbowy e-mail osoby i info@ageno.pl jako linki `mailto:`
+w `.nowrap`. Dane osoby i zdjęcie tylko z sekcji „Osoby” w `references/ageno.md`, adres info@ageno.pl
+z sekcji „Podstawy”. Bez numeru telefonu (`references/ageno.md`, „Poufność”). Po prawej te same
 góry Ageno co na slajdzie tytułowym, wychodzące poza prawą i dolną krawędź; tekst i stopka
 w lewej kolumnie 640 px. Portret w kole to jedyne zaokrąglenie w decku (kadr zdjęcia, nie
 pudełko). Bez „Dziękujemy”, pytań retorycznych i zwrotów w 1. osobie („Zapraszam do kontaktu”).
@@ -193,11 +197,8 @@ Fragment skracaj tylko przez wybór zdania, nie przez przerabianie słów. Jedna
 `.card` (białe tło, dopełnienie 32) na wyróżnienie bloku, np. decyzji. Bez ramek, cieni
 i zaokrągleń.
 
-## Tło
-
-Tło każdego slajdu jest zawsze szare `#f7f7f7` (`--c-bg`). Bez pasów, kolorowych ani ciemnych
-teł slajdu, także w prezentacji w marce klienta. Wyróżnienie robi akcent `.mark`, biała `.card`
-albo odstęp.
+Tło slajdu i kolory: `references/siatka.md`, „Kolory”. Wyróżnienie robi akcent `.mark`,
+biała `.card` albo odstęp, nigdy kolorowe tło.
 
 ## Nowy układ
 

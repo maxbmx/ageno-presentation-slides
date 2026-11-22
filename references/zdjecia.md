@@ -52,15 +52,13 @@ przez AI, motywy zimowo-świąteczne i turystyczne pocztówki.
 
 ## Pobieranie
 
-```bash
-node scripts/photos.mjs decks/2026-11-16-klient-temat/photos.json
-```
+Zdjęcia z `photos.json` pobiera `scripts/photos.mjs` (bez klucza API): kadruje do
+1504 × 1728, zapisuje JPEG i wypisuje gotowy HTML ramki z podpisem. Polecenie i zachowanie przy
+blokadzie Unsplash: `README.md`. Blokady (bramka anty-botowa, HTTP 401/403 z HTML) nie próbuj
+obchodzić, także headless przeglądarką. Na koniec `inline-assets.mjs` osadza zdjęcie w pliku.
 
-Skrypt pobiera zdjęcie zwykłym linkiem pobierania Unsplash (bez klucza API), kadruje do
-1504 × 1728 i zapisuje w `screens/`. Wypisuje gotowy HTML ramki z podpisem. Na koniec
-`inline-assets.mjs` osadza zdjęcie w pliku.
-
-Gdy w danym środowisku nie da się pobrać pliku (brak sieci, czat bez dostępu do Unsplash):
+Gdy w danym środowisku nie da się pobrać pliku (brak sieci, blokada bramki, czat bez dostępu
+do Unsplash):
 zostaw w decku zaślepkę `.photo-placeholder`, przekaż użytkownikowi gotowy `photos.json`
 z wybranymi zdjęciami i polecenie do uruchomienia u siebie. Nie wstawiaj zdjęcia
 z innego źródła i nie generuj go.
@@ -84,6 +82,4 @@ z innego źródła i nie generuj go.
   zdjęcie. Ostateczność: przenieś podpis do stopki po stronie tekstu jako
   „Zdjęcie: @autor, Unsplash” (z tym samym linkiem). Bez teł i cieni pod podpisem.
 - `alt` opisuje, co widać (np. „Pasma górskie we mgle o świcie”), nie „zdjęcie dekoracyjne”.
-- Strona tekstu: tło `#f7f7f7`, nadtytuł, teza 40 / 64, 2–3 punkty `.points` (do 3 wierszy
-  każdy), stopka (z małym logo Ageno, jak na każdym slajdzie). Duże logo Ageno tylko na slajdzie tytułowym.
-- Kierunek: zmieniaj stronę zdjęcia między kolejnymi slajdami tego typu, jeśli jest ich kilka.
+- Układ strony tekstu i zmiana strony zdjęcia: `references/uklady.md`, „Zdjęcie + treść”.

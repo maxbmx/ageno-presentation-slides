@@ -143,8 +143,10 @@ się rozdzielić. Łączy je twarda spacja (U+00A0, w HTML `&nbsp;`).
 **Jak to działa w szablonie:**
 
 - Funkcja `fixOrphans` w skrypcie szablonu wstawia twarde spacje we wszystkich przypadkach
-  z pięciu pierwszych wierszy tabeli, w całym tekście slajdów, przy otwarciu pliku i przed
-  drukiem. Nie wpisuj `&nbsp;` ręcznie w tych przypadkach i nie usuwaj tej funkcji.
+  z pięciu pierwszych wierszy tabeli, w całym tekście slajdów, raz, przy otwarciu pliku.
+  Poprawiony tekst zostaje w DOM, więc druk i PDF dostają te same twarde spacje; osobnego
+  wywołania przed drukiem nie ma. Nie wpisuj `&nbsp;` ręcznie w tych przypadkach i nie usuwaj
+  tej funkcji.
 - Ręcznie tylko ostatni wiersz tabeli: wyrażenie, które ma zostać razem, w `.nowrap`. Używaj
   rzadko; długie `.nowrap` wypycha tekst poza kolumnę.
 - Ostatni wiersz akapitu z jednym słowem (wdowa) ogranicza CSS: `text-wrap: balance`
@@ -173,7 +175,18 @@ i siatkę, ale nie ocenią, czy złamanie wiersza wygląda dobrze.
 
 ## Kontrola automatyczna
 
-`scripts/text-lint.mjs` sprawdza widoczny tekst każdego slajdu (bez treści cytatów)
-i zgłasza fragment z numerem reguły. **Błąd** trzeba poprawić; **uwaga** wymaga oceny, bo
-słowo bywa poprawne w kontekście. Skrypt nie zastępuje czytania: reguł 8, 9, 22, 24, 25, 29
-i S1–S7 nie da się sprawdzić automatycznie.
+`scripts/text-lint.mjs` sprawdza widoczny tekst każdego slajdu (bez treści cytatów `blockquote`
+i zaślepek) i zgłasza fragment z numerem reguły. **Błąd** trzeba poprawić; **uwaga** wymaga
+oceny, bo słowo bywa poprawne w kontekście. Milczenie skryptu nie znaczy, że tekst jest zgodny
+z tą listą.
+
+| Zakres | Reguły |
+| --- | --- |
+| Sprawdza (błąd) | 5, 6, 7, 11, 12, 16, 17, 20, 31, 32, 34, 35, daty |
+| Sprawdza (uwaga) | 10, 21, 23, 28, 33 |
+| Sprawdza tylko częściowo | 12: dwukropek tylko w tytułach, nagłówkach i nadtytułach, nie w treści; S3: tylko lista typowych czasowników w 1. osobie liczby mnogiej (np. „zrobimy”, „proponujemy”, formy na „-liśmy”); reguły 5, 6, 20, 23, 28, 31–34: tylko słowa wymienione w regule |
+| Nie sprawdza | 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 oraz S1, S2, S4–S7 |
+| Nie czyta | `alt`, `<title>`, `aria-label`, treść `blockquote` |
+
+Reguły z wiersza „Nie sprawdza”, resztę S3, regułę 12 poza nagłówkami i teksty z wiersza
+„Nie czyta” sprawdź czytając cały deck.

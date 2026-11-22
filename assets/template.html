@@ -165,7 +165,8 @@ strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
   font-size: var(--fs-meta);
   line-height: var(--lh-meta);
 }
-/* Małe logo Ageno w stopce każdego slajdu poza tytułowym (wstawia je skrypt), wysokość 24 px */
+/* Małe logo Ageno w stopce każdego slajdu bez .brand-logo, czyli poza tytułowym (1) i „Kontakt” (24);
+   wstawia je skrypt. Wysokość 24 px w wierszu 32 px (align-items: center), offset 4 px. */
 .footer-logo { display: block; flex: none; height: 24px; width: auto; }
 .slide-footer [data-source] { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .slide-footer [data-slide-number] { flex: none; margin-left: auto; }
@@ -185,7 +186,6 @@ strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
 .grid-2-1 { grid-template-columns: var(--col-2of3) var(--col-3); }
 .grid-2 > *, .grid-3 > *, .grid-1-2 > *, .grid-2-1 > * { min-width: 0; }
 .w-2of3 { width: var(--col-2of3); }
-.w-2 { width: var(--col-2); }
 
 /* Blok o zmiennej wysokości: skrypt dopisuje resztę do pełnej kratki. */
 [data-snap] { margin-bottom: var(--snap, 0px); }
@@ -313,7 +313,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 .contact-text { width: var(--col-2); }
 .slide-contact .slide-footer { width: var(--col-2); }   /* stopka po lewej, z dala od gór */
 /* Osoba: portret 256 × 256 w kole (jedyne zaokrąglenie w decku: kadr zdjęcia, nie pudełko),
-   obok imię, e-mail, telefon od drugiej kratki portretu. */
+   obok imię, służbowy e-mail i info@ageno.pl od drugiej kratki portretu. Bez numeru telefonu. */
 .person { display: grid; grid-template-columns: 256px 352px; column-gap: var(--gutter); align-items: start; }
 .person-photo { width: 256px; height: 256px; border-radius: 50%; overflow: hidden; background: var(--c-card); }
 .person-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
@@ -727,7 +727,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
       <div class="container">
         <div class="grid-2-1" data-grid="32" data-snap>
           <div class="stack" data-grid="32" data-snap>
-            <p class="eyebrow">Mobile</p>
+            <p class="eyebrow">Wersja mobilna</p>
             <h2>Teza o widoku na telefonie</h2>
             <p>Krótko: co widać na zrzucie i dlaczego to ważne.</p>
           </div>
@@ -940,16 +940,16 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
     <!-- 13. Harmonogram (timeline) -->
     <section data-slide class="slide" aria-hidden="true">
       <div class="container stack">
-        <h2 data-grid="32">Osiem miesięcy do uruchomienia MVP</h2>
+        <h2 data-grid="32">Planowane uruchomienie MVP do 2027-07-31</h2>
         <div class="gantt" data-grid="32" style="--periods: 8;" aria-label="Harmonogram projektu">
           <ol class="gantt-scale" aria-label="Okresy">
             <li>2026-12-01</li><li>2027-01-01</li><li>2027-02-01</li><li>2027-03-01</li>
             <li>2027-04-01</li><li>2027-05-01</li><li>2027-06-01</li><li>2027-07-01</li>
           </ol>
           <ul class="gantt-rows">
-            <li class="gantt-row"><span class="gantt-name">Analiza i assessment B2B</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 0; --span: 2;"><span class="sr-only">2026-12-01 – 2027-01-31</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Analiza wymagań B2B</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 0; --span: 2;"><span class="sr-only">2026-12-01 – 2027-01-31</span></span></span></li>
             <li class="gantt-row"><span class="gantt-name">Projektowanie UX i UI</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 0; --span: 3;"><span class="sr-only">2026-12-01 – 2027-02-28</span></span></span></li>
-            <li class="gantt-row"><span class="gantt-name">Development e-commerce</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 2; --span: 4;"><span class="sr-only">2027-02-01 – 2027-05-31</span></span></span></li>
+            <li class="gantt-row"><span class="gantt-name">Budowa sklepu e-commerce</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 2; --span: 4;"><span class="sr-only">2027-02-01 – 2027-05-31</span></span></span></li>
             <li class="gantt-row"><span class="gantt-name">Testy</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 3; --span: 3;"><span class="sr-only">2027-03-01 – 2027-05-31</span></span></span></li>
             <li class="gantt-row"><span class="gantt-name">Uruchomienie stagingu</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 3; --span: 4;"><span class="sr-only">2027-03-01 – 2027-06-30</span></span></span></li>
             <li class="gantt-row"><span class="gantt-name">Code freeze</span><span class="gantt-track"><span class="gantt-bar" data-grid="8" style="--start: 6; --span: 1;"><span class="sr-only">2027-06-01 – 2027-06-30</span></span></span></li>
@@ -987,7 +987,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
       <div class="container">
         <div class="stack mt-128" data-grid="32" data-snap>
           <p class="eyebrow">Nadtytuł sekcji</p>
-          <h2>Teza sekcji w&nbsp;dwóch wierszach</h2>
+          <h2>Teza sekcji w dwóch wierszach</h2>
           <ul class="points">
             <li><strong>Pierwsza korzyść.</strong> Jedno zdanie wyjaśnienia.</li>
             <li><strong>Druga korzyść.</strong> Jedno zdanie wyjaśnienia.</li>
@@ -1011,7 +1011,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
       <div class="container">
         <div class="stack mt-128" data-grid="32" data-snap>
           <p class="eyebrow">Nadtytuł sekcji</p>
-          <h2>Teza sekcji w&nbsp;dwóch wierszach</h2>
+          <h2>Teza sekcji w dwóch wierszach</h2>
           <ul class="points">
             <li><strong>Pierwsza korzyść.</strong> Jedno zdanie wyjaśnienia.</li>
             <li><strong>Druga korzyść.</strong> Jedno zdanie wyjaśnienia.</li>
@@ -1089,7 +1089,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           <tbody>
             <tr><td>Analiza i specyfikacja wymagań</td><td>odpowiada</td><td>akceptuje</td></tr>
             <tr><td>Dane produktowe i dostęp do ERP</td><td>wspiera</td><td>odpowiada</td></tr>
-            <tr><td>Development i testy techniczne</td><td>odpowiada</td><td></td></tr>
+            <tr><td>Programowanie i testy techniczne</td><td>odpowiada</td><td></td></tr>
             <tr><td>Testy akceptacyjne</td><td>wspiera</td><td>odpowiada</td></tr>
             <tr><td>Decyzja o uruchomieniu</td><td>rekomenduje</td><td>decyduje</td></tr>
           </tbody>
@@ -1146,8 +1146,10 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           </figure>
         </div>
       </div>
+      <!-- Stopka: adres strony z opiniami z references/ageno.md („Opinie klientów”) i data stanu,
+           dopiero gdy karty mają prawdziwe fragmenty opinii z tego źródła -->
       <footer class="slide-footer">
-        <span data-source>Opinie z ageno.pl/opinie, stan na 2026-11-17</span>
+        <span data-source>Źródło opinii, 2026-11-16</span>
         <span data-slide-number></span>
       </footer>
     </section>
@@ -1218,8 +1220,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           </div>
           <div class="person-details stack-tight" data-grid="32">
             <p class="person-name">Maksymilian Śleziak</p>
-            <p><a href="mailto:maksymilian.sleziak@ageno.pl">maksymilian.sleziak@ageno.pl</a></p>
-            <p><a class="nowrap" href="tel:+48502022202">+48 502 02 22 02</a></p>
+            <p><a class="nowrap" href="mailto:maksymilian.sleziak@ageno.pl">maksymilian.sleziak@ageno.pl</a></p>
+            <p><a class="nowrap" href="mailto:info@ageno.pl">info@ageno.pl</a></p>
           </div>
         </div>
       </div>
@@ -1246,7 +1248,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 
   // Sierotki (references/redakcja.md): twarda spacja (U+00A0) w tekście slajdów, żeby
   // jednoliterowe słowa, liczby z jednostkami, grupy cyfr, skróty i myślnik zakresu dat
-  // nie zostawały na końcu ani na początku wiersza. Działa przy każdym otwarciu i przed drukiem.
+  // nie zostawały na końcu ani na początku wiersza. Działa raz, przy otwarciu pliku; poprawiony
+  // tekst zostaje w DOM, więc druk i PDF dostają te same twarde spacje.
   const NB = "\u00A0";
   const ORPHAN_RULES = [
     [/(?<=^|[\s(\["'„])([aiouwzAIOUWZ])\s+/gu, `$1${NB}`],                         // a, i, o, u, w, z
@@ -1275,7 +1278,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 
   fixOrphans(deck);
 
-  // Numeracja, etykiety i małe logo Ageno w stopce (poza slajdem tytułowym z dużym logo)
+  // Numeracja, etykiety i małe logo Ageno w stopce (poza slajdami z dużym logo: tytułowy i „Kontakt”)
   slides.forEach((slide, i) => {
     const footer = slide.querySelector(".slide-footer");
     if (footer && !slide.querySelector(".brand-logo") && !footer.querySelector(".footer-logo")) {

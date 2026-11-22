@@ -1,45 +1,37 @@
 #!/usr/bin/env node
 /**
- * Zrzuty ekranu do slajdów, dopasowane do ramek z siatki (references/screeny.md).
+ * Zrzuty ekranu do slajdów, dopasowane do ramek z siatki (references/siatka.md, „Ramki screenów”;
+ * zasady zrzutów: references/screeny.md).
  * Viewport zrzutu ma te same proporcje co ramka, więc obraz wypełnia ją bez kadrowania.
- * deviceScaleFactor 2 daje ostry obraz na dużym ekranie.
+ * deviceScaleFactor 2 daje ostry obraz na dużym ekranie. Ramki, skala i jakość JPEG: constants.mjs.
  *
  * Użycie: node scripts/screenshots.mjs screens.json [--out ./screens]
+ * Kod wyjścia: 0 = wszystkie zrzuty, 1 = któryś zrzut się nie udał, 2 = złe wywołanie (scripts/cli.mjs).
  *
  * screens.json:
  * [
  *   { "name": "home", "url": "https://example.com", "frame": "wide" },
  *   { "name": "koszyk-mobile", "url": "https://example.com/koszyk", "frame": "mobile",
- *     "hide": ["#cookie-banner"], "waitFor": ".cart", "scrollY": 0, "delay": 500 }
+ *     "hide": ["#cookie-banner"], "waitFor": ".cart", "scrollY": 0, "delay": 400 }
  * ]
  *
  * Pola: name, url, frame (full | wide | half | mobile) – wymagane;
- * hide (selektory ukrywane przez CSS, np. banery), waitFor (selektor), scrollY (px), delay (ms) – opcjonalne.
- * Wymaga: npm install --no-save playwright && npx playwright install chromium
+ * hide (selektory ukrywane przez CSS, np. banery), waitFor (selektor), scrollY (px), delay (ms, domyślnie 400 = SCREENSHOT_DELAY_MS) – opcjonalne.
+ * Wymaga: npm install && npx playwright install chromium (package.json)
  */
-import { chromium } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { launchChromium, parseCli, usageError } from "./cli.mjs";
+import { DEVICE_SCALE, FRAMES, JPEG_QUALITY, SCREENSHOT_DELAY_MS } from "./constants.mjs";
 
-const FRAMES = {
-  full:   { frame: [1312, 608], viewport: [1312, 608], mobile: false },
-  wide:   { frame: [864, 544],  viewport: [1296, 816], mobile: false },
-  half:   { frame: [640, 416],  viewport: [1280, 832], mobile: false },
-  mobile: { frame: [320, 640],  viewport: [400, 800],  mobile: true },
-};
-
-const args = process.argv.slice(2);
-const listPath = args.find((a) => !a.startsWith("--"));
-if (!listPath) {
-  console.error("Użycie: node scripts/screenshots.mjs screens.json [--out ./screens]");
-  process.exit(2);
-}
-const outIdx = args.indexOf("--out");
-const outDir = path.resolve(outIdx >= 0 ? args[outIdx + 1] : path.join(path.dirname(listPath), "screens"));
+const USAGE = "node scripts/screenshots.mjs screens.json [--out katalog]  (domyślnie screens/ obok JSON)";
+const { values, positionals: [listPath] } = parseCli({ usage: USAGE, options: { out: { type: "string" } }, positionals: [1, 1], files: true });
+let list;
+try { list = JSON.parse(await readFile(listPath, "utf8")); } catch (error) { usageError(USAGE, `${listPath} nie jest poprawnym JSON: ${error.message}`); }
+if (!Array.isArray(list)) usageError(USAGE, `${listPath} ma zawierać listę (tablicę JSON)`);
+const outDir = path.resolve(values.out ?? path.join(path.dirname(listPath), "screens"));
 await mkdir(outDir, { recursive: true });
-
-const list = JSON.parse(await readFile(listPath, "utf8"));
-const browser = await chromium.launch({ headless: true });
+const browser = await launchChromium();
 let failed = 0;
 
 for (const item of list) {
@@ -52,7 +44,7 @@ for (const item of list) {
   const [vw, vh] = preset.viewport;
   const context = await browser.newContext({
     viewport: { width: vw, height: vh },
-    deviceScaleFactor: 2,
+    deviceScaleFactor: DEVICE_SCALE,
     isMobile: preset.mobile,
     hasTouch: preset.mobile,
     locale: "pl-PL",
@@ -66,9 +58,9 @@ for (const item of list) {
     if (item.waitFor) await page.waitForSelector(item.waitFor, { timeout: 15000 });
     await page.evaluate(() => document.fonts?.ready);
     if (item.scrollY) await page.evaluate((y) => window.scrollTo(0, y), item.scrollY);
-    await page.waitForTimeout(item.delay ?? 400);
+    await page.waitForTimeout(item.delay ?? SCREENSHOT_DELAY_MS);
     const file = path.join(outDir, `${item.name}.jpg`);
-    await page.screenshot({ path: file, type: "jpeg", quality: 85, animations: "disabled" });
+    await page.screenshot({ path: file, type: "jpeg", quality: JPEG_QUALITY, animations: "disabled" });
     console.log(`OK  ${item.name}  ramka ${preset.frame.join("×")}  viewport ${vw}×${vh}  → ${file}`);
   } catch (error) {
     failed += 1;

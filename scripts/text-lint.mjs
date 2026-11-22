@@ -3,24 +3,25 @@
  * Kontrola tekstu slajdów według references/redakcja.md.
  * Czyta widoczny tekst każdego slajdu (bez treści cytatów i zaślepek) i zgłasza fragmenty
  * z numerem reguły. BŁĄD = do poprawienia, UWAGA = do oceny w kontekście.
- * Nie zastępuje czytania: reguł 8, 9, 22, 24, 25, 29 i S1–S7 nie sprawdza w całości.
+ * Sprawdza reguły 5, 6, 7, 10, 11, 12 (tylko nagłówki), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
+ * wycinek S3 (lista czasowników w 1. os. lm.) i format dat. Lista ma być zgodna z references/redakcja.md.
+ * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
+ * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
  * Użycie: node scripts/text-lint.mjs prezentacja.html
- * Kod wyjścia 1, gdy są błędy.
- * Wymaga: npm install --no-save playwright && npx playwright install chromium
+ * Kod wyjścia: 0 = brak błędów (same uwagi też), 1 = są błędy albo brak slajdów [data-slide], 2 = złe wywołanie (scripts/cli.mjs).
+ * Wymaga: npm install && npx playwright install chromium (package.json)
  */
-import { chromium } from "playwright";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { launchChromium, parseCli } from "./cli.mjs";
+import { CANVAS } from "./constants.mjs";
 
-const input = process.argv[2];
-if (!input) {
-  console.error("Użycie: node scripts/text-lint.mjs prezentacja.html");
-  process.exit(2);
-}
+const USAGE = "node scripts/text-lint.mjs prezentacja.html";
+const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1], files: true });
 
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1536, height: 864 } });
+const browser = await launchChromium();
+const page = await browser.newPage({ viewport: { width: CANVAS.width, height: CANVAS.height } });
 await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 
 // Tekst zbierany per element blokowy; nagłówki osobno, bo mają ostrzejsze reguły.
@@ -51,11 +52,13 @@ const rules = [
   // [reguła, poziom, wzorzec, opis, tylko nagłówki]
   ["5", "błąd", word("dodatkowo|kluczow\\p{L}*|kompleksow\\p{L}*|innowacyjn\\p{L}*|holistyczn\\p{L}*|synergi\\p{L}*|ekosystem\\p{L}*|krajobraz\\p{L}*|unikaln\\p{L}*|przełomow\\p{L}*|wartoś\\p{L}* dodan\\p{L}*|w dzisiejszych czasach"), "słowo typowe dla AI"],
   ["5", "błąd", word("additionally|crucial|delve\\p{L}*|enhanc\\p{L}*|foster\\p{L}*|landscape|pivotal|showcas\\p{L}*|testament|underscor\\p{L}*|vibrant"), "słowo typowe dla AI (EN)"],
-  ["6", "błąd", word("stanowi\\p{L}*|pełni\\p{L}* rolę|może pochwalić się"), "zamiast „jest” / „ma”"],
+  ["6", "błąd", word("stanowi(?!sk)\\p{L}*|pełni\\p{L}* rolę|może pochwalić się"), "zamiast „jest” / „ma”"],
   ["7", "błąd", /nie tylko\b.*\bale/iu, "„nie tylko X, ale Y”"],
   ["10", "uwaga", /(?<![\p{L}\p{N}])od [^.,]{1,40}? po /iu, "„od X po Y”: czy to prawdziwa skala?"],
   ["11", "błąd", /—/u, "pauza (em dash)"],
-  ["11", "błąd", /(?<![\p{N}]) [–-] |(?<![\p{N}]) [–-]$|^[–-] /u, "myślnik zamiast kropki lub przecinka"],
+  // Wyjątek tylko dla półpauzy w zakresie liczba – liczba (2026-10-01 – 2026-10-31, 10 – 20 osób);
+  // dywiz ze spacjami i półpauza przed słowem („Krok 1 - analiza”, „W 2026 – start”) to błąd.
+  ["11", "błąd", /(?<!\p{N}) – | - |(?<=\p{N}) – (?!\p{N})| [–-]$|^[–-] /u, "myślnik zamiast kropki lub przecinka"],
   ["11", "błąd", /[()]/u, "nawias"],
   ["12", "błąd", /:/u, "dwukropek w tytule lub nagłówku", true],
   ["16", "błąd", /\p{Extended_Pictographic}/u, "emoji"],
@@ -64,7 +67,7 @@ const rules = [
   ["23", "uwaga", word("fundament\\p{L}*|kręgosłup\\p{L}*|filar\\p{L}*|paradygmat\\p{L}*|koł\\p{L}* zamachow\\p{L}*|gwiazd\\p{L}* przewodni\\p{L}*|motor\\p{L}* napędow\\p{L}*"), "metafora zamiast konkretnego słowa"],
   ["28", "uwaga", word("wykorzyst\\p{L}*|zaimplementow\\p{L}*|lewarow\\p{L}*"), "czy wystarczy „użyć”?"],
   ["31", "błąd", word("dokona\\p{L}*|przeprowadzeni\\p{L}*"), "rzeczownik odczasownikowy z pustym czasownikiem"],
-  ["32", "błąd", word("w oparciu o|adresow\\p{L}*|dedykowan\\p{L}*"), "kalka z angielskiego"],
+  ["32", "błąd", word("w oparciu o|adresowa[ćłn]\\p{L}*|adresuj\\p{L}*|dedykowan\\p{L}*"), "kalka z angielskiego"],
   ["33", "uwaga", word("w ramach|na poziomie|w obszarze|w zakresie|pozwala na|umożliwia\\p{L}*"), "pusty łącznik"],
   ["34", "błąd", word("feature\\p{L}*|insight\\p{L}*|deliverable\\p{L}*|performance"), "zbędny anglicyzm"],
   ["35", "błąd", /(?<![\p{L}])zostan(?:ie|ą) \p{L}+(?:ny|na|ne|ni|ty|ta|te|ci)(?![\p{L}])/iu, "strona bierna w przyszłości"],
@@ -73,6 +76,11 @@ const rules = [
   ["daty", "błąd", word("(?:styczeń|stycznia|luty|lutego|marzec|marca|kwiecień|kwietnia|maj|maja|czerwiec|czerwca|lipiec|lipca|sierpień|sierpnia|wrzesień|września|październik|października|listopad|listopada|grudzień|grudnia|styczniu|lutym|marcu|kwietniu|maju|czerwcu|lipcu|sierpniu|wrześniu|październiku|listopadzie|grudniu) \\d{4}"), "miesiąc słownie zamiast YYYY-MM-DD"],
 ];
 const HEDGES = /(?<![\p{L}])(może|prawdopodobnie|potencjalnie|raczej|ewentualnie|być może|niekiedy)(?![\p{L}])/giu;
+
+if (!slides.length) {
+  console.error("BŁĄD: brak slajdów [data-slide] w pliku; nie ma czego sprawdzić (kontrakt DOM: references/nawigacja.md).");
+  process.exit(1);
+}
 
 let errors = 0;
 let warnings = 0;

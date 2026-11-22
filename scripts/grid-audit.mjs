@@ -1,41 +1,44 @@
 #!/usr/bin/env node
 /**
  * Audyt siatki 8 / 32 px dla prezentacji z assets/template.html.
- * Otwiera plik w oknie 1536 × 864 (skala płótna = 1), więc pomiary są w px logicznych slajdu.
+ * Otwiera plik w oknie płótna (CANVAS z constants.mjs, 1536 × 864, skala = 1), więc pomiary są w px logicznych slajdu.
  * Sprawdza KAŻDY slajd, także nieaktywne (są ułożone, tylko niewidoczne).
  *
  * Reguły:
  *  - [data-grid="32"]: X, Y, szerokość i wysokość podzielne przez 32,
  *  - [data-grid="8"]:  X i szerokość przez 8, Y i wysokość przez 32,
+ *  - [data-grid="32y"]: tylko Y i wysokość przez 32 (blok dochodzący do krawędzi slajdu, np. .photo),
  *  - wiersze tekstu (h1–h3, p, li, figcaption, blockquote, dt, dd): Y i wysokość przez 32,
- *  - interlinia każdego tekstu: 32 lub 64 px (poza <strong> i stopką),
- *  - nic w kontenerze nie wychodzi poza 112–1424 × 64–768,
+ *  - interlinia każdego tekstu: wielokrotność 32 px (poza <strong> i stopką),
+ *  - nic w kontenerze nie wychodzi poza 112–1424 × 64–768 (zgłaszane wszystkie takie elementy),
+ *  - tolerancja 0,1 px przy krawędziach, wymiarach i interlinii,
  *  - stopka na y = 800,
- *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w .bleed albo oznacz data-bleed).
+ *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w warstwie .bleed z szablonu
+ *    albo oznacz atrybutem data-bleed; obie formy audyt traktuje tak samo).
  * X liczony od lewej krawędzi kontenera (112), Y od góry slajdu.
  *
  * Użycie: node scripts/grid-audit.mjs prezentacja.html
- * Wymaga: npm install --no-save playwright && npx playwright install chromium
+ * Kod wyjścia: 0 = wszystkie slajdy OK, 1 = błąd siatki albo brak slajdów [data-slide], 2 = złe wywołanie (scripts/cli.mjs).
+ * Wymaga: npm install && npx playwright install chromium (package.json)
  */
-import { chromium } from "playwright";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { launchChromium, parseCli } from "./cli.mjs";
+import { CANVAS, CONTAINER, FOOTER, GRID } from "./constants.mjs";
 
-const input = process.argv[2];
-if (!input) {
-  console.error("Użycie: node scripts/grid-audit.mjs prezentacja.html");
-  process.exit(2);
-}
+const USAGE = "node scripts/grid-audit.mjs prezentacja.html";
+const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1], files: true });
 
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1536, height: 864 } });
+const browser = await launchChromium();
+const page = await browser.newPage({ viewport: { width: CANVAS.width, height: CANVAS.height } });
 await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 await page.evaluate(() => document.fonts?.ready);
 await page.waitForTimeout(300); // ResizeObserver i snap
 
-const result = await page.evaluate(() => {
+const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
   const TOL = 0.1;
-  const X0 = 112, Y_MIN = 64, Y_MAX = 768, X_MAX = 1424, FOOTER_Y = 800;
+  const X0 = CONTAINER.x0, Y_MIN = CONTAINER.y0, Y_MAX = CONTAINER.y1, X_MAX = CONTAINER.x1, FOOTER_Y = FOOTER.y;
+  const M = GRID.module, U = GRID.unit;
   const off = (v, step) => Math.abs(v - step * Math.round(v / step));
   const name = (el) => {
     const cls = typeof el.className === "string" ? el.className.trim().split(/\s+/).filter(Boolean).join(".") : "";
@@ -60,10 +63,10 @@ const result = await page.evaluate(() => {
     for (const el of slide.querySelectorAll("[data-grid]")) {
       if (!visible(el)) continue;
       const mode = el.dataset.grid;
-      const step = mode.startsWith("32") ? 32 : 8;
+      const step = mode.startsWith("32") ? M : U;
       const b = rel(el);
       const snap = el.hasAttribute("data-snap") ? parseFloat(getComputedStyle(el).marginBottom) || 0 : 0;
-      const checks = [["y", b.y, 32], ["h", b.h + snap, 32]];
+      const checks = [["y", b.y, M], ["h", b.h + snap, M]];
       if (mode !== "32y") checks.push(["x", b.x, step], ["w", b.w, step]);
       const bad = checks.filter(([, v, m]) => off(v, m) > TOL);
       if (bad.length) problems.push(`${name(el)} [${mode}] ${bad.map(([k, v]) => `${k}=${v.toFixed(2)}`).join(" ")}`);
@@ -73,7 +76,7 @@ const result = await page.evaluate(() => {
     for (const el of lines) {
       if (el.hasAttribute("data-grid") || !visible(el)) continue;
       const b = rel(el);
-      if (off(b.y, 32) > TOL || off(b.h, 32) > TOL) {
+      if (off(b.y, M) > TOL || off(b.h, M) > TOL) {
         problems.push(`${name(el)} [wiersz] y=${b.y.toFixed(2)} h=${b.h.toFixed(2)}`);
       }
     }
@@ -85,24 +88,27 @@ const result = await page.evaluate(() => {
       const el = walker.currentNode.parentElement;
       if (!walker.currentNode.textContent.trim() || el.closest("strong, script, style, .slide-footer, .deck-nav")) continue;
       const v = parseFloat(getComputedStyle(el).lineHeight);
-      if (Number.isNaN(v) || v % 32 !== 0) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
+      if (Number.isNaN(v) || v < M - TOL || off(v, M) > TOL) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
     }
     problems.push(...lh);
 
-    // Granice kontenera
+    // Granice kontenera: wszystkie elementy poza kontenerem; potomek już zgłoszonego elementu
+    // nie jest zgłaszany drugi raz, żeby jeden za duży blok nie dawał kilkudziesięciu wierszy.
+    const outside = [];
     for (const el of slide.querySelectorAll(".container *")) {
-      if (!visible(el)) continue;
+      if (!visible(el) || outside.some((o) => o.contains(el))) continue;
       const b = rel(el);
       if (b.left < X0 - TOL || b.right > X_MAX + TOL || b.bottom > Y_MAX + TOL || b.y < Y_MIN - TOL) {
+        outside.push(el);
         problems.push(`${name(el)} poza kontenerem: x ${b.left.toFixed(0)}–${b.right.toFixed(0)}, y ${b.y.toFixed(0)}–${b.bottom.toFixed(0)}`);
-        break;
       }
     }
 
     const footer = slide.querySelector(".slide-footer");
     if (footer && Math.abs(rel(footer).y - FOOTER_Y) > TOL) problems.push(`stopka na y=${rel(footer).y.toFixed(2)}, oczekiwane ${FOOTER_Y}`);
-    // Grafiki celowo wychodzące poza slajd (data-bleed, np. góry na slajdzie tytułowym) nie liczą się.
-    const bleed = [...slide.querySelectorAll("[data-bleed]")];
+    // Grafiki celowo wychodzące poza slajd (warstwa .bleed albo [data-bleed], np. góry na slajdzie
+    // tytułowym i „Kontakt”) nie liczą się do przewijania.
+    const bleed = [...slide.querySelectorAll(".bleed, [data-bleed]")];
     bleed.forEach((el) => { el.dataset.auditDisplay = el.style.display; el.style.display = "none"; });
     if (slide.scrollHeight > slide.clientHeight + 1 || slide.scrollWidth > slide.clientWidth + 1) problems.push("przewijanie wewnątrz slajdu");
     bleed.forEach((el) => { el.style.display = el.dataset.auditDisplay; delete el.dataset.auditDisplay; });
@@ -110,9 +116,13 @@ const result = await page.evaluate(() => {
     report.push({ slide: i + 1, problems });
   });
   return report;
-});
+}, { CONTAINER, FOOTER, GRID });
 
 await browser.close();
+if (!result.length) {
+  console.error("BŁĄD: brak slajdów [data-slide] w pliku; nie ma czego sprawdzić (kontrakt DOM: references/nawigacja.md).");
+  process.exit(1);
+}
 let failed = 0;
 for (const { slide, problems } of result) {
   if (problems.length) {

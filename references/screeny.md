@@ -7,17 +7,9 @@ data zrzutu (np. „Screen: sklep.klient.pl/koszyk, 2026-11-16”) i `alt` w `<i
 
 ## Ramki z siatki
 
-Najpierw wybierz ramkę, potem zrób zrzut w tych samych proporcjach. Wtedy obraz wypełnia ramkę
-bez kadrowania.
-
-| Ramka (`frame`) | Klasa | Wymiar na slajdzie | Viewport zrzutu | Do czego |
-| --- | --- | --- | --- | --- |
-| `full` | `.shot-full` | 1312 × 608 | 1312 × 608 | pełny ekran desktop |
-| `wide` | `.shot-wide` | 864 × 544 | 1296 × 816 | screen obok tekstu |
-| `half` | `.shot-half` | 640 × 416 | 1280 × 832 | dwa screeny obok siebie |
-| `mobile` | `.shot-mobile` | 320 × 640 | 400 × 800 | telefon w kolumnie 416 |
-
-Zrzuty mają `deviceScaleFactor: 2`, więc są ostre także na projektorze 4K.
+Najpierw wybierz ramkę (`full`, `wide`, `half`, `mobile`), potem zrób zrzut w tych samych
+proporcjach. Wtedy obraz wypełnia ramkę bez kadrowania. Wymiary ramek na slajdzie, viewporty
+zrzutów, skala 2× i jakość JPEG: `references/siatka.md`, „Ramki screenów”.
 
 ## Zrzut automatyczny
 
@@ -28,19 +20,18 @@ W folderze decku utwórz `screens.json`:
   { "name": "home", "url": "https://sklep.klient.pl", "frame": "wide",
     "hide": ["#cookie-banner", ".chat-widget"] },
   { "name": "koszyk-mobile", "url": "https://sklep.klient.pl/koszyk", "frame": "mobile",
-    "waitFor": ".cart", "delay": 800 }
+    "waitFor": ".cart", "delay": 400 }
 ]
 ```
 
-```bash
-node scripts/screenshots.mjs decks/2026-11-16-klient-temat/screens.json
-```
-
-Pliki trafiają do `screens/` obok `screens.json` jako `nazwa.jpg`.
+Zrzuty robi `scripts/screenshots.mjs` (polecenie: `README.md`). Pliki trafiają do `screens/`
+obok `screens.json` jako `nazwa.jpg`.
 
 - `hide` ukrywa banery cookies, czaty i popupy przez CSS. Nie klikaj zgód w cudzym serwisie.
 - Strony za logowaniem, koszyk z produktami, panel admina: zrzut ręczny użytkownika.
 - Fragment niżej na stronie: `scrollY`.
+- `delay`: pauza przed zrzutem w ms, domyślnie 400 (`SCREENSHOT_DELAY_MS` w `scripts/constants.mjs`);
+  dłuższa tylko dla stron z animacją wejścia.
 
 ## Zrzut ręczny
 
@@ -54,8 +45,9 @@ Gdy użytkownik dostarcza gotowe pliki:
 ## Osadzanie
 
 - W trakcie pracy: `<img src="screens/home.jpg" alt="…">` w `index.html` decku.
-- Na koniec `scripts/inline-assets.mjs` zamienia lokalne obrazy na data URI i pilnuje limitu 15 MB.
-- Za duży plik: mniej screenów, mniejsza jakość JPEG (75), ramka `half` zamiast `full`.
+- Na koniec `scripts/inline-assets.mjs` zamienia lokalne obrazy na data URI; plik ponad 15 MB kończy go kodem 1.
+- Za duży plik: mniej screenów albo ramka `half` zamiast `full`. Jakości JPEG nie obniżaj
+  dla jednego decku (stała 80 w `scripts/constants.mjs`).
 
 ## Wygląd
 

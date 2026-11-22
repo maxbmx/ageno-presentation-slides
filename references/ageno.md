@@ -13,9 +13,9 @@ danych, użytkownik dopisze.
 | Sekcja pliku | Gdzie trafia w decku | Układ (slajd szablonu, `references/uklady.md`) |
 | --- | --- | --- |
 | Marka i grafiki | slajd tytułowy, stopki, tło slajdu klientów | 1 Tytułowy, stopka każdego slajdu |
-| Podstawy | nadtytuł slajdu tytułowego, slajd kontaktowy | 1 Tytułowy, slajdy kończące |
+| Podstawy | nadtytuł slajdu tytułowego, slajd kontaktowy | 1 Tytułowy, 24 Kontakt |
 | Liczby | slajd o Ageno, dowody w tezach | 2 Teza + 3 liczby |
-| Klienci i logotypy | slajd kończący z logotypami | 23 Klienci Ageno |
+| Klienci i logotypy | przedostatni slajd z logotypami | 23 Klienci Ageno |
 | Realizacje | dowód, że podobny projekt się udał | 11 Case study, 3 Teza + screen |
 | Opinie klientów | głos klienta | 21 Opinie klientów, 14 Cytat |
 | Sposób pracy | plan projektu, etapy, warianty, role, ryzyka | 8 Warianty, 12 Kroki, 13 Harmonogram, 18 Ryzyka, 19 Role |
@@ -26,13 +26,11 @@ danych, użytkownik dopisze.
 
 ## Marka i grafiki (2026-11-17)
 
-- Logo Ageno: `assets/ageno-logo.svg`; w szablonie jako `<symbol id="ageno-logo">`. Duże na slajdzie
-  tytułowym, małe w stopce każdego kolejnego slajdu.
-- Kolory z logo: ciemny fiolet `#231430` (tekst), pomarańcz `#ff6b00` (akcent).
+- Logo Ageno: `assets/ageno-logo.svg`. Gdzie, jak duże i czego nie zmieniać: `references/siatka.md`,
+  „Logo”. Kolory z logo jako tokeny tekstu i akcentu: `references/siatka.md`, „Kolory”.
 - Góry Ageno: `https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg` →
-  `ageno-mountains.svg` (pobiera `scripts/ageno-assets.mjs`). Obowiązkowo na slajdzie tytułowym
-  (po lewej, poza lewą i dolną krawędź) i na slajdzie kontaktowym (po prawej, poza prawą
-  i dolną krawędź). Pliku nie zmieniamy.
+  `ageno-mountains.svg` (pobiera `scripts/ageno-assets.mjs`). Obowiązkowo na slajdach 1 i 24;
+  położenie: `references/uklady.md`, „Tytułowy” i „Kontakt”. Pliku nie zmieniamy.
 - Hasło ze strony: „Zdobywamy szczyty e-commerce” **[ageno.pl]**. Na slajdach tylko dosłownie,
   jako hasło marki, nie jako teza.
 - Górski charakter: siedziba w Bielsku-Białej, w Beskidzie Śląskim **[ageno.pl]**. Zdjęcia
@@ -43,6 +41,7 @@ danych, użytkownik dopisze.
 - Nazwa: Ageno Sp. z o.o. **[ageno.pl]**
 - Adres: Sobieskiego 105, 43-300 Bielsko-Biała **[ageno.pl]**
 - Strona: ageno.pl; konsultacje: ageno.pl/konsultacje **[ageno.pl]**
+- E-mail firmy: info@ageno.pl. Na slajdzie „Kontakt” stoi obok służbowego e-maila osoby.
 - Blanc: na ageno.pl rozwiązanie „Blanc – Błyskawiczne wdrożenie Magento” **[ageno.pl]**.
   Kiedy deck jest pod marką Blanc, a kiedy Ageno: **[uzupełnić]**
 - Rok założenia, liczba osób w zespole: **[uzupełnić]**
@@ -128,14 +127,17 @@ Pełne brzmienie: ageno.pl/opinie. Cytat na slajdzie przepisz ze źródła słow
 ## Osoby
 
 Do slajdu „Kontakt” (24). Zdjęcie pobiera `scripts/ageno-assets.mjs` do `people/`; tylko
-zdjęcia z tej listy, nigdy ze stocku.
+zdjęcia z tej listy, nigdy ze stocku. Obok osoby: jej służbowy e-mail z tabeli i info@ageno.pl
+z sekcji „Podstawy”. Prywatnego numeru telefonu nie podajemy (sekcja „Poufność”).
 
-| Osoba | Rola | E-mail | Telefon | Zdjęcie |
-| --- | --- | --- | --- | --- |
-| Maksymilian Śleziak | **[uzupełnić]** | maksymilian.sleziak@ageno.pl | +48 502 02 22 02 | https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png → `people/maksymilian-sleziak.png` |
+| Osoba | Rola | E-mail | Zdjęcie |
+| --- | --- | --- | --- |
+| Maksymilian Śleziak | **[uzupełnić]** | maksymilian.sleziak@ageno.pl | https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png → `people/maksymilian-sleziak.png` |
 
-Domyślna osoba na slajdzie kontaktowym: Maksymilian Śleziak. Inna osoba: dopisz wiersz tu
-i w liście `PEOPLE` w `scripts/ageno-assets.mjs`.
+Domyślna osoba na slajdzie kontaktowym: Maksymilian Śleziak. Ta tabela jest źródłem prawdy
+dla osoby, roli, służbowego e-maila i zdjęcia.
+Inna osoba: dopisz wiersz tu, potem wpis z tym samym adresem zdjęcia w liście `PEOPLE`
+w `scripts/constants.mjs` (z niej korzysta `scripts/ageno-assets.mjs`).
 
 ## Słownik
 
@@ -151,4 +153,6 @@ i w liście `PEOPLE` w `scripts/ageno-assets.mjs`.
 - Wolno: realizacje, logotypy i opinie opublikowane na ageno.pl.
 - Nie wolno bez zgody użytkownika: nazwy i liczby klientów spoza ageno.pl, ceny z innych ofert,
   dane wewnętrzne Ageno (marże, wynagrodzenia, wyniki finansowe).
+- Nie wolno: prywatnych numerów telefonów w deckach ani w repozytorium (szablon, `references/`,
+  skrypty, komentarze). Kontakt podajemy e-mailem: służbowy adres osoby i info@ageno.pl.
 - Inne zasady: **[uzupełnić]**

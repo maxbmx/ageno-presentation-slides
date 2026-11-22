@@ -4,30 +4,34 @@
  *  - góry na slajd tytułowy: ageno-mountains.svg,
  *  - logotypy klientów ze strony głównej ageno.pl (sekcja „Ponad 100+ zadowolonych klientów”)
  *    do logos/NN-nazwa.ext oraz listę logos.json,
- *  - zdjęcia osób na slajd kontaktowy do people/ (lista PEOPLE niżej, zgodna z references/ageno.md).
+ *  - zdjęcia osób na slajd kontaktowy do people/ (lista PEOPLE w constants.mjs, zgodna z references/ageno.md).
  * Pliki logo zapisuje bajt w bajt: nie przycina i nie skaluje obszaru roboczego, dlatego
  * w równych polach slajdu „Klienci Ageno” logotypy są równe.
  *
  * Użycie: node scripts/ageno-assets.mjs [--out decks/…/] [--site https://ageno.pl/]
  *         [--mountains <adres svg>]
  * Bez zależności (Node 18+). Wymaga dostępu do ageno.pl.
+ * Kod wyjścia: 0 = wszystko pobrane, 1 = coś się nie udało, 2 = złe wywołanie (scripts/cli.mjs).
+ *
+ * Status HTTP strony głównej jest sprawdzany przed parsowaniem: przy statusie innym niż 200
+ * (np. 403 z bramki Cloudflare „Just a moment…”) body nie jest czytane, a komunikat podaje status.
+ * Góry i zdjęcia osób są pobierane niezależnie od strony głównej. logos.json powstaje zawsze:
+ * z pobranymi logotypami albo z pustą listą i polem "error". Kod 1, gdy cokolwiek się nie udało.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { parseCli, requireUrl } from "./cli.mjs";
+import { PEOPLE } from "./constants.mjs";
 
-const args = process.argv.slice(2);
-const opt = (name, fallback) => {
-  const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : fallback;
-};
-const SITE = opt("--site", "https://ageno.pl/");
-const MOUNTAINS = opt("--mountains", "https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg");
-const OUT = path.resolve(opt("--out", "."));
-// Osoby na slajd kontaktowy: plik = slug imienia i nazwiska, jak w szablonie (people/<slug>.png).
-const PEOPLE = [
-  { file: "maksymilian-sleziak.png", url: "https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png" },
-];
+const USAGE = "node scripts/ageno-assets.mjs [--out katalog] [--site https://ageno.pl/] [--mountains <adres svg>]";
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+const { values } = isMain
+  ? parseCli({ usage: USAGE, options: { out: { type: "string" }, site: { type: "string" }, mountains: { type: "string" } } })
+  : { values: {} };
+const SITE = isMain ? requireUrl(USAGE, "site", values.site ?? "https://ageno.pl/") : "https://ageno.pl/";
+const MOUNTAINS = isMain ? requireUrl(USAGE, "mountains", values.mountains ?? "https://ageno.pl/wp-content/uploads/2024/02/mountains-optim-1.svg") : "";
+const OUT = path.resolve(values.out ?? ".");
 // Sekcja z logotypami: od zdania o klientach do nagłówka „Nasze realizacje”.
 const SECTION_START = /zadowolonych\s+klient/i;
 const SECTION_END = /Nasze\s+realizacje/i;
@@ -36,13 +40,49 @@ const slug = (s) =>
   s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ł/g, "l")
     .replace(/(logotyp|logo)/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "logo";
 
-async function download(url, file) {
+// Typ obrazu z nagłówka Content-Type → rozszerzenie pliku (te same typy, które osadza inline-assets.mjs).
+const IMAGE_EXT = {
+  "image/svg+xml": ".svg", "image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp",
+  "image/gif": ".gif", "image/avif": ".avif",
+};
+
+/** Rozszerzenie dla Content-Type obrazu albo null (HTML, nieznany typ, brak nagłówka). */
+export function imageExtension(contentType) {
+  const type = (contentType || "").split(";")[0].trim().toLowerCase();
+  return IMAGE_EXT[type] ?? null;
+}
+
+/**
+ * Pobiera obraz bajt w bajt. Sukces tylko przy HTTP 2xx i Content-Type z IMAGE_EXT; HTML
+ * (np. strona bramki z kodem 200) i inne typy są błędem, plik nie powstaje.
+ * @param {string} url
+ * @param {string} fileBase ścieżka bez rozszerzenia
+ * @param {string} [expectExt] wymagane rozszerzenie (plik o stałej nazwie, np. ".svg"); bez niego z Content-Type
+ * @returns {Promise<string>} ścieżka zapisanego pliku
+ */
+export async function downloadImage(url, fileBase, expectExt) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+  const type = res.headers.get("content-type") || "";
+  if (!res.ok) {
+    await res.body?.cancel();
+    throw new Error(`HTTP ${res.status}: ${url}`);
+  }
+  const ext = imageExtension(type);
+  if (!ext) {
+    await res.body?.cancel();
+    throw new Error(`odpowiedź nie jest obrazem (Content-Type: ${type || "brak"})${/text\/html/i.test(type) ? ", pewnie strona bramki albo błędu" : ""}: ${url}`);
+  }
+  if (expectExt && ext !== expectExt) {
+    await res.body?.cancel();
+    throw new Error(`oczekiwany plik ${expectExt}, serwer zwrócił ${type}: ${url}`);
+  }
+  const file = `${fileBase}${ext}`;
   await writeFile(file, Buffer.from(await res.arrayBuffer()));
+  return file;
 }
 
 // Adres obrazka z <img>: src, leniwe ładowanie (data-src, data-lazy-src) albo pierwszy wpis srcset.
+// Eksport zostaje: parser jest testowany w test/scripts.test.mjs (strona 403, sekcja klientów).
 export function imagesInSection(html, base) {
   const start = html.search(SECTION_START);
   const endRel = start >= 0 ? html.slice(start).search(SECTION_END) : -1;
@@ -65,7 +105,7 @@ async function main() {
   let failed = 0;
 
   try {
-    await download(MOUNTAINS, path.join(OUT, "ageno-mountains.svg"));
+    await downloadImage(MOUNTAINS, path.join(OUT, "ageno-mountains"), ".svg");
     console.log(`OK  góry → ${path.join(OUT, "ageno-mountains.svg")}`);
   } catch (error) {
     failed += 1;
@@ -75,7 +115,8 @@ async function main() {
   await mkdir(path.join(OUT, "people"), { recursive: true });
   for (const person of PEOPLE) {
     try {
-      await download(person.url, path.join(OUT, "people", person.file));
+      const ext = path.extname(person.file);
+      await downloadImage(person.url, path.join(OUT, "people", path.basename(person.file, ext)), ext === ".jpeg" ? ".jpg" : ext);
       console.log(`OK  people/${person.file}`);
     } catch (error) {
       failed += 1;
@@ -83,18 +124,34 @@ async function main() {
     }
   }
 
-  const html = await (await fetch(SITE)).text();
-  const images = imagesInSection(html, SITE);
-  if (!images.length) {
-    console.error("BŁĄD: nie znaleziono logotypów w sekcji klientów na stronie głównej (zmienił się układ strony?).");
-    process.exit(1);
-  }
   const list = [];
+  let error = null;
+  let images = [];
+  try {
+    const res = await fetch(SITE);
+    if (res.status !== 200) {
+      await res.body?.cancel();
+      const gate = res.headers.get("cf-mitigated") || /cloudflare/i.test(res.headers.get("server") || "") ? ", bramka Cloudflare" : "";
+      error = `strona główna ${SITE} zwróciła HTTP ${res.status}${gate}; strony nie parsowano, logotypów nie pobrano`;
+    } else {
+      images = imagesInSection(await res.text(), SITE);
+      if (!images.length) error = `HTTP 200, ale w HTML strony ${SITE} nie ma sekcji klientów z logotypami (zmienił się układ strony?)`;
+    }
+  } catch (e) {
+    error = `nie udało się pobrać strony głównej ${SITE}: ${e.cause?.code || e.message}`;
+  }
+  if (error) {
+    failed += 1;
+    console.error(`BŁĄD logotypy: ${error}`);
+  }
+
   for (const [i, img] of images.entries()) {
-    const ext = path.extname(new URL(img.url).pathname) || ".svg";
-    const file = `logos/${String(i + 1).padStart(2, "0")}-${slug(img.alt || path.basename(img.url, ext))}${ext}`;
+    const urlExt = path.extname(new URL(img.url).pathname);
+    const base = `logos/${String(i + 1).padStart(2, "0")}-${slug(img.alt || path.basename(new URL(img.url).pathname, urlExt))}`;
     try {
-      await download(img.url, path.join(OUT, file));
+      // Rozszerzenie z Content-Type, nie z adresu (adres bez rozszerzenia albo z innym niż typ pliku).
+      const saved = await downloadImage(img.url, path.join(OUT, base));
+      const file = path.relative(OUT, saved).split(path.sep).join("/");
       list.push({ file, alt: img.alt, url: img.url });
       console.log(`OK  ${file}  (${img.alt})`);
     } catch (error) {
@@ -102,10 +159,14 @@ async function main() {
       console.error(`BŁĄD ${img.url}: ${error.message}`);
     }
   }
-  await writeFile(path.join(OUT, "logos.json"), JSON.stringify({ source: SITE, downloaded: new Date().toISOString().slice(0, 10), logos: list }, null, 2));
+  // Zapisz to, co się udało: logos.json powstaje także bez logotypów (wtedy z polem "error").
+  const meta = { source: SITE, downloaded: new Date().toISOString().slice(0, 10), ...(error ? { error } : {}), logos: list };
+  await writeFile(path.join(OUT, "logos.json"), JSON.stringify(meta, null, 2));
   console.log(`\nLogotypów: ${list.length} → ${path.join(OUT, "logos.json")}`);
-  console.log("Na slajd „Klienci Ageno” wybierz 10 (2 wiersze po 5); kolejność jak w logos.json albo wg branży klienta.");
+  if (list.length) console.log("Na slajd „Klienci Ageno” wybierz 10 (2 wiersze po 5); kolejność jak w logos.json albo wg branży klienta.");
+  else console.log("Brak logotypów: zgłoś to użytkownikowi; nie szukaj ich w innych źródłach bez zgody.");
+  if (failed) console.error(`\nNie udało się: ${failed}. Pliki pobrane poprawnie zostały zapisane.`);
   process.exit(failed ? 1 : 0);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) await main();
+if (isMain) await main();
