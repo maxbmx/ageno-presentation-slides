@@ -155,8 +155,9 @@ podpisów i tła pod logotypami. Źródło i data stanu w stopce. Mniej niż 10 
 jeden pełny wiersz 5, nie zostawiaj dziur.
 
 **Kontakt.** Slajd zamykający, zawsze ostatni. Duże logo Ageno (`references/siatka.md`, „Logo”), tytuł „Pytania i kontakt” (56 / 64), jedno zdanie leadu, pod nim osoba: portret
-256 × 256 w kole, obok imię i nazwisko, e-mail jako link `mailto:` i telefon jako link `tel:`
-w `.nowrap`. Dane i zdjęcie tylko z sekcji „Osoby” w `references/ageno.md`. Po prawej te same
+256 × 256 w kole, obok imię i nazwisko, służbowy e-mail osoby i info@ageno.pl jako linki `mailto:`
+w `.nowrap`. Dane osoby i zdjęcie tylko z sekcji „Osoby” w `references/ageno.md`, adres info@ageno.pl
+z sekcji „Podstawy”. Bez numeru telefonu (`references/ageno.md`, „Poufność”). Po prawej te same
 góry Ageno co na slajdzie tytułowym, wychodzące poza prawą i dolną krawędź; tekst i stopka
 w lewej kolumnie 640 px. Portret w kole to jedyne zaokrąglenie w decku (kadr zdjęcia, nie
 pudełko). Bez „Dziękujemy”, pytań retorycznych i zwrotów w 1. osobie („Zapraszam do kontaktu”).

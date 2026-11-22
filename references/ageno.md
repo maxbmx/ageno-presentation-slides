@@ -41,6 +41,7 @@ danych, użytkownik dopisze.
 - Nazwa: Ageno Sp. z o.o. **[ageno.pl]**
 - Adres: Sobieskiego 105, 43-300 Bielsko-Biała **[ageno.pl]**
 - Strona: ageno.pl; konsultacje: ageno.pl/konsultacje **[ageno.pl]**
+- E-mail firmy: info@ageno.pl. Na slajdzie „Kontakt” stoi obok służbowego e-maila osoby.
 - Blanc: na ageno.pl rozwiązanie „Blanc – Błyskawiczne wdrożenie Magento” **[ageno.pl]**.
   Kiedy deck jest pod marką Blanc, a kiedy Ageno: **[uzupełnić]**
 - Rok założenia, liczba osób w zespole: **[uzupełnić]**
@@ -126,13 +127,15 @@ Pełne brzmienie: ageno.pl/opinie. Cytat na slajdzie przepisz ze źródła słow
 ## Osoby
 
 Do slajdu „Kontakt” (24). Zdjęcie pobiera `scripts/ageno-assets.mjs` do `people/`; tylko
-zdjęcia z tej listy, nigdy ze stocku.
+zdjęcia z tej listy, nigdy ze stocku. Obok osoby: jej służbowy e-mail z tabeli i info@ageno.pl
+z sekcji „Podstawy”. Prywatnego numeru telefonu nie podajemy (sekcja „Poufność”).
 
-| Osoba | Rola | E-mail | Telefon | Zdjęcie |
-| --- | --- | --- | --- | --- |
-| Maksymilian Śleziak | **[uzupełnić]** | maksymilian.sleziak@ageno.pl | +48 502 02 22 02 | https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png → `people/maksymilian-sleziak.png` |
+| Osoba | Rola | E-mail | Zdjęcie |
+| --- | --- | --- | --- |
+| Maksymilian Śleziak | **[uzupełnić]** | maksymilian.sleziak@ageno.pl | https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png → `people/maksymilian-sleziak.png` |
 
-Domyślna osoba na slajdzie kontaktowym: Maksymilian Śleziak. Ta tabela jest źródłem prawdy.
+Domyślna osoba na slajdzie kontaktowym: Maksymilian Śleziak. Ta tabela jest źródłem prawdy
+dla osoby, roli, służbowego e-maila i zdjęcia.
 Inna osoba: dopisz wiersz tu, potem wpis z tym samym adresem zdjęcia w liście `PEOPLE`
 w `scripts/constants.mjs` (z niej korzysta `scripts/ageno-assets.mjs`).
 
@@ -150,4 +153,6 @@ w `scripts/constants.mjs` (z niej korzysta `scripts/ageno-assets.mjs`).
 - Wolno: realizacje, logotypy i opinie opublikowane na ageno.pl.
 - Nie wolno bez zgody użytkownika: nazwy i liczby klientów spoza ageno.pl, ceny z innych ofert,
   dane wewnętrzne Ageno (marże, wynagrodzenia, wyniki finansowe).
+- Nie wolno: prywatnych numerów telefonów w deckach ani w repozytorium (szablon, `references/`,
+  skrypty, komentarze). Kontakt podajemy e-mailem: służbowy adres osoby i info@ageno.pl.
 - Inne zasady: **[uzupełnić]**

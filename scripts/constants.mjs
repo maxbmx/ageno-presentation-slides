@@ -58,7 +58,8 @@ export const MAX_DECK_MB = 15;
 /**
  * Osoby na slajd „Kontakt”: plik = slug imienia i nazwiska (people/<slug>.png w szablonie).
  * Źródło prawdy: tabela w references/ageno.md, sekcja „Osoby”. Nowa osoba: najpierw wiersz
- * tam (imię, rola, e-mail, telefon, adres zdjęcia), potem wpis tutaj z tym samym adresem.
+ * tam (imię, rola, e-mail, adres zdjęcia), potem wpis tutaj z tym samym adresem.
+ * Prywatnych numerów telefonów nie zapisujemy (references/ageno.md, „Poufność”).
  */
 export const PEOPLE = [
   { file: "maksymilian-sleziak.png", url: "https://ageno.pl/wp-content/uploads/2023/04/image-15-1.png" },

@@ -10,7 +10,7 @@ Instrukcja dla agenta (`SKILL.md`) i skrypty, które składają prezentację Age
 - `references/` — `ageno.md`, `tresc.md`, `redakcja.md`, `siatka.md`, `uklady.md`, `screeny.md`, `zdjecia.md`, `nawigacja.md`, `qa.md`.
 - `scripts/` — polecenia poniżej; `constants.mjs` (wspólne stałe) i `cli.mjs` (umowa CLI) to moduły pomocnicze.
 - `test/` — testy skryptów (`npm test`, bez dodatkowego runnera).
-- `package.json` — Playwright jako devDependency, skróty `npm run`; `.gitignore` — `node_modules`, `decks/`, `dist/`, katalogi QA.
+- `package.json` — Playwright jako devDependency, skróty `npm run`; `.gitignore` — `node_modules`, `package-lock.json`, `decks/`, `dist/`, katalogi QA oraz pliki pobierane przez skrypty (`logos/`, `logos.json`, `people/`, `screens/`, `ageno-mountains.svg`, JPEG).
 
 Katalog prezentacji jest konwencją ze `SKILL.md`. Skrypty czytają tylko pliki podane w poleceniu. `brief.md` nie jest parsowany.
 
