@@ -4,8 +4,9 @@
  * Czyta widoczny tekst każdego slajdu (bez treści cytatów i zaślepek) i zgłasza fragmenty
  * z numerem reguły. BŁĄD = do poprawienia, UWAGA = do oceny w kontekście.
  * Sprawdza reguły 5, 6, 7, 10, 11, 12 (tylko nagłówki), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
- * wycinek S3 (lista czasowników w 1. os. lm.), format dat oraz tekst na wypełnionym tle w kolorze
- * akcentu (pomarańczowy prostokąt pod tekstem, references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
+ * 36 (tytuł slajdu dłuższy niż 5 słów), wycinek S3 (lista czasowników w 1. os. lm.), format dat
+ * oraz tekst na wypełnionym tle w kolorze akcentu (pomarańczowy prostokąt pod tekstem,
+ * references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
  * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
@@ -54,10 +55,16 @@ const slides = await page.evaluate(() => {
       const block = parent.closest(BLOCK) || parent;
       blocks.set(block, (blocks.get(block) || "") + node.textContent);
     }
-    return [...blocks].map(([el, text]) => ({
-      heading: el.matches("h1, h2, h3, .title, .eyebrow"),
-      text: text.replace(/\s+/g, " ").trim(),
-    })).concat(onAccent);
+    const title = [...slide.querySelectorAll("h1, h2")]
+      .map((el) => (el.closest(SKIP) ? "" : visibleText(el)))
+      .find(Boolean) || null;
+    return {
+      title,
+      blocks: [...blocks].map(([el, text]) => ({
+        heading: el.matches("h1, h2, h3, .title, .eyebrow"),
+        text: text.replace(/\s+/g, " ").trim(),
+      })).concat(onAccent),
+    };
   });
 });
 await browser.close();
@@ -100,7 +107,7 @@ if (!slides.length) {
 
 let errors = 0;
 let warnings = 0;
-slides.forEach((blocks, i) => {
+slides.forEach(({ blocks, title }, i) => {
   const found = [];
   for (const { heading, text, onAccent } of blocks) {
     if (onAccent) {
@@ -117,6 +124,10 @@ slides.forEach((blocks, i) => {
       const hedges = sentence.match(HEDGES) || [];
       if (hedges.length > 1) found.push(["uwaga", "21", "więcej niż jedno zastrzeżenie", sentence, hedges.join(", ")]);
     }
+  }
+  if (title) {
+    const words = title.split(/\s+/).filter(Boolean).length;
+    if (words > 5) found.push(["błąd", "36", "tytuł slajdu dłuższy niż 5 słów", title, String(words)]);
   }
   if (!found.length) {
     console.log(`Slajd ${i + 1}: OK`);

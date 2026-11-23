@@ -18,7 +18,8 @@ nie powtarza, więc w każdym kroku otwórz wskazany plik.
 
 1. **Źródła przed narracją.** Nie wymyślaj liczb, cytatów, klientów, wyników, funkcji ani decyzji;
    luki i sprzeczności oznacz (`references/tresc.md`). Fakty o Ageno tylko z `references/ageno.md`.
-2. **Jeden slajd, jedna teza.** Tytuł slajdu to wniosek, nie temat (`references/tresc.md`).
+2. **Jeden slajd, jedna teza.** Tytuł slajdu to wniosek, nie temat, w formie hasła do 5 słów;
+   szczegół idzie do leadu albo treści (`references/tresc.md`).
 3. **Jeden plik HTML, działa bez sieci** (`references/nawigacja.md`, „Jeden plik”).
 4. **Siatka 32 px na płótnie 1536 × 864**: każda krawędź bloku i każdy wiersz na kratce
    (`references/siatka.md`).
@@ -39,7 +40,7 @@ nie powtarza, więc w każdym kroku otwórz wskazany plik.
 | `references/tresc.md` | Rejestr źródeł, narracja, plan slajdów, tytuły, gęstość | Krok 2–3 |
 | `references/siatka.md` | Płótno, kolumny, budżet wysokości, typografia, kolory, logo, oznaczenia `data-grid`, błędy, decyzje projektowe | Krok 3 i 5 |
 | `references/uklady.md` | Katalog 24 układów (numer slajdu, kiedy użyć, wysokość) i zasady każdego układu | Krok 3 (wybór układu) i 5 |
-| `references/redakcja.md` | Język: styl S1–S7, reguły 3–35, daty, korekta, sierotki, co sprawdza linter | Krok 5 przy tekstach i krok 6 |
+| `references/redakcja.md` | Język: styl S1–S7, reguły 3–36, daty, korekta, sierotki, co sprawdza linter | Krok 5 przy tekstach i krok 6 |
 | `references/screeny.md` | Ramki screenów, `screens.json`, zrzuty i osadzanie | Gdy deck ma screeny |
 | `references/zdjecia.md` | Zdjęcia górskie z Unsplash: dobór, pobieranie, podpis autora | Gdy deck ma slajd „Zdjęcie + treść” |
 | `references/nawigacja.md` | Jeden plik, kontrakt DOM, sterowanie, druk do PDF | Przed zmianą skryptu lub struktury, przy PDF, krok 7 |

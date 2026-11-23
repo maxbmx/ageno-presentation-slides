@@ -103,6 +103,39 @@ test("text-lint: stanowisko, adresowy, zakres dat z półpauzą, cytat w blockqu
   assert.equal(r.status, 1, "są przypadki z błędem, więc kod 1");
 });
 
+test("text-lint: tytuł slajdu dłuższy niż 5 słów to błąd 36", (t) => {
+  const cases = [
+    ["<h2>Pięć krótkich słów hasła tezy</h2>", false],
+    ["<h2>Sześć krótkich słów hasła tezy tutaj</h2>", true],
+    ['<h1 class="title">Siedem słów tytułu prezentacji jako długie hasło</h1>', true],
+    ["<h2>Pięć słów w krótkiej tezie</h2><h3>To jest długi podtytuł z wieloma słowami</h3><p>To jest długi akapit z wieloma słowami</p>", false],
+    ['<blockquote class="h2">Długi cytat wielowyrazowy z wieloma słowami i jeszcze więcej</blockquote>', false],
+    ['<h2>Platforma <span class="nowrap">Magento 2</span> dla B2B</h2>', false],
+  ];
+  const dir = mkdtempSync(path.join(tmpdir(), "ageno-test-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const file = path.join(dir, "lint36.html");
+  const body = cases.map(([html]) => `<section data-slide>${html}</section>`).join("\n");
+  writeFileSync(file, `<!doctype html><meta charset="utf-8"><style>:root { --c-accent: #ff6b00; }</style><body>${body}</body>`);
+  const r = run("text-lint.mjs", [file]);
+  if (r.status === 1 && NO_BROWSER.test(r.stderr)) return t.skip("brak Playwrighta albo Chromium");
+
+  const bySlide = new Map();
+  let current = 0;
+  for (const line of r.stdout.split("\n")) {
+    const head = line.match(/^Slajd (\d+)/);
+    if (head) { current = Number(head[1]); bySlide.set(current, []); continue; }
+    const err = line.match(/^\s+BŁĄD reguła (\S+):/);
+    if (err) bySlide.get(current).push(err[1]);
+  }
+  cases.forEach(([html, expected], i) => {
+    const ids = [...new Set(bySlide.get(i + 1) ?? [])];
+    assert.equal(ids.includes("36"), expected, `slajd ${i + 1}: ${html}`);
+  });
+  assert.match(r.stdout, /BŁĄD reguła 36: tytuł slajdu dłuższy niż 5 słów/);
+  assert.equal(r.status, 1, "są przypadki z błędem 36, więc kod 1");
+});
+
 const tempDir = (t) => {
   const dir = mkdtempSync(path.join(tmpdir(), "ageno-test-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));

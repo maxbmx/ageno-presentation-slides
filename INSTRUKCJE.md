@@ -61,7 +61,8 @@ Układy (numer slajdu w szablonie): 1 Tytułowy (zawsze pierwszy), 2 Teza + 3 li
 
 ## Język
 
-- Tytuł slajdu to wniosek, nie temat. Krótko, bez „my”, bez dwukropka.
+- Tytuł slajdu to wniosek, nie temat, jako hasło maks. 5 słów (data, „B2B”, „90%” to jedno słowo).
+  Szczegół idzie do leadu albo treści. Bez „my”, bez dwukropka.
 - Opisuj projekt i rezultat, nie czynności autora. Wykonawca w 3. osobie („zespół Ageno wdraża”,
   „klient akceptuje”). Plan jako plan („planowane uruchomienie do 2027-07-31”).
 - Punkty i opisy to pełne zdania; etykiety i komórki tabel mogą być rzeczownikami.
