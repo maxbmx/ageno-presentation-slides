@@ -38,15 +38,17 @@ albo źródła są niejednoznaczne):
 
 | Nr | Rola | Teza (tytuł) | Dowód / dane | Układ | Screen |
 | --- | --- | --- | --- | --- | --- |
-| 3 | dowód | Klienci porzucają koszyk na kroku dostawy | analityka X, 2026-10-01 – 2026-10-31 | teza + screen | koszyk-dostawa (wide) |
+| 3 | dowód | Koszyk porzucany na kroku dostawy | analityka X, 2026-10-01 – 2026-10-31 | teza + screen | koszyk-dostawa (wide) |
 
 ## Tytuły
 
-Tytuł to wniosek, nie temat, zapisany krótko, bez „my” i bez dwukropka
-(`references/redakcja.md`, S1 i reguła 12):
+Tytuł slajdu to krótkie hasło, maksymalnie 3–5 słów (5 to twardy limit,
+`references/redakcja.md`, reguła 36). Nadal niesie wniosek, nie temat, bez „my” i bez dwukropka
+(S1 i reguła 12). Szczegół, data, mechanizm i wyliczenie idą do leadu albo treści slajdu:
 
 - słabo: „Wyniki sprzedaży” (temat), „Pokażemy, jak rośnie sprzedaż” (deklaracja),
-- lepiej: „Wzrost sprzedaży skoncentrowany w dwóch kanałach”.
+  „Wzrost sprzedaży skoncentrowany w dwóch kanałach, głównie w wyszukiwarce” (za długie),
+- lepiej: „Wzrost sprzedaży w dwóch kanałach”, a nazwy kanałów i okres w treści.
 
 Plan opisuj jako plan, nie jako rezultat (`references/redakcja.md`, S7).
 

@@ -89,7 +89,8 @@ dotyczy, okres (zakres dat), jednostka.
 wysokość). W każdej karcie te same wiersze w tej samej kolejności (`dl.facts`): Zakres, Czas,
 Koszt, Ryzyko; wartości krótkie, w całej karcie najwyżej 2 dodatkowe wiersze. Teza w jednym
 wierszu. Najwyżej jeden wariant „Rekomendowany” (nadtytuł
-w `.mark`); teza slajdu mówi, który i dlaczego. Bez ikon ✓ / ✗ i tabel plusów i minusów.
+w `.mark`); teza slajdu (hasło, maks. 5 słów, `references/tresc.md`) mówi, który
+wariant; uzasadnienie jest w kartach albo treści. Bez ikon ✓ / ✗ i tabel plusów i minusów.
 Koszty i terminy tylko ze źródła.
 
 **Zakres.** Dwie kolumny `.grid-2`: „W zakresie” (`.points`) i „Poza zakresem”
