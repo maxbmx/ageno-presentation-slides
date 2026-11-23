@@ -8,7 +8,7 @@ w nierównych odstępach. Dlatego reguły są ścisłe i sprawdza je `scripts/gr
 ## Płótno
 
 Slajd ma stały rozmiar **1536 × 864 px** (16:9, 48 × 27 kratek). Skrypt w szablonie skaluje całe
-płótno do okna (`transform: scale()`), wolne pola wypełnia kolor tła. Dzięki temu wszystkie
+płótno do okna (`transform: scale()`), wolne pola okna wokół slajdu są czarne (`--c-letterbox`). Dzięki temu wszystkie
 wymiary w slajdzie są w px logicznych i nie ma progów responsywnych.
 
 | Strefa | X | Y | Rozmiar |
@@ -107,19 +107,27 @@ kratki (`padding-left: 32px`), każdy punkt to wiersz 32 px. Nie używaj zwykły
 
 | Token | Wartość | Użycie |
 | --- | --- | --- |
-| `--c-bg` | `#f7f7f7` | tło każdego slajdu i wolnych pól okna, zawsze |
+| `--c-bg` | `#f7f7f7` | tło każdego slajdu (także w druku i PDF), zawsze |
+| `--c-letterbox` | `#000000` | wolne pola okna wokół slajdu (`html`, `body`, `[data-presentation]`); w druku nie występują |
 | `--c-card` | `#ffffff` | karta, tło pod screenem, co drugi wiersz tabeli |
 | (biały) | `#ffffff` | tylko podpis autora i strzałka nawigacji na zdjęciu |
+| `--c-nav-bg` / `--c-nav-hover` | `rgb(0 0 0 / 0.06)` / `0.12` | koło pod strzałką nawigacji, zwykłe / po najechaniu |
 | `--c-text` | `#231430` | tekst, ciemny fiolet z logo Ageno |
 | `--c-muted` | `#5e5b52` | tylko nadtytuły, metadane, stopka |
-| `--c-accent` | `#ff6b00` | pomarańcz z logo Ageno, jeden akcent: `.mark` przy kluczowej liczbie, znaczniki listy, kluczowy etap harmonogramu |
+| `--c-accent` | `#ff6b00` | pomarańcz z logo Ageno, jeden akcent: kreska `.mark` pod kluczową wartością, znaczniki listy, kluczowy etap harmonogramu |
 | `--c-bar` | `#e2ddca` | zwykłe paski harmonogramu |
-| `--c-on-accent` | `#231430` | tekst na akcencie (kontrast 6:1; biały na pomarańczu jest nieczytelny) |
 | `--grid-line` | `transparent` | kratka w tle, domyślnie ukryta; pokazanie: `rgb(70 130 220 / 0.1)` |
 
-Tło całej prezentacji jest zawsze `#f7f7f7`: bez pasów, kolorowych i ciemnych teł slajdu.
-Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, `--c-on-accent`,
-`--c-muted`) z jego brandbooka. Tła i wymiarów nie ruszaj.
+Tło każdego slajdu jest zawsze `#f7f7f7`: bez pasów, kolorowych i ciemnych teł slajdu.
+Wolne pola okna wokół slajdu są czarne (`#000000`), w druku i PDF ich nie ma.
+Prezentacja w marce klienta: podmień tekst i akcent (`--c-text`, `--c-accent`, `--c-muted`)
+z jego brandbooka. Tła i wymiarów nie ruszaj.
+
+**Wyróżnienie bez zakreślacza.** Nie wyróżniamy tekstu pomarańczowym wypełnionym prostokątem
+z ciemną treścią (słabo się czyta). Kluczowa liczba wyróżnia się rozmiarem i grubością w kolorze
+tekstu (`.number`) albo cienką pomarańczową kreską pod nią: `.mark` (`text-decoration`, nie zmienia
+wymiarów). Tło w kolorze akcentu tylko bez tekstu na nim (kluczowy etap harmonogramu).
+`scripts/text-lint.mjs` zgłasza tekst na wypełnionym tle w kolorze akcentu jako błąd.
 
 ## Logo
 
@@ -150,8 +158,9 @@ wysokości ani nie wyrównuj go do kratki.
 
 - Ramek, linii podziału, cieni i zaokrągleń pudełek. Na slajdzie nie ma żadnych linii, bo
   obramowanie 1 px dodaje piksel i spycha blok z siatki. Jedyny wyjątek: `.shot-edge` przy
-  jasnym screenie zlewającym się z tłem (`outline`, nie zmienia wymiaru). Jedyne zaokrąglenie: portret
-  w kole na slajdzie „Kontakt”.
+  jasnym screenie zlewającym się z tłem (`outline`, nie zmienia wymiaru), oraz kreska `.mark` pod
+  kluczową wartością (`text-decoration`, nie zmienia wymiaru). Jedyne zaokrąglenie: portret
+  w kole na slajdzie „Kontakt” (poza slajdem: koło pod strzałką nawigacji).
 - Gradientów, stockowych zdjęć i ilustracji, grafik generowanych, ozdobnych ikon, kilku akcentów.
   Jedyny wyjątek: zdjęcie górskie z Unsplash w układzie „Zdjęcie + treść” (`references/zdjecia.md`).
 - Wielkich nagłówków dla wypełnienia miejsca. Wolna przestrzeń jest w porządku.
@@ -195,10 +204,10 @@ oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 | Płótno 1536 × 864 skalowane w całości, bez progów | siatka 32 px zgadza się w każdym oknie |
 | Wszystkie teksty bezszeryfowe, monospace tylko w metadanych | czytelność z daleka; serif ze strony osobistej odpada |
 | Żadnych linii podziału, ramek i cieni | odstęp i biel wystarczą; linie spychają bloki z siatki |
-| Tło każdego slajdu zawsze `#f7f7f7`, bez pasów | spójny wygląd wszystkich prezentacji |
+| Tło każdego slajdu zawsze `#f7f7f7`, bez pasów; wolne pola okna czarne | spójny wygląd wszystkich prezentacji; slajd odcina się od reszty ekranu |
 | Kratka w tle ukryta (`--grid-line: transparent`), kod zostaje | czysty slajd; podgląd klawiszem `G` |
 | Slajd tytułowy z górami Ageno po lewej, wychodzącymi poza slajd; tekst w kolumnie po prawej | grafika z ageno.pl łączy deck z marką |
-| Przedostatni slajd z 10 logotypami klientów z ageno.pl, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
+| Przedostatni slajd z 8 logotypami klientów z `logos/`, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
 | Ostatni slajd „Kontakt” z portretem w kole i górami Ageno po prawej | rozmowa kończy się konkretną osobą; koło to kadr zdjęcia, jedyny wyjątek od zakazu zaokrągleń |
 | Kolory z logo Ageno: tekst `#231430`, akcent `#ff6b00` | prezentacja rozpoznawalna jako Ageno, spójna z logo |
 | Logo Ageno: duże na slajdzie tytułowym i „Kontakt”, małe (24 px) w stopce pozostałych slajdów | prezentacje Ageno zawsze podpisane marką |

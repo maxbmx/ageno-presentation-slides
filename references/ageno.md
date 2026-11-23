@@ -65,13 +65,13 @@ Na slajdzie liczba zawsze z opisem i okresem lub datą stanu (`references/redakc
 - Zdanie do slajdu „Klienci Ageno”: „Ponad 100 klientów, m.in. z branży sportowej, modowej,
   produkcyjnej, motoryzacyjnej i wyposażenia wnętrz.” (na podstawie **[ageno.pl]**, przepisane
   według `redakcja.md`: bez emoji, myślnika i „nam”).
-- Logotypy: ze strony głównej ageno.pl, sekcja klientów; pobiera je `scripts/ageno-assets.mjs`
-  do `logos/` i listy `logos.json`. Plików nie przycinamy i nie skalujemy: wszystkie mają ten
-  sam obszar roboczy, więc w równych polach 256 × 128 są równe.
-- Wzorcowy zestaw 10 logotypów (wg slajdu Ageno „Zaufali nam”): Auto Partner, Martes Sport,
-  Safety First, Avionaut, PRO, Eurofirany, Henry Schein, Nobile, Marrodent, Kontakt-Simon.
-  Kolejność i wybór do potwierdzenia przy danym decku; pod klienta z danej branży można
-  podmienić logotypy na bliższe jego branży.
+- Logotypy: w repo jest 8 wybranych plików SVG w `logos/` (źródło: ageno.pl). Nowy deck kopiuje je
+  z repo; `scripts/ageno-assets.mjs` może pobrać pełną listę do `logos/` i `logos.json`
+  (roboczo, poza commitem). Plików nie przycinamy i nie skalujemy: w równych polach
+  304 × 128 (4 kolumny po 304 px + 3 × 32 px = 1312) są równe.
+- Zestaw w repo (8, 2 wiersze po 4): Martes Sport, Safety First, Avionaut, PRO, Eurofirany,
+  Henry Schein, Nobile, Kontakt-Simon. Kolejność i wybór do potwierdzenia przy danym decku;
+  pod klienta z danej branży można podmienić logotypy na bliższe jego branży.
 - Branże ze strony: moda, sport, budownictwo, home & decor, medycyna, farmacja, przemysł,
   kosmetyka, motoryzacja, elektrotechnika, BHP i inne **[ageno.pl]**.
 

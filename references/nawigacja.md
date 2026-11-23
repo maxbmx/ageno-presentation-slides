@@ -38,10 +38,12 @@ użytkownika (np. w czacie), dostarcz od razu jeden plik HTML z obrazami jako da
 
 ## Strzałki
 
-- Domyślnie `opacity: 0`. Pokazują się po ruchu myszy, znikają po 1,8 s bezczynności.
+- Domyślnie `opacity: 0`. Pokazują się po ruchu myszy albo najechaniu na strzałkę, znikają
+  po 2 s bezczynności (`HIDE_AFTER = 2000` w szablonie, `NAV.hideAfterMs` w `scripts/constants.mjs`).
 - Zostają widoczne przy hoverze i fokusie klawiatury.
-- Obszar kliknięcia 64 × 64 px w marginesie slajdu, symbol 24 px, bez tła, ramki i cienia.
-  Po najechaniu delikatne tło.
+- Przycisk 64 × 64 px w marginesie slajdu, symbol 24 px na okrągłym tle (`border-radius: 50%`,
+  `--c-nav-bg`, lekkie przyciemnienie), bez ramki i cienia. Po najechaniu tło ciemniejsze
+  (`--c-nav-hover`). Na zdjęciu strzałka biała na jasnym półprzezroczystym kole.
 - Na ekranach dotykowych (`hover: none`) są półprzezroczyste, bo nie ma hovera.
 
 ## Przejście
@@ -54,7 +56,8 @@ użytkownika (np. w czacie), dostarcz od razu jeden plik HTML z obrazami jako da
 ## Skalowanie i pełny ekran
 
 - `scale = min(szerokość okna / 1536, wysokość okna / 864)`, liczone przy `resize`
-  i `fullscreenchange`. Wolne pola w kolorze `--c-bg`, slajd nigdy nie jest rozciągany.
+  i `fullscreenchange`. Wolne pola okna wokół slajdu są czarne (`--c-letterbox`, `#000000`), sam slajd ma tło `--c-bg`
+  i nigdy nie jest rozciągany. W druku czarnych pól nie ma.
 - Żądanie pełnego ekranu może się nie udać (ograniczenia przeglądarki): błąd jest wyciszony.
 - Brak przewijania strony i slajdu (poza drukiem).
 

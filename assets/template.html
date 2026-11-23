@@ -11,7 +11,8 @@
    Płótno slajdu 1536 × 864 px (48 × 27 kratek), skalowane do okna.
    Wszystkie wymiary wewnątrz slajdu są w px logicznych płótna.
    Tokenów geometrii nie zmieniaj. Tło zawsze #f7f7f7 (--c-bg), także w marce klienta.
-   Marka klienta = tylko --c-text, --c-muted, --c-accent, --c-on-accent. Logo Ageno bez zmian.
+   Marka klienta = tylko --c-text, --c-muted, --c-accent. Logo Ageno bez zmian.
+   Wolne pola okna wokół slajdu (letterbox) są czarne: --c-letterbox.
    ===================================================================== */
 :root {
   color-scheme: only light;
@@ -22,9 +23,10 @@
   --c-text: #231430;        /* ciemny fiolet z logo Ageno */
   --c-muted: #5e5b52;
   --c-accent: #ff6b00;      /* pomarańcz z logo Ageno, jeden akcent */
-  --c-on-accent: #231430;   /* tekst na akcencie, kontrast 6:1 */
+  --c-letterbox: #000000;   /* wolne pola okna wokół slajdu */
   --c-bar: #e2ddca;        /* paski harmonogramu; kluczowy etap w --c-accent */
-  --c-nav-hover: rgb(0 0 0 / 0.05);
+  --c-nav-bg: rgb(0 0 0 / 0.06);     /* koło pod strzałką nawigacji */
+  --c-nav-hover: rgb(0 0 0 / 0.12);
   /* Kratka w tle: domyślnie ukryta. Żeby ją pokazać: rgb(70 130 220 / 0.1).
      Podgląd siatki niezależnie od tego: klawisz G albo adres #siatka. */
   --grid-line: transparent;
@@ -74,7 +76,7 @@
 
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--c-bg); }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--c-letterbox); }
 body {
   color: var(--c-text);
   font-family: var(--font-sans);
@@ -95,7 +97,7 @@ body { hyphens: manual; }                          /* bez automatycznego dzielen
 strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
 
 /* ---------- Scena i slajd ---------- */
-[data-presentation] { position: fixed; inset: 0; overflow: hidden; background: var(--c-bg); }
+[data-presentation] { position: fixed; inset: 0; overflow: hidden; background: var(--c-letterbox); }
 .stage {
   position: absolute;
   left: 50%;
@@ -214,7 +216,14 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   font-variant-numeric: tabular-nums;
 }
 .meta { font-family: var(--font-mono); font-size: var(--fs-meta); line-height: var(--lh-meta); color: var(--c-muted); }
-.mark { background: var(--c-accent); color: var(--c-on-accent); padding-inline: var(--unit); }
+/* Akcent: cienka pomarańczowa kreska pod tekstem w kolorze tekstu. Bez wypełnionego tła
+   (pomarańczowy prostokąt z ciemnym tekstem wygląda jak zakreślacz). Nie zmienia wymiarów. */
+.mark {
+  text-decoration: underline var(--c-accent);
+  text-decoration-thickness: max(2px, 0.08em);
+  text-underline-offset: 0.15em;
+  text-decoration-skip-ink: none;
+}
 
 /* Lista punktów: znacznik 8 × 8 px w akcencie, na środku pierwszej kratki 32 × 32
    (12 + 8 + 12 = 32 w poziomie i w pionie). Tekst zaczyna się od następnej kratki. */
@@ -338,9 +347,9 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   text-underline-offset: 0.25em;
 }
 
-/* Logotypy klientów: 5 kolumn po 256 px z odstępem 8 px (= 1312), wiersz 128 px.
+/* Logotypy klientów: 4 kolumny po 304 px z odstępem 32 px (= 1312), wiersz 128 px.
    Pliki logo bez zmian: wszystkie mają ten sam obszar roboczy, więc w równych polach są równe. */
-.logo-wall { display: grid; grid-template-columns: repeat(5, 256px); column-gap: var(--unit); row-gap: var(--module); }
+.logo-wall { display: grid; grid-template-columns: repeat(4, 304px); column-gap: var(--gutter); row-gap: var(--module); }
 .logo-cell { height: 128px; }
 .logo-cell img { display: block; width: 100%; height: 100%; object-fit: contain; }
 
@@ -371,8 +380,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   height: 64px;
   padding: 0;
   border: 0;
-  border-radius: 0;
-  background: transparent;
+  border-radius: 50%;
+  background: var(--c-nav-bg);
   color: var(--c-text);
   cursor: pointer;
   opacity: 0;
@@ -560,9 +569,9 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 }
 /* Strzałka nad zdjęciem: biała, żeby była widoczna na ciemnym tle */
 [data-photo-side="right"] .deck-nav [data-nav="next"],
-[data-photo-side="left"] .deck-nav [data-nav="prev"] { color: #ffffff; }
+[data-photo-side="left"] .deck-nav [data-nav="prev"] { color: #ffffff; background: rgb(255 255 255 / 0.15); }
 [data-photo-side="right"] .deck-nav [data-nav="next"]:hover,
-[data-photo-side="left"] .deck-nav [data-nav="prev"]:hover { background: rgb(255 255 255 / 0.15); }
+[data-photo-side="left"] .deck-nav [data-nav="prev"]:hover { background: rgb(255 255 255 / 0.3); }
 
 /* ---------- Druk i PDF ----------
    Każdy slajd to osobna strona 1536 × 864 px (16:9, w PDF 16 × 9 cali), bez marginesów.
@@ -577,7 +586,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  [data-presentation] { position: static; inset: auto; overflow: visible; }
+  [data-presentation] { position: static; inset: auto; overflow: visible; background: var(--c-bg); }
   .stage { position: static; transform: none; width: var(--slide-w); height: auto; }
   .slide {
     position: relative;
@@ -1178,7 +1187,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
       <div class="container stack">
         <h2 data-grid="32">Klienci Ageno</h2>
         <p class="lead w-2of3" data-grid="32" data-snap>Ponad 100 klientów, m.in. z branży sportowej, modowej, produkcyjnej, motoryzacyjnej i wyposażenia wnętrz.</p>
-        <!-- Logotypy z ageno.pl (scripts/ageno-assets.mjs → logos.json): <li class="logo-cell"><img src="logos/01-nazwa.svg" alt="Nazwa klienta"></li> -->
+        <!-- Logotypy: podmień 8 zaślepek na <li class="logo-cell"><img src="logos/nazwa.svg" alt="Nazwa klienta"></li>. -->
         <ul class="logo-wall mt-64" data-grid="32" aria-label="Logotypy klientów">
           <li class="logo-cell logo-placeholder">logo 01</li>
           <li class="logo-cell logo-placeholder">logo 02</li>
@@ -1188,8 +1197,6 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           <li class="logo-cell logo-placeholder">logo 06</li>
           <li class="logo-cell logo-placeholder">logo 07</li>
           <li class="logo-cell logo-placeholder">logo 08</li>
-          <li class="logo-cell logo-placeholder">logo 09</li>
-          <li class="logo-cell logo-placeholder">logo 10</li>
         </ul>
       </div>
       <footer class="slide-footer">
@@ -1273,7 +1280,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   const slides = [...deck.querySelectorAll("[data-slide]")];
   const prev = deck.querySelector('[data-nav="prev"]');
   const next = deck.querySelector('[data-nav="next"]');
-  const SLIDE_W = 1536, SLIDE_H = 864, DURATION = 200, HIDE_AFTER = 1800, SWIPE = 50;
+  const SLIDE_W = 1536, SLIDE_H = 864, DURATION = 200, HIDE_AFTER = 2000, SWIPE = 50;
   let index = Math.max(0, slides.findIndex((s) => s.classList.contains("is-active")));
 
   fixOrphans(deck);
@@ -1339,7 +1346,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   prev.addEventListener("click", () => go(-1));
   next.addEventListener("click", () => go(1));
 
-  // Strzałki: widoczne po ruchu myszy, znikają po 1,8 s bezczynności
+  // Strzałki: widoczne po ruchu myszy, znikają po 2 s bezczynności
   let hideTimer;
   const scheduleHide = () => {
     window.clearTimeout(hideTimer);

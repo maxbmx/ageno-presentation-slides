@@ -60,7 +60,7 @@ test("inline-assets: bez argumentów kod 2, obraz http(s) kod 1", (t) => {
   assert.match(r.stderr, /obraz z sieci/);
 });
 
-test("text-lint: stanowisko, adresowy, zakres dat z półpauzą i cytat w blockquote", (t) => {
+test("text-lint: stanowisko, adresowy, zakres dat z półpauzą, cytat w blockquote i tło akcentu", (t) => {
   // Jeden tekst na slajd; oczekiwane: lista reguł, które mają dać BŁĄD (pusta = brak błędu).
   const cases = [
     ["Stanowisko klienta jest jasne.", []],
@@ -78,12 +78,14 @@ test("text-lint: stanowisko, adresowy, zakres dat z półpauzą i cytat w blockq
     ["Okres 2026-10-01 - 2026-10-31.", ["11"]],
     ["Zespół 10 – 20 osób.", []],
     ['<blockquote>"Zrobimy to w oparciu o dane – dodatkowo 10.2026."</blockquote>', []],
+    ['<p class="number"><span style="background: var(--c-accent)">42%</span></p>', ["akcent"]],
+    ['<span style="background: var(--c-accent)"><span class="sr-only">2026-12-01 – 2026-12-31</span></span>', []],
   ];
   const dir = mkdtempSync(path.join(tmpdir(), "ageno-test-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const file = path.join(dir, "lint.html");
   const body = cases.map(([html]) => `<section data-slide>${html.startsWith("<") ? html : `<p>${html}</p>`}</section>`).join("\n");
-  writeFileSync(file, `<!doctype html><meta charset="utf-8"><body>${body}</body>`);
+  writeFileSync(file, `<!doctype html><meta charset="utf-8"><style>:root { --c-accent: #ff6b00; }</style><body>${body}</body>`);
   const r = run("text-lint.mjs", [file]);
   if (r.status === 1 && NO_BROWSER.test(r.stderr)) return t.skip("brak Playwrighta albo Chromium");
 

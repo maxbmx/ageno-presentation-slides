@@ -11,7 +11,8 @@
    Płótno slajdu 1536 × 864 px (48 × 27 kratek), skalowane do okna.
    Wszystkie wymiary wewnątrz slajdu są w px logicznych płótna.
    Tokenów geometrii nie zmieniaj. Tło zawsze #f7f7f7 (--c-bg), także w marce klienta.
-   Marka klienta = tylko --c-text, --c-muted, --c-accent, --c-on-accent. Logo Ageno bez zmian.
+   Marka klienta = tylko --c-text, --c-muted, --c-accent. Logo Ageno bez zmian.
+   Wolne pola okna wokół slajdu (letterbox) są czarne: --c-letterbox.
    ===================================================================== */
 :root {
   color-scheme: only light;
@@ -22,9 +23,10 @@
   --c-text: #231430;        /* ciemny fiolet z logo Ageno */
   --c-muted: #5e5b52;
   --c-accent: #ff6b00;      /* pomarańcz z logo Ageno, jeden akcent */
-  --c-on-accent: #231430;   /* tekst na akcencie, kontrast 6:1 */
+  --c-letterbox: #000000;   /* wolne pola okna wokół slajdu */
   --c-bar: #e2ddca;        /* paski harmonogramu; kluczowy etap w --c-accent */
-  --c-nav-hover: rgb(0 0 0 / 0.05);
+  --c-nav-bg: rgb(0 0 0 / 0.06);     /* koło pod strzałką nawigacji */
+  --c-nav-hover: rgb(0 0 0 / 0.12);
   /* Kratka w tle: domyślnie ukryta. Żeby ją pokazać: rgb(70 130 220 / 0.1).
      Podgląd siatki niezależnie od tego: klawisz G albo adres #siatka. */
   --grid-line: transparent;
@@ -74,7 +76,7 @@
 
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--c-bg); }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--c-letterbox); }
 body {
   color: var(--c-text);
   font-family: var(--font-sans);
@@ -95,7 +97,7 @@ body { hyphens: manual; }                          /* bez automatycznego dzielen
 strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
 
 /* ---------- Scena i slajd ---------- */
-[data-presentation] { position: fixed; inset: 0; overflow: hidden; background: var(--c-bg); }
+[data-presentation] { position: fixed; inset: 0; overflow: hidden; background: var(--c-letterbox); }
 .stage {
   position: absolute;
   left: 50%;
@@ -214,7 +216,14 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   font-variant-numeric: tabular-nums;
 }
 .meta { font-family: var(--font-mono); font-size: var(--fs-meta); line-height: var(--lh-meta); color: var(--c-muted); }
-.mark { background: var(--c-accent); color: var(--c-on-accent); padding-inline: var(--unit); }
+/* Akcent: cienka pomarańczowa kreska pod tekstem w kolorze tekstu. Bez wypełnionego tła
+   (pomarańczowy prostokąt z ciemnym tekstem wygląda jak zakreślacz). Nie zmienia wymiarów. */
+.mark {
+  text-decoration: underline var(--c-accent);
+  text-decoration-thickness: max(2px, 0.08em);
+  text-underline-offset: 0.15em;
+  text-decoration-skip-ink: none;
+}
 
 /* Lista punktów: znacznik 8 × 8 px w akcencie, na środku pierwszej kratki 32 × 32
    (12 + 8 + 12 = 32 w poziomie i w pionie). Tekst zaczyna się od następnej kratki. */
@@ -338,9 +347,9 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   text-underline-offset: 0.25em;
 }
 
-/* Logotypy klientów: 5 kolumn po 256 px z odstępem 8 px (= 1312), wiersz 128 px.
+/* Logotypy klientów: 4 kolumny po 304 px z odstępem 32 px (= 1312), wiersz 128 px.
    Pliki logo bez zmian: wszystkie mają ten sam obszar roboczy, więc w równych polach są równe. */
-.logo-wall { display: grid; grid-template-columns: repeat(5, 256px); column-gap: var(--unit); row-gap: var(--module); }
+.logo-wall { display: grid; grid-template-columns: repeat(4, 304px); column-gap: var(--gutter); row-gap: var(--module); }
 .logo-cell { height: 128px; }
 .logo-cell img { display: block; width: 100%; height: 100%; object-fit: contain; }
 
@@ -371,8 +380,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   height: 64px;
   padding: 0;
   border: 0;
-  border-radius: 0;
-  background: transparent;
+  border-radius: 50%;
+  background: var(--c-nav-bg);
   color: var(--c-text);
   cursor: pointer;
   opacity: 0;
@@ -560,9 +569,9 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 }
 /* Strzałka nad zdjęciem: biała, żeby była widoczna na ciemnym tle */
 [data-photo-side="right"] .deck-nav [data-nav="next"],
-[data-photo-side="left"] .deck-nav [data-nav="prev"] { color: #ffffff; }
+[data-photo-side="left"] .deck-nav [data-nav="prev"] { color: #ffffff; background: rgb(255 255 255 / 0.15); }
 [data-photo-side="right"] .deck-nav [data-nav="next"]:hover,
-[data-photo-side="left"] .deck-nav [data-nav="prev"]:hover { background: rgb(255 255 255 / 0.15); }
+[data-photo-side="left"] .deck-nav [data-nav="prev"]:hover { background: rgb(255 255 255 / 0.3); }
 
 /* ---------- Druk i PDF ----------
    Każdy slajd to osobna strona 1536 × 864 px (16:9, w PDF 16 × 9 cali), bez marginesów.
@@ -577,7 +586,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  [data-presentation] { position: static; inset: auto; overflow: visible; }
+  [data-presentation] { position: static; inset: auto; overflow: visible; background: var(--c-bg); }
   .stage { position: static; transform: none; width: var(--slide-w); height: auto; }
   .slide {
     position: relative;
@@ -614,7 +623,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 <main data-presentation aria-roledescription="prezentacja" aria-label="Platforma B2B na Magento 2, prezentacja przykładowa">
   <div class="stage">
 
-    <!-- Przykład: fikcyjny klient „Firma Przykładowa”, wszystkie dane klienta i kwoty są przykładowe.
+    <!-- Przykład: fikcyjny klient „Firma Przykładowa”, wszystkie dane klienta są przykładowe.
          Fakty o Ageno tylko z references/ageno.md. Układy skopiowane z assets/template.html (numer w komentarzu). -->
 
     <!-- 1. Tytułowy -->
@@ -630,7 +639,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
         <div class="title-text stack mt-128" data-grid="32" data-snap>
           <p class="eyebrow">Ageno · Firma Przykładowa · 2026-11-24</p>
           <h1 class="title">Platforma B2B na <span class="nowrap">Magento 2</span> z MVP do 2027-07-31</h1>
-          <p class="lead">Prezentacja przykładowa z fikcyjnym klientem. Do decyzji: wariant projektu i budżet etapu 1.</p>
+          <p class="lead">Prezentacja przykładowa z fikcyjnym klientem. Do decyzji: wariant projektu i zakres etapu 1.</p>
         </div>
       </div>
       <footer class="slide-footer">
@@ -646,7 +655,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
         <div class="grid-3 mt-64" data-grid="32" data-snap>
           <div class="stack-tight" data-grid="32" data-snap>
             <p class="number"><span class="mark">64%</span></p>
-            <p class="caption">Zamówienia B2B złożone e-mailem lub telefonicznie, 2026-01-01 – 2026-10-31.</p>
+            <p class="caption">Zamówienia B2B wysyłane e-mailem lub telefonicznie, 2026-01-01 – 2026-10-31.</p>
           </div>
           <div class="stack-tight" data-grid="32" data-snap>
             <p class="number">1,5 dnia</p>
@@ -673,7 +682,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           <h3>Rozwiązanie</h3>
           <p class="pair pair-problem">Handlowiec przepisuje każde zamówienie z e-maila do ERP.</p>
           <p class="pair">Klient składa zamówienie w panelu B2B, a ERP przyjmuje je bez przepisywania.</p>
-          <p class="pair pair-problem">Klient nie widzi swoich cen i rabatów przed złożeniem zamówienia.</p>
+          <p class="pair pair-problem">Klient nie widzi swoich cen i rabatów przed wysłaniem zamówienia.</p>
           <p class="pair">Panel pokazuje ceny i rabaty z umowy klienta, pobrane z ERP.</p>
           <p class="pair pair-problem">Stan magazynu klient sprawdza telefonicznie u handlowca.</p>
           <p class="pair">Karta produktu pokazuje stan magazynu, aktualizowany co 15 minut.</p>
@@ -696,7 +705,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <dl class="facts">
               <dt>Zakres</dt><dd>Wszystkie funkcje B2B</dd>
               <dt>Czas</dt><dd>2026-12-01 – 2027-12-31</dd>
-              <dt>Koszt</dt><dd>780 000 zł netto</dd>
+              <dt>Integracje</dt><dd>3 integracje</dd>
               <dt>Ryzyko</dt><dd>Start zamówień po 2027-12-31</dd>
             </dl>
           </div>
@@ -706,7 +715,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <dl class="facts">
               <dt>Zakres</dt><dd>Panel B2B, ceny i stany z ERP</dd>
               <dt>Czas</dt><dd>2026-12-01 – 2027-07-31</dd>
-              <dt>Koszt</dt><dd>420 000 zł netto</dd>
+              <dt>Integracje</dt><dd>2 integracje</dd>
               <dt>Ryzyko</dt><dd>Część funkcji w etapie 2</dd>
             </dl>
           </div>
@@ -716,14 +725,14 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <dl class="facts">
               <dt>Zakres</dt><dd>Zamówienia B2B bez cen z ERP</dd>
               <dt>Czas</dt><dd>2026-12-01 – 2027-04-30</dd>
-              <dt>Koszt</dt><dd>260 000 zł netto</dd>
+              <dt>Integracje</dt><dd>1 integracja</dd>
               <dt>Ryzyko</dt><dd>Ceny poprawiane ręcznie</dd>
             </dl>
           </div>
         </div>
       </div>
       <footer class="slide-footer">
-        <span data-source>Kwoty przykładowe, ceny netto w PLN, szacunek z 2026-11-20</span>
+        <span data-source>Dane przykładowe, czas i zakres, szacunek z 2026-11-20</span>
         <span data-slide-number></span>
       </footer>
     </section>
@@ -788,7 +797,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
     <!-- 10. Wycena -->
     <section data-slide class="slide" aria-hidden="true">
       <div class="container stack">
-        <h2 id="wycena-teza" data-grid="32">Etap 1 za 420 000 zł netto, najwięcej kosztuje budowa panelu B2B</h2>
+        <h2 id="wycena-teza" data-grid="32">Etap 1 w 35 tygodniach, najwięcej zajmuje budowa panelu B2B</h2>
         <table class="table" aria-labelledby="wycena-teza" data-grid="32">
           <colgroup>
             <col style="width: 704px">
@@ -796,21 +805,21 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
             <col style="width: 320px">
           </colgroup>
           <thead>
-            <tr><th scope="col">Pozycja</th><th scope="col" class="num">Czas</th><th scope="col" class="num">Kwota netto, przykład</th></tr>
+            <tr><th scope="col">Pozycja</th><th scope="col" class="num">Czas</th><th scope="col" class="num">Udział czasu</th></tr>
           </thead>
           <tbody>
-            <tr><td>Analiza wymagań i projekt panelu B2B</td><td class="num">5 tyg.</td><td class="num">60 000 zł</td></tr>
-            <tr><td>Budowa panelu B2B</td><td class="num">14 tyg.</td><td class="num">150 000 zł</td></tr>
-            <tr><td>Integracja z ERP</td><td class="num">10 tyg.</td><td class="num">140 000 zł</td></tr>
-            <tr><td>Testy akceptacyjne i uruchomienie</td><td class="num">6 tyg.</td><td class="num">70 000 zł</td></tr>
+            <tr><td>Analiza wymagań i projekt panelu B2B</td><td class="num">5 tyg.</td><td class="num">14%</td></tr>
+            <tr><td>Budowa panelu B2B</td><td class="num">14 tyg.</td><td class="num">40%</td></tr>
+            <tr><td>Integracja z ERP</td><td class="num">10 tyg.</td><td class="num">29%</td></tr>
+            <tr><td>Testy akceptacyjne i uruchomienie</td><td class="num">6 tyg.</td><td class="num">17%</td></tr>
           </tbody>
           <tfoot>
-            <tr><td>Razem</td><td class="num">35 tyg.</td><td class="num"><span class="mark">420 000 zł</span></td></tr>
+            <tr><td>Razem</td><td class="num">35 tyg.</td><td class="num"><span class="mark">100%</span></td></tr>
           </tfoot>
         </table>
       </div>
       <footer class="slide-footer">
-        <span data-source>Kwoty przykładowe. Ceny netto w PLN, oferta ważna do 2026-12-31</span>
+        <span data-source>Dane przykładowe, 35 tyg., szacunek z 2026-11-20</span>
         <span data-slide-number></span>
       </footer>
     </section>
@@ -912,7 +921,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           </thead>
           <tbody>
             <tr><td>Wybór wariantu projektu</td><td>zarząd klienta</td><td><span class="mark">2026-11-27</span></td></tr>
-            <tr><td>Akceptacja budżetu etapu 1</td><td>zarząd klienta</td><td>2026-11-27</td></tr>
+            <tr><td>Akceptacja zakresu etapu 1</td><td>zarząd klienta</td><td>2026-11-27</td></tr>
             <tr><td>Wskazanie właściciela projektu</td><td>klient</td><td>2026-11-30</td></tr>
           </tbody>
         </table>
@@ -930,35 +939,34 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
           <p class="eyebrow">Rekomendacja</p>
           <h2>Wariant B z uruchomieniem MVP do 2027-07-31</h2>
           <ul class="points">
-            <li>Zarząd Firmy Przykładowej wybiera wariant B i budżet 420 000 zł netto do 2026-11-27.</li>
+            <li>Zarząd Firmy Przykładowej wybiera wariant B i zakres etapu 1 do 2026-11-27.</li>
             <li>Zespół Ageno zaczyna analizę wymagań 2026-12-01.</li>
             <li>Klient udostępnia testowe API ERP do 2027-01-15.</li>
           </ul>
         </div>
       </div>
       <footer class="slide-footer">
-        <span data-source>Dane przykładowe, kwoty przykładowe</span>
+        <span data-source>Dane przykładowe</span>
         <span data-slide-number></span>
       </footer>
     </section>
 
-    <!-- 23. Klienci Ageno (logotypy z ageno.pl, scripts/ageno-assets.mjs).
-         onerror: bez pobranego pliku komórka wraca do zaślepki szablonu (.logo-placeholder z nazwą klienta). -->
+    <!-- 23. Klienci Ageno (8 wybranych SVG w logos/, źródło ageno.pl).
+         Lokalnie examples/logos to symlink do ../logos; na Pages workflow kopiuje logos/ obok index.html.
+         onerror: gdy plik zniknie, komórka pokazuje nazwę klienta. -->
     <section data-slide class="slide" aria-hidden="true">
       <div class="container stack">
         <h2 data-grid="32">Klienci Ageno</h2>
         <p class="lead w-2of3" data-grid="32" data-snap>Ponad 100 klientów, m.in. z branży sportowej, modowej, produkcyjnej, motoryzacyjnej i wyposażenia wnętrz.</p>
         <ul class="logo-wall mt-64" data-grid="32" aria-label="Logotypy klientów">
-          <li class="logo-cell"><img src="logos/01-martes-sport.svg" alt="Martes Sport" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/04-safety-first.svg" alt="Safety First" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/07-avionaut.svg" alt="Avionaut" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/03-pro.svg" alt="PRO" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/02-eurofirany.svg" alt="Eurofirany" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/06-henry-schein.svg" alt="Henry Schein" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/08-nobile.svg" alt="Nobile" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/20-marrodent.svg" alt="Marrodent" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/05-kontakt-simon.svg" alt="Kontakt-Simon" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
-          <li class="logo-cell"><img src="logos/14-iguana-group.svg" alt="Iguana" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/martes-sport.svg" alt="Martes Sport" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/safety-first.svg" alt="Safety First" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/avionaut.svg" alt="Avionaut" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/pro.svg" alt="PRO" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/eurofirany.svg" alt="Eurofirany" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/henry-schein.svg" alt="Henry Schein" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/nobile.svg" alt="Nobile" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
+          <li class="logo-cell"><img src="logos/kontakt-simon.svg" alt="Kontakt-Simon" onerror="this.parentElement.classList.add('logo-placeholder'); this.replaceWith(this.alt);"></li>
         </ul>
       </div>
       <footer class="slide-footer">
@@ -1041,7 +1049,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   const slides = [...deck.querySelectorAll("[data-slide]")];
   const prev = deck.querySelector('[data-nav="prev"]');
   const next = deck.querySelector('[data-nav="next"]');
-  const SLIDE_W = 1536, SLIDE_H = 864, DURATION = 200, HIDE_AFTER = 1800, SWIPE = 50;
+  const SLIDE_W = 1536, SLIDE_H = 864, DURATION = 200, HIDE_AFTER = 2000, SWIPE = 50;
   let index = Math.max(0, slides.findIndex((s) => s.classList.contains("is-active")));
 
   fixOrphans(deck);
@@ -1107,7 +1115,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   prev.addEventListener("click", () => go(-1));
   next.addEventListener("click", () => go(1));
 
-  // Strzałki: widoczne po ruchu myszy, znikają po 1,8 s bezczynności
+  // Strzałki: widoczne po ruchu myszy, znikają po 2 s bezczynności
   let hideTimer;
   const scheduleHide = () => {
     window.clearTimeout(hideTimer);

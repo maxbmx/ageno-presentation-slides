@@ -10,7 +10,17 @@ dist/
 # ageno-assets.mjs bez --out zapisuje w katalogu bieżącym: logos/, logos.json,
 # people/ i ageno-mountains.svg (z --out decks/…/ i tak lądują w decks/).
 # photos.mjs i screenshots.mjs domyślnie zapisują JPEG-i w screens/ obok JSON.
-logos/
+# W repo są tylko wybrane SVG w logos/ (poniżej). Inne pobrane logo (np. 01-*.svg)
+# i logos.json zostają poza gitem.
+logos/*
+!logos/martes-sport.svg
+!logos/eurofirany.svg
+!logos/pro.svg
+!logos/safety-first.svg
+!logos/kontakt-simon.svg
+!logos/henry-schein.svg
+!logos/avionaut.svg
+!logos/nobile.svg
 logos.json
 people/
 screens/

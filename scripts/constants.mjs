@@ -50,7 +50,7 @@ export const JPEG_QUALITY = 80;
 export const QA_VIEWPORTS = [[1600, 900], [1366, 768], [1280, 720], [1280, 800]];
 
 /** Nawigacja szablonu: autoukrywanie strzałek i przejście (references/nawigacja.md). */
-export const NAV = { hideAfterMs: 1800, transitionMs: 200 };
+export const NAV = { hideAfterMs: 2000, transitionMs: 200 };
 
 /** Limit rozmiaru złożonego pliku HTML w MB (inline-assets.mjs, references/nawigacja.md, „Jeden plik”). */
 export const MAX_DECK_MB = 15;
