@@ -147,12 +147,12 @@ w wierszu logo. Bez pliku gór szablon pokazuje zaślepkę „brak ageno-mountai
 oddaniem decku plik musi być obok `index.html`.
 
 **Klienci Ageno (logotypy).** Przedostatni slajd, przed kontaktem. Teza „Klienci Ageno”, jedno zdanie
-o skali i branżach z `references/ageno.md`, pod nim 10 logotypów w dwóch wierszach po 5
-(`.logo-wall`, pola 256 × 128 z odstępem 8 px). Logotypy pobiera `scripts/ageno-assets.mjs`
-ze strony głównej ageno.pl; pliki wstawiaj bez zmian (bez przycinania i skalowania obszaru
-roboczego, bez zmiany kolorów), bo równe obszary robocze dają równe logotypy. Bez ramek,
-podpisów i tła pod logotypami. Źródło i data stanu w stopce. Mniej niż 10 logotypów:
-jeden pełny wiersz 5, nie zostawiaj dziur.
+o skali i branżach z `references/ageno.md`, pod nim 8 logotypów w dwóch wierszach po 4
+(`.logo-wall`, pola 304 × 128 z odstępem 32 px; 4 × 304 + 3 × 32 = 1312). W repo jest 8 wybranych
+plików SVG w `logos/`; pliki wstawiaj bez zmian (bez przycinania i skalowania obszaru roboczego,
+bez zmiany kolorów), bo równe obszary robocze dają równe logotypy. Bez ramek, podpisów i tła
+pod logotypami. Źródło i data stanu w stopce. Mniej niż 8 logotypów: jeden pełny wiersz 4,
+nie zostawiaj dziur.
 
 **Kontakt.** Slajd zamykający, zawsze ostatni. Duże logo Ageno (`references/siatka.md`, „Logo”), tytuł „Pytania i kontakt” (56 / 64), jedno zdanie leadu, pod nim osoba: portret
 256 × 256 w kole, obok imię i nazwisko, służbowy e-mail osoby i info@ageno.pl jako linki `mailto:`

@@ -34,14 +34,13 @@ jobs:
             node scripts/grid-audit.mjs "$f"
             node scripts/text-lint.mjs "$f"
           done
-      # Grafiki Ageno trafiają do $RUNNER_TEMP, poza repozytorium, więc nie wchodzą do commita.
-      # Zasada: brak grafik nigdy nie przerywa budowania. Gdy ageno.pl zablokuje pobieranie albo
-      # zmieni listę logotypów, inline-assets.mjs kończy się kodem 1 z samymi komunikatami
-      # „BŁĄD: brak pliku …”. Wtedy plik nie jest w pełni samowystarczalny: brakujące obrazy
-      # zostają ścieżkami, a strona pokazuje zaślepki („brak ageno-mountains.svg”, „brak zdjęcia”,
-      # pola logotypów z nazwą klienta) i workflow zgłasza ::warning::. Każdy inny błąd
-      # inline-assets.mjs (obraz http(s), nieznany typ obrazu, zewnętrzny CSS/JS/@import,
-      # ponad 15 MB, złe wywołanie) przerywa budowanie.
+      # 8 wybranych logotypów SVG jest w repo (logos/) i jest kopiowanych do build.
+      # Góry, portret i ewentualne dodatkowe grafiki pobiera ageno-assets do $RUNNER_TEMP,
+      # poza repozytorium. Brak tych opcjonalnych grafik nie przerywa budowania: inline-assets.mjs
+      # kończy się wtedy kodem 1 z samymi komunikatami „BŁĄD: brak pliku …”, strona pokazuje
+      # zaślepki („brak ageno-mountains.svg”, „brak zdjęcia”), a workflow zgłasza ::warning::.
+      # Każdy inny błąd inline-assets.mjs (obraz http(s), nieznany typ obrazu, zewnętrzny
+      # CSS/JS/@import, ponad 15 MB, złe wywołanie) przerywa budowanie.
       - name: Złożenie strony
         run: |
           BUILD="$RUNNER_TEMP/build"
@@ -50,6 +49,8 @@ jobs:
           mkdir -p "$BUILD" "$SITE"
           cp examples/przyklad.html "$BUILD/index.html"
           cp assets/template.html "$BUILD/template.html"
+          mkdir -p "$BUILD/logos"
+          cp logos/*.svg "$BUILD/logos/"
           node scripts/ageno-assets.mjs --out "$BUILD" \
             || echo "::warning::Nie udało się pobrać wszystkich grafik z ageno.pl."
           for f in index.html template.html; do

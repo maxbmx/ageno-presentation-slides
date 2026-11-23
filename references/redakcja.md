@@ -122,6 +122,8 @@ slajdów, `brief.md`, nazwach plików i folderów.
 - Skracaj, ale nie zmieniaj sensu i nie usuwaj istotnych zastrzeżeń.
 - Polskie znaki, odmiana nazw, interpunkcja. Sierotki: sekcja niżej.
 - Osobna korekta podpisów, stopek, źródeł, etykiet, `alt` i `<title>`.
+- W przykładowych prezentacjach nie podawaj kwot pieniężnych. Zamiast cen używaj czasu,
+  zakresu, procentu albo liczby integracji.
 - Bez notatek prelegenta i komentarzy technicznych na slajdach, chyba że użytkownik o nie prosi.
 
 ## Sierotki i łamanie wierszy
@@ -178,7 +180,8 @@ i siatkę, ale nie ocenią, czy złamanie wiersza wygląda dobrze.
 `scripts/text-lint.mjs` sprawdza widoczny tekst każdego slajdu (bez treści cytatów `blockquote`
 i zaślepek) i zgłasza fragment z numerem reguły. **Błąd** trzeba poprawić; **uwaga** wymaga
 oceny, bo słowo bywa poprawne w kontekście. Milczenie skryptu nie znaczy, że tekst jest zgodny
-z tą listą.
+z tą listą. Poza regułami językowymi zgłasza też błąd „akcent”: tekst na wypełnionym tle w kolorze
+akcentu (`references/siatka.md`, „Kolory”, wyróżnienie bez zakreślacza).
 
 | Zakres | Reguły |
 | --- | --- |

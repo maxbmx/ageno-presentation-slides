@@ -25,7 +25,7 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 - [ ] Jeden akcent na slajd, hierarchia czytelna z daleka.
 - [ ] Slajd tytułowy ma duże logo Ageno w lewym górnym rogu, w oryginalnych kolorach,
       i góry Ageno po lewej, przycięte krawędzią slajdu (nie zaślepkę „brak ageno-mountains.svg”).
-- [ ] Slajd „Klienci Ageno”: logotypy z ageno.pl bez zmian, równe, 2 pełne wiersze po 5.
+- [ ] Slajd „Klienci Ageno”: 8 logotypów SVG z `logos/` bez zmian, równe, 2 pełne wiersze po 4.
 - [ ] Ostatni slajd „Kontakt”: duże logo Ageno w lewym górnym rogu, prawdziwe zdjęcie (nie zaślepka „brak zdjęcia”), służbowy e-mail osoby i info@ageno.pl
       z `references/ageno.md`, linki `mailto:` działają, bez numeru telefonu, góry po prawej.
 - [ ] Każdy slajd poza tytułowym i „Kontakt” ma małe logo Ageno w stopce, także w PDF;
@@ -34,7 +34,8 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 - [ ] Zdjęcia tylko w układzie „Zdjęcie + treść”: górskie, z licencją Unsplash License (nie Unsplash+),
       zgodne z kryteriami z `references/zdjecia.md`, każde inne.
 - [ ] Podpis `@autor` na każdym zdjęciu, czytelny, z linkiem do profilu autora; `alt` opisuje zdjęcie.
-- [ ] Wolne pola przy innych proporcjach okna mają kolor tła.
+- [ ] Wolne pola przy innych proporcjach okna są czarne, slajd ma tło `#f7f7f7`.
+- [ ] Żaden tekst nie stoi na pomarańczowym wypełnionym tle; akcent to kreska `.mark` albo rozmiar liczby.
 - [ ] Tryb `G`: bloki na liniach kratki.
 
 ## 3. PDF

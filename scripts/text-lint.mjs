@@ -4,7 +4,8 @@
  * Czyta widoczny tekst każdego slajdu (bez treści cytatów i zaślepek) i zgłasza fragmenty
  * z numerem reguły. BŁĄD = do poprawienia, UWAGA = do oceny w kontekście.
  * Sprawdza reguły 5, 6, 7, 10, 11, 12 (tylko nagłówki), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
- * wycinek S3 (lista czasowników w 1. os. lm.) i format dat. Lista ma być zgodna z references/redakcja.md.
+ * wycinek S3 (lista czasowników w 1. os. lm.), format dat oraz tekst na wypełnionym tle w kolorze
+ * akcentu (pomarańczowy prostokąt pod tekstem, references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
  * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
@@ -28,7 +29,22 @@ await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 const slides = await page.evaluate(() => {
   const BLOCK = "h1, h2, h3, .title, p, li, dt, dd, th, td, figcaption, .eyebrow, [data-source], .gantt-name";
   const SKIP = "blockquote, script, style, .shot-placeholder, .photo-placeholder, .logo-placeholder, .deck-nav, [data-slide-number]";
+  // Kolor akcentu (--c-accent) jako rgb(); bez tokenu w pliku kontrola tła jest pomijana.
+  const probe = document.createElement("div");
+  probe.style.background = "var(--c-accent)";
+  document.body.append(probe);
+  const accent = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  const visibleText = (el) => {
+    let text = "";
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) if (!w.currentNode.parentElement.closest(".sr-only")) text += w.currentNode.textContent;
+    return text.replace(/\s+/g, " ").trim();
+  };
   return [...document.querySelectorAll("[data-slide]")].map((slide) => {
+    const onAccent = /^rgba?\(0, 0, 0(, 0)?\)$/.test(accent) ? [] : [...slide.querySelectorAll("*")]
+      .filter((el) => !el.closest(SKIP) && getComputedStyle(el).backgroundColor === accent && visibleText(el))
+      .map((el) => ({ heading: false, text: visibleText(el), onAccent: true }));
     const blocks = new Map();
     const walker = document.createTreeWalker(slide, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
@@ -41,7 +57,7 @@ const slides = await page.evaluate(() => {
     return [...blocks].map(([el, text]) => ({
       heading: el.matches("h1, h2, h3, .title, .eyebrow"),
       text: text.replace(/\s+/g, " ").trim(),
-    }));
+    })).concat(onAccent);
   });
 });
 await browser.close();
@@ -86,7 +102,11 @@ let errors = 0;
 let warnings = 0;
 slides.forEach((blocks, i) => {
   const found = [];
-  for (const { heading, text } of blocks) {
+  for (const { heading, text, onAccent } of blocks) {
+    if (onAccent) {
+      found.push(["błąd", "akcent", "tekst na wypełnionym tle w kolorze akcentu; wyróżnij rozmiarem, grubością albo .mark (kreska)", text, text]);
+      continue;
+    }
     for (const [id, level, re, label, headingOnly] of rules) {
       if (headingOnly && !heading) continue;
       if (id === "33" && /^w zakresie$/iu.test(text)) continue; // nagłówek układu „Zakres”

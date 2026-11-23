@@ -21,7 +21,7 @@ Podgląd: po każdym pushu do `main` workflow `.github/workflows/pages.yml` publ
 - `references/` — `ageno.md`, `tresc.md`, `redakcja.md`, `siatka.md`, `uklady.md`, `screeny.md`, `zdjecia.md`, `nawigacja.md`, `qa.md`.
 - `scripts/` — polecenia poniżej; `constants.mjs` (wspólne stałe) i `cli.mjs` (umowa CLI) to moduły pomocnicze.
 - `test/` — testy skryptów (`npm test`, bez dodatkowego runnera).
-- `package.json` — Playwright jako devDependency, skróty `npm run`; `.gitignore` — `node_modules`, `package-lock.json`, `decks/`, `dist/`, katalogi QA oraz pliki pobierane przez skrypty (`logos/`, `logos.json`, `people/`, `screens/`, `ageno-mountains.svg`, JPEG).
+- `package.json` — Playwright jako devDependency, skróty `npm run`; `.gitignore` — `node_modules`, `package-lock.json`, `decks/`, `dist/`, katalogi QA oraz pliki pobierane roboczo (`logos.json`, `people/`, `screens/`, `ageno-mountains.svg`, JPEG); wybrane SVG w `logos/` są w repo.
 
 Katalog prezentacji jest konwencją ze `SKILL.md`. Skrypty czytają tylko pliki podane w poleceniu. `brief.md` nie jest parsowany.
 
@@ -30,7 +30,7 @@ decks/2026-11-16-klient-temat/
 ├── brief.md                 cel, odbiorca, rejestr źródeł, plan slajdów
 ├── index.html               kopia szablonu, obrazy jako ścieżki
 ├── ageno-mountains.svg      góry na slajd tytułowy i kontaktowy
-├── logos/   logos.json      logotypy klientów z ageno.pl
+├── logos/   logos.json      logotypy klientów (SVG z repo lub pobrane)
 ├── people/                  zdjęcia osób na slajd kontaktowy
 ├── screens.json             lista zrzutów
 ├── photos.json              wybrane zdjęcia z Unsplash

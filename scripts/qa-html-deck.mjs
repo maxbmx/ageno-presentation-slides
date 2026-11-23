@@ -73,7 +73,7 @@ try {
       if (shownOpacity < 0.5) viewportReport.navigation.push('Strzałka „Następny” nie pokazała się po ruchu myszy.');
       await page.waitForTimeout(AFTER_HIDE);
       const hiddenOpacity = await nextButton.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
-      if (hiddenOpacity > 0.1) viewportReport.navigation.push('Strzałka „Następny” nie zniknęła po 1,8 s bezczynności.');
+      if (hiddenOpacity > 0.1) viewportReport.navigation.push('Strzałka „Następny” nie zniknęła po 2 s bezczynności.');
       await page.mouse.move(Math.round(viewport.width / 2), Math.round(viewport.height / 2));
       await page.waitForTimeout(100);
       const box = await nextButton.boundingBox();
