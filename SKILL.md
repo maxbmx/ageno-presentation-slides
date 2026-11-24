@@ -66,8 +66,10 @@ braki i sprzeczności (`references/tresc.md`).
 ### 3. Plan slajdów
 
 Tabela: nr, rola, teza, dowód, układ, screen (`references/tresc.md`). Układ wybierz z katalogu
-w `references/uklady.md` (pierwszy zawsze tytułowy, ostatni zawsze „Kontakt”) i zsumuj wysokości (budżet: `references/siatka.md`); nie mieści się =
-podziel slajd. Przy decku dłuższym niż kilka slajdów albo niejasnych źródłach pokaż plan
+w `references/uklady.md` (pierwszy zawsze tytułowy, ostatni zawsze „Kontakt”) i zsumuj wysokości
+według budżetu z `references/siatka.md`. Przed zaakceptowaniem planu sprawdź, czy sąsiednie
+slajdy z tej samej sekcji można połączyć w układzie wielokolumnowym, i uzasadnij w planie
+każdy podział. Przy decku dłuższym niż kilka slajdów albo niejasnych źródłach pokaż plan
 użytkownikowi przed kodem.
 
 ### 4. Screeny i grafiki

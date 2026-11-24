@@ -40,6 +40,13 @@ albo źródła są niejednoznaczne):
 | --- | --- | --- | --- | --- | --- |
 | 3 | dowód | Koszyk porzucany na kroku dostawy | analityka X, 2026-10-01 – 2026-10-31 | teza + screen | koszyk-dostawa (wide) |
 
+Jeśli dzielisz jedną sekcję źródłową na kilka slajdów, zapisz w planie konkretny powód
+podziału, np. przekroczony budżet wysokości lub odrębna teza.
+
+Przed kodowaniem i podczas QA sprawdź każdą parę sąsiednich slajdów. Czy ich treść zmieści się
+razem w dwóch kolumnach bez naruszenia siatki, czytelności i zasady jednej tezy? Jeśli tak,
+połącz slajdy.
+
 ## Tytuły
 
 Tytuł slajdu to krótkie hasło, maksymalnie 3–5 słów (5 to twardy limit,
@@ -59,8 +66,15 @@ Jeśli źródła nie uzasadniają tezy, daj neutralny tytuł. Długość tezy: `
 
 - Nie przenoś akapitów dokumentu na slajd. Zostaw liczby, zastrzeżenia i argumenty konieczne
   do zrozumienia wniosku.
-- Maks. ok. 6 wierszy tekstu w kolumnie. Za dużo treści = kolejny slajd albo dodatek,
-  nigdy mniejszy font.
+- Limit około 6 wierszy obowiązuje osobno w każdej kolumnie. Policz wiersze po złamaniu
+  tekstu w docelowej szerokości kolumny. Liczba punktów i sama długość tekstu nie wystarczą
+  do oceny.
+- Zdjęcie zmniejsza dostępną przestrzeń, ale samo w sobie nie uzasadnia podziału listy.
+  Najpierw sprawdź układ dwukolumnowy, zmianę strony zdjęcia albo przeniesienie zdjęcia
+  na inny slajd tej sekcji.
+- Podziel treść dopiero wtedy, gdy po sprawdzeniu odpowiednich układów nie mieści się
+  w budżecie wysokości 704 px, przekracza limit wierszy w którejś kolumnie albo zawiera
+  odrębne tezy wymagające osobnego wyjaśnienia. Nie zmniejszaj fontu, by uniknąć podziału.
 - Wykres tylko, gdy jest czytelniejszy niż tekst lub tabela. Nie interpoluj braków, nie
   sugeruj przyczynowości z korelacji, oznacz szacunki i prognozy. Osie, jednostki, legenda,
   źródło.
