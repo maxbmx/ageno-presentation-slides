@@ -12,6 +12,9 @@
  *  - interlinia każdego tekstu: wielokrotność 32 px (poza <strong> i stopką),
  *  - nic w kontenerze nie wychodzi poza 112–1424 × 64–768 (zgłaszane wszystkie takie elementy),
  *  - tolerancja 0,1 px przy krawędziach, wymiarach i interlinii,
+ *  - tekst ciągły (p, li, blockquote, dd w kontenerze) łamany na ≥ 2 wiersze: najszerszy wiersz
+ *    (Range.getClientRects) i szerokość bloku najwyżej TEXT_MAX_WIDTH (864 px, references/siatka.md,
+ *    „Szerokość tekstu”); pomija tabele, stopkę i elementy z display grid/flex (np. wiersze .gantt),
  *  - stopka na y = 800,
  *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w warstwie .bleed z szablonu
  *    albo oznacz atrybutem data-bleed; obie formy audyt traktuje tak samo).
@@ -24,7 +27,7 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { launchChromium, parseCli } from "./cli.mjs";
-import { CANVAS, CONTAINER, FOOTER, GRID } from "./constants.mjs";
+import { CANVAS, CONTAINER, FOOTER, GRID, TEXT_MAX_WIDTH } from "./constants.mjs";
 
 const USAGE = "node scripts/grid-audit.mjs prezentacja.html";
 const { positionals: [input] } = parseCli({ usage: USAGE, positionals: [1, 1], files: true });
@@ -35,7 +38,7 @@ await page.goto(pathToFileURL(path.resolve(input)).href, { waitUntil: "load" });
 await page.evaluate(() => document.fonts?.ready);
 await page.waitForTimeout(300); // ResizeObserver i snap
 
-const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
+const result = await page.evaluate(({ CONTAINER, FOOTER, GRID, TEXT_MAX_WIDTH }) => {
   const TOL = 0.1;
   const X0 = CONTAINER.x0, Y_MIN = CONTAINER.y0, Y_MAX = CONTAINER.y1, X_MAX = CONTAINER.x1, FOOTER_Y = FOOTER.y;
   const M = GRID.module, U = GRID.unit;
@@ -81,6 +84,28 @@ const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
       }
     }
 
+    // Szerokość tekstu ciągłego: prostokąty z Range w jednym wierszu, gdy środek jednego
+    // leży w pionie w drugim (inline o innej wysokości, np. <strong>, nie daje nowego wiersza)
+    for (const el of slide.querySelectorAll(".container :is(p, li, blockquote, dd)")) {
+      if (!visible(el) || el.closest("table, .slide-footer") || /grid|flex/.test(getComputedStyle(el).display)) continue;
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const rows = [];
+      for (const r of range.getClientRects()) {
+        if (!r.width || !r.height) continue;
+        const mid = r.top + r.height / 2;
+        const row = rows.find((o) => mid >= o.top && mid <= o.bottom);
+        if (row) Object.assign(row, { left: Math.min(row.left, r.left), right: Math.max(row.right, r.right) });
+        else rows.push({ top: r.top, bottom: r.bottom, left: r.left, right: r.right });
+      }
+      if (rows.length < 2) continue;
+      const widest = Math.max(...rows.map((o) => o.right - o.left));
+      const w = el.getBoundingClientRect().width;
+      if (widest > TEXT_MAX_WIDTH + TOL || w > TEXT_MAX_WIDTH + TOL) {
+        problems.push(`${name(el)} [szerokość tekstu] ${rows.length} wiersze, wiersz ${widest.toFixed(0)} px, blok ${w.toFixed(0)} px > ${TEXT_MAX_WIDTH}: węższa kolumna, .grid-2 / .grid-3 albo kilka slajdów`);
+      }
+    }
+
     // Interlinie
     const walker = document.createTreeWalker(slide, NodeFilter.SHOW_TEXT);
     const lh = new Set();
@@ -116,7 +141,7 @@ const result = await page.evaluate(({ CONTAINER, FOOTER, GRID }) => {
     report.push({ slide: i + 1, problems });
   });
   return report;
-}, { CONTAINER, FOOTER, GRID });
+}, { CONTAINER, FOOTER, GRID, TEXT_MAX_WIDTH });
 
 await browser.close();
 if (!result.length) {

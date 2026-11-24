@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -150,6 +150,27 @@ test("grid-audit i text-lint: plik bez [data-slide] to błąd z kodem 1", (t) =>
     if (r.status === 1 && NO_BROWSER.test(r.stderr)) return t.skip("brak Playwrighta albo Chromium");
     assert.equal(r.status, 1, script);
     assert.match(r.stderr, /brak slajdów \[data-slide\]/, script);
+  }
+});
+
+test("grid-audit: tekst ciągły na ≥ 2 wiersze szerszy niż 864 px to błąd, w kolumnie .w-2of3 OK", (t) => {
+  const dir = tempDir(t);
+  const template = readFileSync(path.join(ROOT, "assets", "template.html"), "utf8");
+  const block = '<div class="w-2of3 stack mt-128" data-grid="32" data-snap>\n          <p class="eyebrow">Rekomendacja</p>';
+  assert.ok(template.includes(block), "szablon: blok rekomendacji w .w-2of3");
+  const long = "Długi punkt, który zajmuje kilka wierszy: kto odpowiada za krok, co dokładnie robi, do kiedy i od czego zależy, z opisem ryzyka i decyzji potrzebnej od odbiorcy";
+  const withLong = template.replace("<li>Kolejny krok, kto i kiedy</li>", `<li>${long}</li>`);
+  const cases = [
+    ["dobry.html", withLong, 0],
+    ["zly.html", withLong.replace(block, block.replace("w-2of3 ", "")), 1],
+  ];
+  for (const [name, html, expected] of cases) {
+    const file = path.join(dir, name);
+    writeFileSync(file, html);
+    const r = run("grid-audit.mjs", [file]);
+    if (r.status === 1 && NO_BROWSER.test(r.stderr)) return t.skip("brak Playwrighta albo Chromium");
+    assert.equal(r.status, expected, `${name}:\n${r.stdout}`);
+    assert.equal(/\[szerokość tekstu\]/.test(r.stdout), expected === 1, name);
   }
 });
 

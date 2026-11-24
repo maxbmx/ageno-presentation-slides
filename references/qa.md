@@ -20,6 +20,8 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 ## 2. Oględziny każdego zrzutu
 
 - [ ] Brak uciętego tekstu i elementów, brak kolizji, stopka nie dotyka treści.
+- [ ] Żaden akapit, lead ani lista nie idzie przez całą szerokość slajdu; wiersz tekstu
+      najwyżej 864 px, dłuższa treść w kolumnach (`references/siatka.md`, „Szerokość tekstu”).
 - [ ] Teza w maks. 2 wierszach, bez sierotek, wdów i dziwnych złamań (`references/redakcja.md`, sekcja „Sierotki”).
 - [ ] Screeny ostre, właściwy fragment widoczny, nic ważnego nie ucięte.
 - [ ] Jeden akcent na slajd, hierarchia czytelna z daleka.
