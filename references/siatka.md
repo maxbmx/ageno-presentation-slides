@@ -89,7 +89,7 @@ Interlinia to zawsze 32 albo 64 px. Rozmiar dobiera się do interlinii, nigdy od
 
 | Klasa / element | Rozmiar / interlinia | Uwagi |
 | --- | --- | --- |
-| `.title` (h1) | 56 / 64 | slajd tytułowy, −0.033em |
+| `.title` (h1) | 56 / 64 | slajd tytułowy, grubość 800 i obrys 0.015em, −0.033em |
 | `h2` (teza) | 40 / 64 | maks. 2 wiersze, −0.03em |
 | `.number` | 56 / 64 | cyfry tabelaryczne |
 | `.lead` | 24 / 32 | podtytuł |
@@ -111,6 +111,24 @@ Interlinia to zawsze 32 albo 64 px. Rozmiar dobiera się do interlinii, nigdy od
 (po 12 px odstępu z każdej strony, w poziomie i w pionie). Tekst zaczyna się od następnej
 kratki (`padding-left: 32px`), każdy punkt to wiersz 32 px. Nie używaj zwykłych kropek
 `list-style` ani znaków typu „•” w tekście.
+
+## Logotypy uzupełniające treść
+
+Logotypy pod tekstem w innym układzie niż pełny slajd „Klienci Ageno” (`uklady.md`, `.logo-wall`):
+ikona + podpis w jednym wierszu 64 px, klasa `.logo-list`.
+
+- Rozmieść logotypy pod tekstem w równych kolumnach. Wypełniaj rzędy
+  od lewej i zachowaj te same osie w każdym rzędzie.
+- Przy dziewięciu logotypach najpierw sprawdź układ 6 + 3 (`.logo-list--6`, kolumna 192 px).
+  Użyj go, jeśli najdłuższa nazwa mieści się w kolumnie w jednym
+  wierszu, przy standardowym rozmiarze znaku i podpisu.
+- Przy węższym kontenerze lub dłuższych nazwach wybierz 4 + 4 + 1 (`.logo-list--4`, kolumna
+  304 px, ta sama szerokość co w `.logo-wall`).
+- Zachowaj co najmniej 32 px zgodnie z gridem między tekstem a grupą logotypów.
+  Wyrównaj znaki i podpisy do lewej w każdej kolumnie.
+- Sprawdź cały slajd w proporcjach 16:9. Nazwy mają być czytelne,
+  a tekst i logotypy muszą mieścić się w kontenerze.
+- Zostaw wspólne tło slajdu. Pomiń osobne kafelki, ramki i cienie.
 
 ## Kolory
 

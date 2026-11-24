@@ -30,6 +30,25 @@ nie powtarza, więc w każdym kroku otwórz wskazany plik.
 7. **Daty YYYY-MM-DD i język decku** według `references/redakcja.md`.
 8. **Sprawdzaj, nie deklaruj**: przed oddaniem automat, oględziny i lista z `references/qa.md`.
 
+## Praca nad skillem i publikowanie zmian
+
+Repozytorium służy do rozwijania skilla Ageno. W commitach umieszczaj wyłącznie
+pliki potrzebne do jego działania i utrzymania, takie jak instrukcje, szablony,
+skrypty, testy i przykłady przygotowane na fikcyjnych danych.
+
+- Prezentacje robocze i gotowe oraz ich materiały źródłowe trzymaj poza repozytorium.
+  Dotyczy to także PDF-ów, briefów, notatek ze spotkań, zrzutów ekranu, danych
+  klientów i innych materiałów poufnych. Nie dodawaj ich do indeksu Gita ani nie
+  wysyłaj ich na żadne zdalne gałęzie, do pull requestów, zgłoszeń i załączników.
+  Zasada obowiązuje również w repozytorium prywatnym.
+- Jeśli zmianę opracowano w lokalnej prezentacji, przenieś do repozytorium wyłącznie
+  rozwiązanie wielokrotnego użytku, np. styl SVG w szablonie. Do demonstracji i testów
+  użyj fikcyjnej treści.
+- Dodawaj pliki do commita jawnie po ścieżkach. Przed commitem sprawdź listę plików
+  i pełny `git diff --cached`. Przed pushem sprawdź wszystkie wychodzące commity,
+  także wcześniejsze lokalne commity. Jeśli zawierają materiały wykluczone powyżej
+  albo zmiany spoza zlecenia, wstrzymaj push i przygotuj czystą gałąź.
+
 ## Pliki skilla
 
 | Plik | Co zawiera | Kiedy czytać |

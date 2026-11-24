@@ -195,7 +195,14 @@ strong { font-weight: 700; font-size: 0.9em; line-height: 1; }
 .card { background: var(--c-card); padding: var(--module); }
 
 /* ---------- Typografia ---------- */
-.title  { font-size: var(--fs-title); line-height: var(--lh-title); letter-spacing: var(--ls-title); }
+.title {
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+  letter-spacing: var(--ls-title);
+  font-weight: 800;
+  /* Pogrubienie także przy foncie systemowym bez odmiany 800. */
+  -webkit-text-stroke: 0.015em currentColor;
+}
 h2, .h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); letter-spacing: var(--ls-h2); }
 h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: var(--ls-h3); }
 .lead   { font-size: var(--fs-lead); line-height: var(--lh-lead); }
