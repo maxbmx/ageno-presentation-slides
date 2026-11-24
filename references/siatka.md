@@ -107,10 +107,10 @@ Interlinia to zawsze 32 albo 64 px. Rozmiar dobiera się do interlinii, nigdy od
 
 ## Lista punktów
 
-`.points`: znacznik to kwadrat 8 × 8 px w kolorze akcentu, na środku pierwszej kratki 32 × 32
-(po 12 px odstępu z każdej strony, w poziomie i w pionie). Tekst zaczyna się od następnej
-kratki (`padding-left: 32px`), każdy punkt to wiersz 32 px. Nie używaj zwykłych kropek
-`list-style` ani znaków typu „•” w tekście.
+`.points`: znacznik SVG 16 × 16 px to koło w kolorze akcentu z jasnym haczykiem.
+Ikona jest wyśrodkowana w pierwszej kratce 32 × 32 px, a tekst zaczyna się od następnej
+kratki (`padding-left: 32px`). W wariancie `.points-out` koło używa koloru `--c-muted`.
+Nie używaj zwykłych kropek `list-style` ani znaków typu „•” w tekście.
 
 ## Kolory
 

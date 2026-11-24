@@ -225,17 +225,19 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   text-decoration-skip-ink: none;
 }
 
-/* Lista punktów: znacznik 8 × 8 px w akcencie, na środku pierwszej kratki 32 × 32
-   (12 + 8 + 12 = 32 w poziomie i w pionie). Tekst zaczyna się od następnej kratki. */
-.points li { position: relative; padding-left: var(--module); }
-.points li::before {
+/* Znacznik SVG 16 × 16 px na środku pierwszej kratki 32 × 32.
+   Tekst zaczyna się od następnej kratki. */
+.points > li { position: relative; padding-left: var(--module); }
+.points > li::before {
+  --marker-size: calc(2 * var(--unit));
   content: "";
   position: absolute;
-  left: calc((var(--module) - var(--unit)) / 2);
-  top: calc((var(--lh-body) - var(--unit)) / 2);
-  width: var(--unit);
-  height: var(--unit);
+  left: calc((var(--module) - var(--marker-size)) / 2);
+  top: calc((var(--lh-body) - var(--marker-size)) / 2);
+  width: var(--marker-size);
+  height: var(--marker-size);
   background: var(--c-accent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 0a12 12 0 1 1 0 24 12 12 0 1 1 0-24ZM5.25 12.6l1.5-1.5 3.2 3.2 7.3-7.3 1.5 1.5-8.8 8.8Z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 /* ---------- Tabela ----------
@@ -436,7 +438,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 .facts dd { font-size: var(--fs-body); line-height: var(--lh-body); }
 .facts dd + dt { margin-top: var(--module); }
 /* Zakres: „poza zakresem” ma przygaszony znacznik */
-.points-out li::before { background: var(--c-muted); }
+.points-out > li::before { background: var(--c-muted); }
 /* Wycena: wiersz sumy */
 .table tfoot td { font-weight: 700; }
 /* Case study: miejsce na logo klienta, wysokość jednego wiersza */
