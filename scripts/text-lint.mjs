@@ -7,6 +7,9 @@
  * 36 (tytuł slajdu dłuższy niż 5 słów), wycinek S3 (lista czasowników w 1. os. lm.), format dat
  * oraz tekst na wypełnionym tle w kolorze akcentu (pomarańczowy prostokąt pod tekstem,
  * references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
+ * Dla całego decku (błąd „kontakt”, wiersz bez wcięcia po slajdach): ostatni [data-slide] musi mieć
+ * klasę slide-contact i portret osoby (.person .person-photo), a wcześniej slide-contact nie może
+ * wystąpić (references/uklady.md, „Kontakt”).
  * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
@@ -66,6 +69,16 @@ const slides = await page.evaluate(() => {
       })).concat(onAccent),
     };
   });
+});
+// Slajd zamykający „Kontakt”: zawsze ostatni, tylko jeden, z portretem osoby.
+const contact = await page.evaluate(() => {
+  const all = [...document.querySelectorAll("[data-slide]")];
+  const last = all.at(-1);
+  return {
+    lastIsContact: Boolean(last?.classList.contains("slide-contact")),
+    lastHasPerson: Boolean(last?.querySelector(".person .person-photo")),
+    earlier: all.slice(0, -1).flatMap((s, i) => (s.classList.contains("slide-contact") ? [i + 1] : [])),
+  };
 });
 await browser.close();
 
@@ -140,5 +153,13 @@ slides.forEach(({ blocks, title }, i) => {
     console.log(`  ${level.toUpperCase()} reguła ${id}: ${label} [${hit}] w: ${short}`);
   }
 });
+const deck = [];
+if (!contact.lastIsContact) deck.push("ostatni slajd to nie slajd zamykający „Kontakt” (.slide-contact, układ 24)");
+else if (!contact.lastHasPerson) deck.push("slajd „Kontakt” bez portretu osoby (.person .person-photo)");
+if (contact.earlier.length) deck.push(`slajd „Kontakt” przed końcem decku (slajd ${contact.earlier.join(", ")}); po nim nie może być nic`);
+if (deck.length) {
+  console.log("\nDeck:");
+  for (const label of deck) { errors += 1; console.log(`BŁĄD reguła kontakt: ${label}`); }
+}
 console.log(`\nTekst: ${errors} błędów, ${warnings} uwag.`);
 process.exit(errors ? 1 : 0);

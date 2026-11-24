@@ -33,8 +33,9 @@ sprawdza je przy każdym teście.
 | 23 | Klienci Ageno (logotypy) | przedostatni slajd, przed kontaktem | teza 64 + 32 + lead 64 + 64 + 2 × 128 + 32 = 512 |
 | 24 | Kontakt | slajd zamykający, zawsze ostatni | logo 64 + 128 + tytuł 64 + 32 + lead 32 + 64 + portret 256 = 640 |
 
-Slajd tytułowy jest obowiązkowy i zawsze pierwszy. Pozostałe wybieraj według planu slajdów;
-ten sam układ może wystąpić wiele razy.
+Slajd tytułowy jest obowiązkowy i zawsze pierwszy. Slajd „Kontakt” (24) jest obowiązkowy
+i zawsze ostatni, tylko jeden, nic po nim. Pozostałe wybieraj według planu slajdów; ten sam
+układ może wystąpić wiele razy.
 
 ## Rama każdego slajdu
 
@@ -157,7 +158,7 @@ bez zmiany kolorów), bo równe obszary robocze dają równe logotypy. Bez ramek
 pod logotypami. Źródło i data stanu w stopce. Mniej niż 8 logotypów: jeden pełny wiersz 4,
 nie zostawiaj dziur.
 
-**Kontakt.** Slajd zamykający, zawsze ostatni. Duże logo Ageno (`references/siatka.md`, „Logo”), tytuł „Pytania i kontakt” (56 / 64), jedno zdanie leadu, pod nim osoba: portret
+**Kontakt.** Slajd zamykający, obowiązkowy w każdej prezentacji, zawsze ostatni i jedyny, nic po nim. Duże logo Ageno (`references/siatka.md`, „Logo”), tytuł „Pytania i kontakt” (56 / 64), jedno zdanie leadu, pod nim osoba: portret
 256 × 256 w kole, obok imię i nazwisko, służbowy e-mail osoby i info@ageno.pl jako linki `mailto:`
 w `.nowrap`. Dane osoby i zdjęcie tylko z sekcji „Osoby” w `references/ageno.md`, adres info@ageno.pl
 z sekcji „Podstawy”. Bez numeru telefonu (`references/ageno.md`, „Poufność”). Po prawej te same

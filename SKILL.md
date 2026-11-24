@@ -65,7 +65,7 @@ braki i sprzeczności (`references/tresc.md`).
 ### 3. Plan slajdów
 
 Tabela: nr, rola, teza, dowód, układ, screen (`references/tresc.md`). Układ wybierz z katalogu
-w `references/uklady.md` i zsumuj wysokości (budżet: `references/siatka.md`); nie mieści się =
+w `references/uklady.md` (pierwszy zawsze tytułowy, ostatni zawsze „Kontakt”) i zsumuj wysokości (budżet: `references/siatka.md`); nie mieści się =
 podziel slajd. Przy decku dłuższym niż kilka slajdów albo niejasnych źródłach pokaż plan
 użytkownikowi przed kodem.
 
@@ -79,7 +79,7 @@ górskie z Unsplash (`references/zdjecia.md`). Polecenia: `README.md`.
 ### 5. Slajdy
 
 1. Skopiuj `assets/template.html` jako `index.html` decku. Slajd tytułowy zostaw i zmień tylko
-   jego teksty. Dalsze slajdy kopiuj z przykładowych układów, wypełnij treścią, nieużyte usuń.
+   jego teksty; slajd „Kontakt” zostaw jako ostatni i zmień tylko dane osoby (`references/ageno.md`, „Osoby”). Dalsze slajdy kopiuj z przykładowych układów, wypełnij treścią, nieużyte usuń.
    Style i skrypt zostaw (`references/uklady.md`).
 2. Buduj z klas szablonu; nowego CSS jak najmniej i tylko z tokenami (`references/siatka.md`).
 3. Każdy blok oznacz `data-grid` (`32`, `8` albo `32y`), blok o zmiennej wysokości także

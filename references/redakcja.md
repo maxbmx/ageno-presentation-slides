@@ -186,7 +186,8 @@ i siatkę, ale nie ocenią, czy złamanie wiersza wygląda dobrze.
 i zaślepek) i zgłasza fragment z numerem reguły. **Błąd** trzeba poprawić; **uwaga** wymaga
 oceny, bo słowo bywa poprawne w kontekście. Milczenie skryptu nie znaczy, że tekst jest zgodny
 z tą listą. Poza regułami językowymi zgłasza też błąd „akcent”: tekst na wypełnionym tle w kolorze
-akcentu (`references/siatka.md`, „Kolory”, wyróżnienie bez zakreślacza).
+akcentu (`references/siatka.md`, „Kolory”, wyróżnienie bez zakreślacza), oraz błąd „kontakt”: deck
+nie kończy się jednym slajdem „Kontakt” z portretem osoby (`references/uklady.md`, „Kontakt”).
 
 | Zakres | Reguły |
 | --- | --- |
