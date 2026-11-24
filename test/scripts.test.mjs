@@ -11,6 +11,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer } from "node:http";
 import { existsSync, readdirSync } from "node:fs";
+import { readFileSync as readText } from "node:fs";
 import { downloadImage, imageExtension, imagesInSection } from "../scripts/ageno-assets.mjs";
 import { pdfPages } from "../scripts/pdf.mjs";
 import { BLOCKED, downloadTarget, entryProblem, photoId } from "../scripts/photos.mjs";
@@ -212,4 +213,29 @@ test("ageno-assets: downloadImage odrzuca HTML 200, rozszerzenie bierze z Conten
   await assert.rejects(downloadImage(`${base}/gory.svg`, path.join(dir, "ageno-mountains"), ".svg"), /oczekiwany plik \.svg/);
   assert.deepEqual(readdirSync(dir), ["01-logo.png"]);
   assert.equal(existsSync(path.join(dir, "02-logo.svg")), false);
+});
+
+test("text-lint: deck kończy się jednym slajdem „Kontakt” z portretem, inaczej błąd kontakt", (t) => {
+  const dir = tempDir(t);
+  const template = readText(path.join(ROOT, "assets", "template.html"), "utf8");
+  const start = template.indexOf("    <!-- 24. Kontakt");
+  const end = template.indexOf("</section>", start) + "</section>\n".length;
+  assert.ok(start > 0 && end > start, "szablon: slajd 24 „Kontakt”");
+  const contact = template.slice(start, end);
+  const without = template.slice(0, start) + template.slice(end);
+  const second = "    <!-- 2. Teza + 3 liczby -->";
+  const cases = [
+    ["dobry.html", template, 0],
+    ["bez-kontaktu.html", without, 1],
+    ["kontakt-wczesniej.html", without.replace(second, contact + "\n" + second), 1],
+    ["bez-portretu.html", template.replace('<div class="person-photo"', '<div class="person-photo-x"'), 1],
+  ];
+  for (const [name, html, expected] of cases) {
+    const file = path.join(dir, name);
+    writeFileSync(file, html);
+    const r = run("text-lint.mjs", [file]);
+    if (r.status === 1 && NO_BROWSER.test(r.stderr)) return t.skip("brak Playwrighta albo Chromium");
+    assert.equal(r.status, expected, `${name}:\n${r.stdout}`);
+    assert.equal(/BŁĄD reguła kontakt:/.test(r.stdout), expected === 1, name);
+  }
 });

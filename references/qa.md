@@ -26,7 +26,7 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 - [ ] Slajd tytułowy ma duże logo Ageno w lewym górnym rogu, w oryginalnych kolorach,
       i duże góry Ageno po prawej, przycięte prawą i dolną krawędzią slajdu, niezasłaniające tekstu (nie zaślepkę „brak ageno-mountains.svg”).
 - [ ] Slajd „Klienci Ageno”: 8 logotypów SVG z `logos/` bez zmian, równe, 2 pełne wiersze po 4.
-- [ ] Ostatni slajd „Kontakt”: duże logo Ageno w lewym górnym rogu, prawdziwe zdjęcie (nie zaślepka „brak zdjęcia”), służbowy e-mail osoby i info@ageno.pl
+- [ ] Deck kończy się jednym slajdem „Kontakt” (`.slide-contact`), po nim nie ma nic. Ostatni slajd „Kontakt”: duże logo Ageno w lewym górnym rogu, prawdziwe zdjęcie (nie zaślepka „brak zdjęcia”), służbowy e-mail osoby i info@ageno.pl
       z `references/ageno.md`, linki `mailto:` działają, bez numeru telefonu, góry po prawej.
 - [ ] Każdy slajd poza tytułowym i „Kontakt” ma małe logo Ageno w stopce, także w PDF;
       slajdy tytułowy i „Kontakt” mają duże logo i nie mają małego.
