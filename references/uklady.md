@@ -147,7 +147,8 @@ wychodzą poza prawą i dolną krawędź slajdu; niskie zbocza mogą wchodzić p
 ale nie zasłaniają nadtytułu, tytułu ani leadu. Leżą w warstwie `.bleed`, która przycina je do
 slajdu, więc slajd się nie przewija. Logo Ageno w lewym górnym rogu. Nadtytuł,
 tytuł i lead w lewej kolumnie `.title-text` (640 px, x = 0), stopka w lewej kolumnie 416 px, logo klienta opcjonalnie po prawej
-w wierszu logo. Bez pliku gór szablon pokazuje zaślepkę „brak ageno-mountains.svg”: przed
+w wierszu logo. Nadtytuł i tytuł tworzą jeden blok `.stack-tight` bez dodatkowego odstępu.
+Od tego bloku do leadu jest 32 px. Bez pliku gór szablon pokazuje zaślepkę „brak ageno-mountains.svg”: przed
 oddaniem decku plik musi być obok `index.html`.
 
 **Klienci Ageno (logotypy).** Przedostatni slajd, przed kontaktem. Teza „Klienci Ageno”, jedno zdanie
