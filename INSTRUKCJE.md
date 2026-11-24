@@ -54,8 +54,14 @@ Układy (numer slajdu w szablonie): 1 Tytułowy (zawsze pierwszy), 2 Teza + 3 li
   „Rekomendowany”. Role: odpowiada, wspiera, akceptuje, decyduje, rekomenduje.
 - Tło zawsze `#f7f7f7`, tekst `#231430`, jeden akcent `#ff6b00` (`.mark`, znaczniki listy).
   Bez ramek, linii, cieni, zaokrągleń, gradientów, ikon, ilustracji i zdjęć ze stocku. Wyjątki:
-  portret w kole na slajdzie Kontakt, zdjęcie górskie z Unsplash w układzie 15–16 z podpisem
-  `@autor`.
+  portret w kole na slajdzie Kontakt, zdjęcie górskie z Unsplash albo zdjęcie użytkownika
+  (np. zespołu) w układzie 15–16 z podpisem `@autor` albo źródła.
+- Zdjęcie w układzie 15–16 stoi zawsze w osobnej kolumnie na pełną wysokość slajdu: zdjęcie
+  752 × 864 w `<figure class="photo">`, sekcja ma klasę `.photo-left` albo `.photo-right`,
+  tekst w kolumnie 544 px po drugiej stronie. Nie twórz nowej klasy ani struktury na zdjęcie
+  (np. własny pas „panorama”); nie wstawiaj zdjęcia pod tekstem, nad tekstem, w tle ani jako
+  pas na całą szerokość slajdu. Dowolne zdjęcie, które nie mieści się w tym układzie, zostaje
+  poza deckiem, nie dostaje nowego layoutu.
 - Logo Ageno duże tylko na slajdzie tytułowym i Kontakt, bez zmian kolorów i kształtu.
   Logo klienta tylko z pliku od użytkownika; bez pliku wariant bez logo, nie tekst zamiast logo.
 
@@ -114,6 +120,8 @@ Screen dopasuj do ramki układu; nie rozciągaj, nie retuszuj, dane osobowe zas�
 
 - [ ] Każdy slajd: jedna teza, maks. 2 wiersze, suma wysokości ≤ 704 px.
 - [ ] Tylko układy i klasy szablonu, `data-grid` na każdym bloku, bez nowych odstępów spoza 32 px.
+- [ ] Zdjęcie (układ 15–16) tylko w bocznej kolumnie na pełną wysokość, `.photo-left` albo
+  `.photo-right`, nigdy pod tekstem, nad tekstem ani jako pas na całą szerokość.
 - [ ] Pierwszy slajd tytułowy, przedostatni Klienci Ageno, ostatni Kontakt.
 - [ ] Każda liczba ze źródłem, jednostką i okresem; kwoty i sumy się zgadzają.
 - [ ] Daty YYYY-MM-DD, bez myślników, zakazanych słów, „my” i dwukropków w tytułach.
