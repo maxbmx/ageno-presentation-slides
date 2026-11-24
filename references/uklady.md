@@ -8,7 +8,7 @@ sprawdza je przy każdym teście.
 
 | Slajd w szablonie | Układ | Kiedy | Wysokość w kontenerze (704) |
 | --- | --- | --- | --- |
-| 1 | Tytułowy | start, zawsze | logo Ageno (i opcjonalnie klienta) 64 + 128 + nadtytuł + tytuł + lead; tekst w kolumnie 864 po prawej, góry Ageno po lewej |
+| 1 | Tytułowy | start, zawsze | logo Ageno (i opcjonalnie klienta) 64 + 128 + nadtytuł + tytuł + lead; tekst w lewej kolumnie 640, duże góry Ageno po prawej |
 | 2 | Teza + 3 liczby | wyniki, skala | teza 64–128 + 64 + liczba 64 + opis 64 |
 | 3 | Teza + screen (1/3 + 2/3) | funkcja, problem | 128 + 32 + 544 = 704 |
 | 4 | Pełny screen | demo jednego ekranu | 64 + 32 + 608 = 704 (teza w 1 wierszu) |
@@ -140,10 +140,12 @@ górski). Zdjęcie 752 × 864 na pełną wysokość od krawędzi slajdu (`data-g
 - Kilka takich slajdów w decku: zmieniaj stronę zdjęcia między kolejnymi.
 - Dobór zdjęcia, pobieranie, podpis `@autor` i `alt`: `references/zdjecia.md`.
 
-**Tytułowy.** Góry Ageno (`ageno-mountains.svg`, `references/ageno.md`) zawsze po lewej,
-wychodzą poza lewą i dolną krawędź slajdu; leżą w warstwie `.bleed`, która przycina je do
-slajdu, więc slajd się nie przewija. Logo Ageno w lewym górnym rogu nad górami. Nadtytuł,
-tytuł i lead w kolumnie `.title-text` (864 px, x = 560), logo klienta opcjonalnie po prawej
+**Tytułowy.** Góry Ageno (`ageno-mountains.svg`, `references/ageno.md`) zawsze po prawej, duże
+(1216 × 576, ok. 55% szerokości slajdu, jak hero na ageno.pl), wierzchołek na wysokości tytułu,
+wychodzą poza prawą i dolną krawędź slajdu; niskie zbocza mogą wchodzić pod kolumnę tekstu od dołu,
+ale nie zasłaniają nadtytułu, tytułu ani leadu. Leżą w warstwie `.bleed`, która przycina je do
+slajdu, więc slajd się nie przewija. Logo Ageno w lewym górnym rogu. Nadtytuł,
+tytuł i lead w lewej kolumnie `.title-text` (640 px, x = 0), stopka w lewej kolumnie 416 px, logo klienta opcjonalnie po prawej
 w wierszu logo. Bez pliku gór szablon pokazuje zaślepkę „brak ageno-mountains.svg”: przed
 oddaniem decku plik musi być obok `index.html`.
 
