@@ -20,6 +20,12 @@ export const CONTAINER = { x0: 112, x1: 1424, y0: 64, y1: 768, width: 1312, heig
 /** Budżet wysokości treści w kontenerze (references/siatka.md, „Budżet wysokości kontenera”). */
 export const HEIGHT_BUDGET = CONTAINER.height;
 
+/**
+ * Maks. szerokość tekstu ciągłego (p, li, blockquote, dd) łamanego na ≥ 2 wiersze: kolumna
+ * --col-2of3 (references/siatka.md, „Szerokość tekstu”). Sprawdza grid-audit.mjs.
+ */
+export const TEXT_MAX_WIDTH = 864;
+
 /** Stopka: jeden wiersz 32 px na y = 800 (references/siatka.md). */
 export const FOOTER = { y: 800, height: 32 };
 

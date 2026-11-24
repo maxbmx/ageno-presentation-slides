@@ -22,7 +22,8 @@ nie powtarza, więc w każdym kroku otwórz wskazany plik.
    szczegół idzie do leadu albo treści (`references/tresc.md`).
 3. **Jeden plik HTML, działa bez sieci** (`references/nawigacja.md`, „Jeden plik”).
 4. **Siatka 32 px na płótnie 1536 × 864**: każda krawędź bloku i każdy wiersz na kratce
-   (`references/siatka.md`).
+   (`references/siatka.md`); tekst ciągły najwyżej 864 px szerokości, nigdy na cały slajd
+   (`references/siatka.md`, „Szerokość tekstu”).
 5. **Szablon jako start**: slajdy powstają z 24 układów `assets/template.html`, nie od zera
    (`references/uklady.md`).
 6. **Marka Ageno**: tło, kolory i logo według `references/siatka.md` („Kolory”, „Logo”).

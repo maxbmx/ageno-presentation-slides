@@ -37,6 +37,15 @@ na 2 i 3 kolumny z siatki.
 
 Kolumny tylko tokenami. `1fr`, procenty i `gap` spoza tokenów dają szerokości poza siatką.
 
+### Szerokość tekstu
+
+Akapit, lead ani lista punktów nie zajmują pełnej szerokości kontenera (1312 px). Wiersz
+tekstu ciągłego ma najwyżej szerokość `--col-2of3` (864 px, ok. 60–75 znaków przy 24 px)
+albo węższej kolumny. Dłuższą treść dziel na 2–3 kolumny (`.grid-2`, `.grid-3`) albo na
+kilka slajdów. Na pełną szerokość mogą iść tylko: teza `h2` (jeden wiersz), tabele, wiersze
+harmonogramu `.gantt` i tekst jednowierszowy (liczba, krótki podpis). `grid-audit.mjs` zgłasza
+`p`, `li`, `blockquote` i `dd` łamane na ≥ 2 wiersze, gdy wiersz albo blok ma ponad 864 px.
+
 ## Pion
 
 - Odstęp między blokami: 32 px (`.stack`), większe: `.mt-64`, `.mt-96`, `.mt-128`, `.mt-192`.
