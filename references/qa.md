@@ -24,7 +24,7 @@ Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.
 - [ ] Screeny ostre, właściwy fragment widoczny, nic ważnego nie ucięte.
 - [ ] Jeden akcent na slajd, hierarchia czytelna z daleka.
 - [ ] Slajd tytułowy ma duże logo Ageno w lewym górnym rogu, w oryginalnych kolorach,
-      i góry Ageno po lewej, przycięte krawędzią slajdu (nie zaślepkę „brak ageno-mountains.svg”).
+      i duże góry Ageno po prawej, przycięte prawą i dolną krawędzią slajdu, niezasłaniające tekstu (nie zaślepkę „brak ageno-mountains.svg”).
 - [ ] Slajd „Klienci Ageno”: 8 logotypów SVG z `logos/` bez zmian, równe, 2 pełne wiersze po 4.
 - [ ] Ostatni slajd „Kontakt”: duże logo Ageno w lewym górnym rogu, prawdziwe zdjęcie (nie zaślepka „brak zdjęcia”), służbowy e-mail osoby i info@ageno.pl
       z `references/ageno.md`, linki `mailto:` działają, bez numeru telefonu, góry po prawej.

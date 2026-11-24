@@ -33,7 +33,7 @@ na 2 i 3 kolumny z siatki.
 | `.grid-2` → `--col-2` | 640 | 20 | dwie kolumny |
 | `.grid-3` → `--col-3` | 416 | 13 | trzy kolumny, liczby, kroki |
 | `.grid-1-2` / `.grid-2-1` | 416 + 864 | 13 + 27 | tekst + screen |
-| `.w-2of3` | 864 | 27 | węższa kolumna tekstu (tytułowy, rekomendacja) |
+| `.w-2of3` | 864 | 27 | węższa kolumna tekstu (rekomendacja) |
 
 Kolumny tylko tokenami. `1fr`, procenty i `gap` spoza tokenów dają szerokości poza siatką.
 
@@ -206,7 +206,7 @@ oznaczenia. Tryb diagnostyczny: klawisz `G` albo adres `#siatka`.
 | Żadnych linii podziału, ramek i cieni | odstęp i biel wystarczą; linie spychają bloki z siatki |
 | Tło każdego slajdu zawsze `#f7f7f7`, bez pasów; wolne pola okna czarne | spójny wygląd wszystkich prezentacji; slajd odcina się od reszty ekranu |
 | Kratka w tle ukryta (`--grid-line: transparent`), kod zostaje | czysty slajd; podgląd klawiszem `G` |
-| Slajd tytułowy z górami Ageno po lewej, wychodzącymi poza slajd; tekst w kolumnie po prawej | grafika z ageno.pl łączy deck z marką |
+| Slajd tytułowy z dużymi górami Ageno po prawej, wychodzącymi poza prawą i dolną krawędź; tekst w lewej kolumnie 640 | grafika z ageno.pl łączy deck z marką |
 | Przedostatni slajd z 8 logotypami klientów z `logos/`, pliki bez zmian | dowód skali; równe obszary robocze dają równe logotypy |
 | Ostatni slajd „Kontakt” z portretem w kole i górami Ageno po prawej | rozmowa kończy się konkretną osobą; koło to kadr zdjęcia, jedyny wyjątek od zakazu zaokrągleń |
 | Kolory z logo Ageno: tekst `#231430`, akcent `#ff6b00` | prezentacja rozpoznawalna jako Ageno, spójna z logo |

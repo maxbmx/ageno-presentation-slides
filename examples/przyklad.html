@@ -261,26 +261,27 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
 .brand-logo svg { display: block; height: 64px; width: auto; }
 /* Logo klienta (opcjonalne): slajd tytułowy, ten sam wiersz co logo Ageno, wyrównane do prawej */
 .title-client-logo { position: absolute; top: 0; right: 0; height: 64px; width: auto; max-width: 416px; object-fit: contain; }
-/* Góry Ageno na slajdzie tytułowym: po lewej, wychodzą poza lewą i dolną krawędź slajdu.
+/* Góry Ageno na slajdzie tytułowym: duże, po prawej (jak hero na ageno.pl), ok. 55% szerokości
+   slajdu; wychodzą poza prawą i dolną krawędź (spad), wierzchołek na wysokości tytułu h1.
    Grafika: ageno-mountains.svg (scripts/ageno-assets.mjs), proporcje bez zmian.
-   Tekst tytułowy przesunięty w prawo, do kolumny 864 px (x 560). */
+   Tekst tytułowy w lewej kolumnie 640 px (x 0); niskie zbocza mogą wchodzić pod nią od dołu. */
 /* Warstwa przycinająca grafikę do slajdu: grafika wychodzi poza krawędź, ale slajd się nie przewija */
 .bleed { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
 .title-mountains {
   position: absolute;
-  left: -96px;
-  bottom: -64px;
-  width: 656px;
-  height: 640px;
+  right: -288px;
+  bottom: -32px;
+  width: 1216px;
+  height: 576px;
   object-fit: contain;
-  object-position: left bottom;
+  object-position: right bottom;
   pointer-events: none;
 }
 .title-mountains-missing {
   position: absolute;
-  left: 0;
+  right: 0;
   bottom: 0;
-  width: 528px;
+  width: 768px;
   height: 448px;
   display: flex;
   align-items: center;
@@ -291,7 +292,8 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
   font-size: var(--fs-meta);
   line-height: var(--lh-meta);
 }
-.title-text { margin-left: 448px; width: var(--col-2of3); }
+.title-text { width: var(--col-2); }
+.slide-title .slide-footer { width: var(--col-3); }   /* stopka po lewej, z dala od gór */
 
 /* Slajd kontaktowy: te same góry Ageno po prawej, wychodzą poza prawą i dolną krawędź. */
 .contact-mountains {
@@ -627,7 +629,7 @@ h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: va
          Fakty o Ageno tylko z references/ageno.md. Układy skopiowane z assets/template.html (numer w komentarzu). -->
 
     <!-- 1. Tytułowy -->
-    <section data-slide class="slide is-active" aria-hidden="false">
+    <section data-slide class="slide slide-title is-active" aria-hidden="false">
       <div class="bleed" aria-hidden="true">
         <img class="title-mountains" src="ageno-mountains.svg" alt="" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
         <div class="title-mountains-missing" hidden>brak ageno-mountains.svg</div>
