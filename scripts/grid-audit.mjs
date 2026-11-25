@@ -15,6 +15,9 @@
  *  - tekst ciągły (p, li, blockquote, dd w kontenerze) łamany na ≥ 2 wiersze: najszerszy wiersz
  *    (Range.getClientRects) i szerokość bloku najwyżej TEXT_MAX_WIDTH (864 px, references/siatka.md,
  *    „Szerokość tekstu”); pomija tabele, stopkę i elementy z display grid/flex (np. wiersze .gantt),
+ *  - rozmiar czcionki każdego tekstu: jeden z tokenów --fs-* (czytanych z :root), nie ręcznie
+ *    dobrany rozmiar jako obejście budżetu wysokości 704 px (references/siatka.md, „Typografia”
+ *    i „Budżet wysokości kontenera”); poza <strong> i stopką,
  *  - stopka na y = 800,
  *  - brak przewijania slajdu (grafiki wychodzące poza slajd umieszczaj w warstwie .bleed z szablonu
  *    albo oznacz atrybutem data-bleed; obie formy audyt traktuje tak samo).
@@ -50,6 +53,18 @@ const result = await page.evaluate(({ CONTAINER, FOOTER, GRID, TEXT_MAX_WIDTH })
   };
   const slides = [...document.querySelectorAll("[data-slide]")];
   const report = [];
+
+  // Rozmiary czcionki dozwolone przez skalę tokenów (references/siatka.md, „Typografia”):
+  // czytane na żywo z custom properties --fs-* w :root, żeby nie dublować listy ręcznie.
+  const rootStyle = getComputedStyle(document.documentElement);
+  const fsTokens = new Set();
+  for (let i = 0; i < rootStyle.length; i += 1) {
+    const prop = rootStyle[i];
+    if (prop.startsWith("--fs-")) {
+      const v = parseFloat(rootStyle.getPropertyValue(prop));
+      if (!Number.isNaN(v)) fsTokens.add(Math.round(v));
+    }
+  }
 
   slides.forEach((slide, i) => {
     const problems = [];
@@ -116,6 +131,21 @@ const result = await page.evaluate(({ CONTAINER, FOOTER, GRID, TEXT_MAX_WIDTH })
       if (Number.isNaN(v) || v < M - TOL || off(v, M) > TOL) lh.add(`${el.tagName.toLowerCase()} line-height ${getComputedStyle(el).lineHeight}`);
     }
     problems.push(...lh);
+
+    // Rozmiar czcionki jako obejście budżetu wysokości (704 px, „Budżet wysokości kontenera”):
+    // każdy rozmiar ma być jednym z tokenów --fs-*, nie dobrany ręcznie, żeby zmieścić treść.
+    const fs = new Set();
+    const fsWalker = document.createTreeWalker(slide, NodeFilter.SHOW_TEXT);
+    while (fsWalker.nextNode()) {
+      const node = fsWalker.currentNode;
+      const el = node.parentElement;
+      if (!node.textContent.trim() || el.closest("strong, script, style, .slide-footer, .deck-nav")) continue;
+      const v = parseFloat(getComputedStyle(el).fontSize);
+      if (!fsTokens.has(Math.round(v))) {
+        fs.add(`${el.tagName.toLowerCase()} font-size ${v.toFixed(1)}px nie pasuje do skali tokenów (references/siatka.md, „Typografia”): prawdopodobne ręczne zmniejszenie, żeby zmieścić treść zamiast ją skrócić`);
+      }
+    }
+    problems.push(...fs);
 
     // Granice kontenera: wszystkie elementy poza kontenerem; potomek już zgłoszonego elementu
     // nie jest zgłaszany drugi raz, żeby jeden za duży blok nie dawał kilkudziesięciu wierszy.
