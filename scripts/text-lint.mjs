@@ -3,15 +3,18 @@
  * Kontrola tekstu slajdów według references/redakcja.md.
  * Czyta widoczny tekst każdego slajdu (bez treści cytatów i zaślepek) i zgłasza fragmenty
  * z numerem reguły. BŁĄD = do poprawienia, UWAGA = do oceny w kontekście.
- * Sprawdza reguły 5, 6, 7, 10, 11, 12 (błąd w nagłówkach, uwaga w treści akapitów), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
- * 36 (tytuł slajdu dłuższy niż 5 słów), wycinek S3 (lista czasowników w 1. os. lm.), format dat
- * oraz tekst na wypełnionym tle w kolorze akcentu (pomarańczowy prostokąt pod tekstem,
- * references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
+ * Sprawdza reguły 3, 4, 5, 6, 7, 10, 11, 12 (błąd w nagłówkach, uwaga w treści akapitów),
+ * 13 (uwaga, heurystyka DOM: więcej niż 3 pogrubienia na slajdzie), 16, 17, 18, 20, 21, 22,
+ * 23, 28, 31, 32, 33, 34, 35, 36 (tytuł slajdu dłuższy niż 5 słów), wycinek S3 (lista
+ * czasowników w 1. os. lm.), format dat oraz tekst na wypełnionym tle w kolorze akcentu
+ * (pomarańczowy prostokąt pod tekstem, references/siatka.md, „Kolory”). Reguły 3, 4, 18, 22
+ * i 13 sprawdza tylko częściowo (wymienione frazy / słowa albo próg liczby pogrubień, nie
+ * pełne znaczenie reguły). Lista ma być zgodna z references/redakcja.md.
  * Dla całego decku (błąd „kontakt”, wiersz bez wcięcia po slajdach): ostatni [data-slide] musi mieć
  * klasę slide-contact i portret osoby (.person .person-photo), działające linki mailto: do
  * służbowego e-maila osoby i do info@ageno.pl, i żadnego numeru telefonu w tekście slajdu;
  * wcześniej slide-contact nie może wystąpić (references/uklady.md, „Kontakt”; references/qa.md).
- * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
+ * Nie sprawdza reguł 8, 9, 14, 15, 19, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
  * Użycie: node scripts/text-lint.mjs prezentacja.html
@@ -62,8 +65,10 @@ const slides = await page.evaluate(() => {
     const title = [...slide.querySelectorAll("h1, h2")]
       .map((el) => (el.closest(SKIP) ? "" : visibleText(el)))
       .find(Boolean) || null;
+    const strongCount = [...slide.querySelectorAll("strong")].filter((el) => !el.closest(SKIP) && visibleText(el)).length;
     return {
       title,
+      strongCount,
       blocks: [...blocks].map(([el, text]) => ({
         heading: el.matches("h1, h2, h3, .title, .eyebrow"),
         text: text.replace(/\s+/g, " ").trim(),
@@ -94,7 +99,11 @@ await browser.close();
 const W = "[\\p{L}\\p{N}]"; // znak słowa z polskimi literami
 const word = (stem) => new RegExp(`(?<!${W})(${stem})(?!${W})`, "iu");
 const rules = [
-  // [reguła, poziom, wzorzec, opis, tylko nagłówki]
+  // [reguła, poziom, wzorzec, opis, tylko nagłówki, tylko treść]
+  ["3", "błąd", word("podkreślając|zapewniając|umożliwiając"), "doczepiony imiesłów bez nowego faktu"],
+  ["4", "błąd", word("eksperci uważają|badania pokazują"), "ogólnikowe źródło: podaj źródło albo usuń zdanie"],
+  ["18", "błąd", /mam nadzieję,? że to (pomoże|pomogło)|daj znać,? jeśli/iu, "zwrot czatbota"],
+  ["22", "błąd", word("to otwiera nowe możliwości"), "ogólne zakończenie bez konkretnego planu lub faktu"],
   ["5", "błąd", word("dodatkowo|kluczow\\p{L}*|kompleksow\\p{L}*|innowacyjn\\p{L}*|holistyczn\\p{L}*|synergi\\p{L}*|ekosystem\\p{L}*|krajobraz\\p{L}*|unikaln\\p{L}*|przełomow\\p{L}*|wartoś\\p{L}* dodan\\p{L}*|w dzisiejszych czasach"), "słowo typowe dla AI"],
   ["5", "błąd", word("additionally|crucial|delve\\p{L}*|enhanc\\p{L}*|foster\\p{L}*|landscape|pivotal|showcas\\p{L}*|testament|underscor\\p{L}*|vibrant"), "słowo typowe dla AI (EN)"],
   ["6", "błąd", word("stanowi(?!sk)\\p{L}*|pełni\\p{L}* rolę|może pochwalić się"), "zamiast „jest” / „ma”"],
@@ -128,10 +137,14 @@ if (!slides.length) {
   process.exit(1);
 }
 
+const STRONG_LIMIT = 3; // heurystyka DOM: więcej pogrubień na slajdzie zwykle znaczy, że każda nazwa własna i skrót są pogrubione
 let errors = 0;
 let warnings = 0;
-slides.forEach(({ blocks, title }, i) => {
+slides.forEach(({ blocks, title, strongCount }, i) => {
   const found = [];
+  if (strongCount > STRONG_LIMIT) {
+    found.push(["uwaga", "13", `${strongCount} pogrubień na slajdzie: sprawdź, czy nie pogrubiasz każdej nazwy własnej i skrótu`, title || "", String(strongCount)]);
+  }
   for (const { heading, text, onAccent } of blocks) {
     if (onAccent) {
       found.push(["błąd", "akcent", "tekst na wypełnionym tle w kolorze akcentu; wyróżnij rozmiarem, grubością albo .mark (kreska)", text, text]);

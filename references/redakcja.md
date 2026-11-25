@@ -193,12 +193,14 @@ służbowego e-maila osoby i do `info@ageno.pl`, i bez numeru telefonu (`referen
 
 | Zakres | Reguły |
 | --- | --- |
-| Sprawdza (błąd) | 5, 6, 7, 11, 12 (nagłówki), 16, 17, 20, 31, 32, 34, 35, 36, daty |
-| Sprawdza (uwaga) | 10, 12 (treść akapitów), 21, 23, 28, 33 |
-| Sprawdza tylko częściowo | S3: tylko lista typowych czasowników w 1. osobie liczby mnogiej (np. „zrobimy”, „proponujemy”, formy na „-liśmy”); reguły 5, 6, 20, 23, 28, 31–34: tylko słowa wymienione w regule |
-| Nie sprawdza | 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 oraz S1, S2, S4–S7 |
+| Sprawdza (błąd) | 3, 4, 5, 6, 7, 11, 12 (nagłówki), 16, 17, 18, 20, 22, 31, 32, 34, 35, 36, daty |
+| Sprawdza (uwaga) | 10, 12 (treść akapitów), 13, 21, 23, 28, 33 |
+| Sprawdza tylko częściowo | 3: tylko doczepione imiesłowy z przykładu reguły („podkreślając”, „zapewniając”, „umożliwiając”); 4: tylko frazy „eksperci uważają”, „badania pokazują”; 13: heurystyka DOM — uwaga przy więcej niż 3 pogrubieniach na slajdzie, nie ocena, czy pogrubienie jest zasadne; 18: tylko frazy z przykładu reguły; 22: tylko fraza „to otwiera nowe możliwości”; S3: tylko lista typowych czasowników w 1. osobie liczby mnogiej (np. „zrobimy”, „proponujemy”, formy na „-liśmy”); reguły 5, 6, 20, 23, 28, 31–34: tylko słowa wymienione w regule |
+| Nie sprawdza | 8, 9, 14, 15, 19, 24, 25, 26, 27, 29, 30 oraz S1, S2, S4–S7 |
 | Nie czyta | `alt`, `<title>`, `aria-label`, treść `blockquote` |
 
-Reguły z wiersza „Nie sprawdza”, resztę S3 i teksty z wiersza „Nie czyta” sprawdź czytając cały deck.
-Dwukropek w treści (reguła 12) linter tylko zgłasza jako uwagę do oceny w kontekście — nie zgaduje,
-czy poprzedza listę lub przykład (dozwolone) czy łączy zdanie (niedozwolone).
+Reguły z wiersza „Nie sprawdza”, resztę reguł z wiersza „Sprawdza tylko częściowo” i teksty
+z wiersza „Nie czyta” sprawdź czytając cały deck. Dwukropek w treści (reguła 12) i liczba
+pogrubień (reguła 13) linter zgłasza tylko jako uwagę do oceny w kontekście — nie zgaduje,
+czy dwukropek poprzedza listę lub przykład (dozwolone) czy łączy zdanie (niedozwolone), ani
+czy pogrubienie jest uzasadnione.
