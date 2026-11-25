@@ -53,6 +53,10 @@ skrypty, testy i przykłady przygotowane na fikcyjnych danych.
   w całości przez automat (`grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs`,
   `references/qa.md`, sekcja „Automat”), żeby złapać błędy sprzed Twojej zmiany, a nie
   tylko te, które sam wprowadzisz. Istniejące błędy zgłoś, zanim zaczniesz poprawkę.
+- Po każdej zmianie w `scripts/` albo `references/` przepuść `examples/przyklad.html` przez
+  cały automat (`grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs`, `pdf.mjs`, kod 0
+  każdego), nie tylko `assets/template.html`: przykład ma inną treść i nie wszystkie 24
+  układy, więc łapie regresje, których szablon sam nie pokaże.
 
 ## Pliki skilla
 
