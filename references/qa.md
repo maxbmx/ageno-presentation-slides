@@ -11,7 +11,8 @@ i „Umowa CLI”. Uruchamiaj na złożonym pliku z `dist/`.
 - [ ] `grid-audit.mjs`: kod 0.
 - [ ] `text-lint.mjs`: kod 0, każda uwaga oceniona (co skrypt sprawdza:
       `references/redakcja.md`, „Kontrola automatyczna”).
-- [ ] `qa-html-deck.mjs`: kod 0 we wszystkich czterech oknach.
+- [ ] `qa-html-deck.mjs`: kod 0 we wszystkich czterech oknach (przepełnienia, nawigacja,
+      dostępność: alt w obrazach, widoczny fokus strzałek, `prefers-reduced-motion`).
 - [ ] `pdf.mjs`: kod 0 (stron tyle, ile slajdów, każda 1152 × 648 pt), PDF obejrzany według punktu 3.
 - [ ] Po zmianie `assets/template.html` albo `references/uklady.md`: `uklady-sync.mjs` kod 0 (katalog układów zgodny z szablonem).
 - [ ] Kod 2 oznacza złe wywołanie: popraw polecenie, nie deck.

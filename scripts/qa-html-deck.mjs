@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
  * Smoke-test prezentacji HTML: przepełnienia, nawigacja (strzałki, krańce, autoukrywanie),
- * błędy konsoli i zrzut każdego slajdu w każdym oknie. Raport: <out>/qa-report.json.
+ * dostępność (alt w obrazach, widoczny fokus strzałek, `prefers-reduced-motion`), błędy
+ * konsoli i zrzut każdego slajdu w każdym oknie. Raport: <out>/qa-report.json.
  *
  * Użycie: node scripts/qa-html-deck.mjs prezentacja.html [--out katalog] [--viewports 1600x900,1366x768,1280x720,1280x800]
  * Domyślne okna: QA_VIEWPORTS z constants.mjs.
  * Domyślne --out: qa/ obok pliku HTML.
- * Kod wyjścia: 0 = bez problemów, 1 = przepełnienie, błąd nawigacji albo konsoli,
+ * Kod wyjścia: 0 = bez problemów, 1 = przepełnienie, błąd nawigacji, dostępności albo konsoli,
  * 2 = złe wywołanie, także zły --viewports (scripts/cli.mjs), przed uruchomieniem przeglądarki.
  * Wymaga: npm install && npx playwright install chromium
  */
@@ -61,7 +62,15 @@ try {
     const activeCount = async () => page.locator('[data-slide].is-active').count();
     if (await activeCount() !== 1) throw new Error(`Oczekiwany dokładnie jeden aktywny slajd, jest ${await activeCount()}.`);
 
-    const viewportReport = { viewport: viewport.label, slides: slideCount, screenshots: [], overflow: [], consoleErrors: [], navigation: [] };
+    const viewportReport = { viewport: viewport.label, slides: slideCount, screenshots: [], overflow: [], consoleErrors: [], navigation: [], accessibility: [] };
+
+    // Obrazy bez atrybutu alt: niezależne od okna, sprawdzane raz, na pierwszym.
+    if (viewport === viewports[0]) {
+      const missingAlt = await page.evaluate(() => [...document.images]
+        .filter((img) => !img.hasAttribute('alt'))
+        .map((img) => img.getAttribute('src') || '(bez src)'));
+      if (missingAlt.length) report.errors.push({ accessibility: missingAlt.map((src) => `obraz bez atrybutu alt: ${src}`) });
+    }
 
     // Autoukrywanie strzałek, raz na okno.
     const nextButton = page.locator('button[data-nav="next"]');
@@ -85,6 +94,20 @@ try {
       }
       await page.mouse.move(-1, -1);
       await page.waitForTimeout(AFTER_HIDE);
+
+      // Widoczny fokus klawiatury na strzałkach (references/nawigacja.md, „Strzałki”).
+      for (const [label, button] of [['Następny', nextButton], ['Poprzedni', prevButton]]) {
+        if (await button.isDisabled().catch(() => false)) continue;
+        await button.focus();
+        await page.waitForTimeout(AFTER_TRANSITION);
+        const focusStyle = await button.evaluate((el) => {
+          const cs = getComputedStyle(el);
+          return { outlineWidth: Number.parseFloat(cs.outlineWidth), outlineStyle: cs.outlineStyle, opacity: Number.parseFloat(cs.opacity) };
+        });
+        if (focusStyle.opacity < 0.5) viewportReport.accessibility.push(`Strzałka „${label}” niewidoczna przy fokusie klawiatury.`);
+        if (focusStyle.outlineStyle === 'none' || focusStyle.outlineWidth === 0) viewportReport.accessibility.push(`Strzałka „${label}” bez widocznej obwódki fokusu (outline) przy fokusie klawiatury.`);
+      }
+      await page.evaluate(() => document.activeElement?.blur());
     }
 
     // Strzałki ukryte tylko na zrzutach; nawigację sprawdza osobny krok.
@@ -151,8 +174,31 @@ try {
     viewportReport.consoleErrors = consoleErrors;
     if (consoleErrors.length) report.errors.push({ viewport: viewport.label, consoleErrors });
     if (viewportReport.navigation.length) report.errors.push({ viewport: viewport.label, navigation: viewportReport.navigation });
+    if (viewportReport.accessibility.length) report.errors.push({ viewport: viewport.label, accessibility: viewportReport.accessibility });
     report.viewports.push(viewportReport);
     await context.close();
+  }
+
+  // prefers-reduced-motion: przejście bez transform, sam krótki zanik (references/nawigacja.md, „Przejście”).
+  {
+    const reducedContext = await browser.newContext({
+      viewport: { width: viewports[0].width, height: viewports[0].height },
+      reducedMotion: 'reduce',
+    });
+    const reducedPage = await reducedContext.newPage();
+    await reducedPage.goto(pathToFileURL(htmlPath).href, { waitUntil: 'load' });
+    await reducedPage.evaluate(() => document.fonts?.ready);
+    await reducedPage.waitForTimeout(250);
+    if (await reducedPage.locator('[data-slide]').count() > 1) {
+      await reducedPage.keyboard.press('ArrowRight');
+      await reducedPage.waitForTimeout(60);
+      const transforms = await reducedPage.evaluate(() => [...document.querySelectorAll('[data-slide]')]
+        .map((el) => getComputedStyle(el).transform)
+        .filter((t) => t && t !== 'none'));
+      if (transforms.length) report.errors.push({ accessibility: ['prefers-reduced-motion: slajd nadal się przesuwa (transform), oczekiwany sam zanik bez ruchu.'] });
+      await reducedPage.waitForTimeout(300);
+    }
+    await reducedContext.close();
   }
 } catch (error) {
   report.errors.push({ fatal: error.message });
@@ -163,6 +209,6 @@ try {
 const reportPath = path.join(outDir, 'qa-report.json');
 await (await import('node:fs/promises')).writeFile(reportPath, JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
-const failed = report.errors.length || report.viewports.some((v) => v.overflow?.length || v.consoleErrors?.length || v.navigation?.length);
+const failed = report.errors.length || report.viewports.some((v) => v.overflow?.length || v.consoleErrors?.length || v.navigation?.length || v.accessibility?.length);
 console.log(failed ? `\nQA: są problemy, raport: ${reportPath}` : `\nQA: bez problemów, raport i zrzuty: ${outDir}`);
 process.exit(failed ? 1 : 0);
