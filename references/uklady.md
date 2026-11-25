@@ -208,5 +208,7 @@ biała `.card` albo odstęp, nigdy kolorowe tło.
 ## Nowy układ
 
 Gdy żaden z 24 nie pasuje: zbuduj go z klas siatki (`references/siatka.md`), dodaj jako
-kolejny przykładowy slajd do `assets/template.html`, dopisz wiersz do katalogu i uruchom
-audyt siatki.
+kolejny przykładowy slajd do `assets/template.html` z komentarzem `<!-- N. Nazwa -->`,
+dopisz wiersz do katalogu wyżej z tą samą nazwą (ewentualny dopisek w nawiasie albo po
+dwukropku zostaje tylko w komentarzu szablonu) i uruchom audyt siatki oraz
+`node scripts/uklady-sync.mjs`, żeby katalog i szablon się nie rozjechały.

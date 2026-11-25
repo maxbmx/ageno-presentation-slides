@@ -55,9 +55,9 @@ Skróty `npm run` (argumenty po `--`, np. `npm run grid -- dist/plik.html`):
 | --- | --- |
 | `npm test` | testy `test/*.test.mjs` przez `node --test`: parser logotypów, odczyt PDF, kody `inline-assets.mjs`, reguły lintera (test lintera jest pomijany bez Playwrighta) |
 | `npm run check` | `node --check` wszystkich skryptów |
-| `npm run verify` | `grid-audit.mjs` i `text-lint.mjs` na `assets/template.html` (oczekiwane: kod 0) |
+| `npm run verify` | `grid-audit.mjs`, `text-lint.mjs` i `uklady-sync.mjs` na `assets/template.html` (oczekiwane: kod 0) |
 | `npm run assets`, `screens`, `photos`, `inline` | `ageno-assets.mjs`, `screenshots.mjs`, `photos.mjs`, `inline-assets.mjs` |
-| `npm run grid`, `lint`, `qa`, `pdf` | `grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs`, `pdf.mjs` |
+| `npm run grid`, `lint`, `qa`, `pdf`, `uklady` | `grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs`, `pdf.mjs`, `uklady-sync.mjs` |
 | `npm run browsers` | `playwright install chromium` |
 
 ```bash
@@ -119,6 +119,14 @@ node scripts/pdf.mjs dist/2026-11-16-klient-temat.html --out dist/2026-11-16-kli
 
 - `pdf.mjs` drukuje plik przez Playwright (`preferCSSPageSize`, tło drukowane) i sprawdza, że liczba stron równa się liczbie slajdów, a każda strona ma MediaBox 1152 × 648 pt (16 × 9 cali). Kod 1 przy niezgodności; PDF zostaje zapisany do obejrzenia. Domyślne `--out`: plik `.pdf` obok HTML.
 
+Katalog układów (bez Playwrighta, bez argumentów, sprawdza zawsze `assets/template.html` i `references/uklady.md`):
+
+```bash
+node scripts/uklady-sync.mjs
+```
+
+- `uklady-sync.mjs` porównuje 24 numerowane komentarze układów (`<!-- N. Nazwa -->`) w `assets/template.html` z katalogiem w `references/uklady.md`: ten sam zestaw numerów, w tej samej kolejności, z tą samą nazwą układu. Łapie rozjazd po dodaniu, usunięciu albo zmianie nazwy układu w jednym pliku bez drugiego. Kod 1 przy niezgodności, z listą różnic.
+
 ## Umowa CLI
 
 Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/cli.mjs`: `parseCli` dla argumentów, `launchChromium` dla przeglądarki):
@@ -139,3 +147,4 @@ Wszystkie skrypty w `scripts/` mają tę samą umowę (wspólny moduł `scripts/
 | `text-lint.mjs` | `prezentacja.html` |
 | `qa-html-deck.mjs` | `prezentacja.html [--out katalog] [--viewports SZERxWYS,…]` |
 | `pdf.mjs` | `prezentacja.html [--out plik.pdf]` |
+| `uklady-sync.mjs` | bez argumentów (wyjątek od reguły pliku wejściowego: sprawdza zawsze `assets/template.html` i `references/uklady.md`) |

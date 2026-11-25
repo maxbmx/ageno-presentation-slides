@@ -13,6 +13,7 @@ i „Umowa CLI”. Uruchamiaj na złożonym pliku z `dist/`.
       `references/redakcja.md`, „Kontrola automatyczna”).
 - [ ] `qa-html-deck.mjs`: kod 0 we wszystkich czterech oknach.
 - [ ] `pdf.mjs`: kod 0 (stron tyle, ile slajdów, każda 1152 × 648 pt), PDF obejrzany według punktu 3.
+- [ ] Po zmianie `assets/template.html` albo `references/uklady.md`: `uklady-sync.mjs` kod 0 (katalog układów zgodny z szablonem).
 - [ ] Kod 2 oznacza złe wywołanie: popraw polecenie, nie deck.
 
 Brak Playwrighta: powiedz o tym wprost i opisz, co sprawdzono inaczej.

@@ -10,13 +10,14 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "check": "node -e \"for (const f of require('fs').readdirSync('scripts').filter((f) => f.endsWith('.mjs'))) require('child_process').execFileSync(process.execPath, ['--check', 'scripts/' + f], { stdio: 'inherit' })\"",
-    "verify": "node scripts/grid-audit.mjs assets/template.html && node scripts/text-lint.mjs assets/template.html",
+    "verify": "node scripts/grid-audit.mjs assets/template.html && node scripts/text-lint.mjs assets/template.html && node scripts/uklady-sync.mjs",
     "assets": "node scripts/ageno-assets.mjs",
     "screens": "node scripts/screenshots.mjs",
     "photos": "node scripts/photos.mjs",
     "inline": "node scripts/inline-assets.mjs",
     "grid": "node scripts/grid-audit.mjs",
     "lint": "node scripts/text-lint.mjs",
+    "uklady": "node scripts/uklady-sync.mjs",
     "qa": "node scripts/qa-html-deck.mjs",
     "pdf": "node scripts/pdf.mjs",
     "browsers": "playwright install chromium"
