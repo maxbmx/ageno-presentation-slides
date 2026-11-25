@@ -48,6 +48,11 @@ skrypty, testy i przykłady przygotowane na fikcyjnych danych.
   i pełny `git diff --cached`. Przed pushem sprawdź wszystkie wychodzące commity,
   także wcześniejsze lokalne commity. Jeśli zawierają materiały wykluczone powyżej
   albo zmiany spoza zlecenia, wstrzymaj push i przygotuj czystą gałąź.
+- Dostajesz czasem gotowy plik HTML spoza tego workflow (np. deck przekazany do poprawki,
+  nie zbudowany od `assets/template.html` krok po kroku). Zanim go edytujesz, przepuść go
+  w całości przez automat (`grid-audit.mjs`, `text-lint.mjs`, `qa-html-deck.mjs`,
+  `references/qa.md`, sekcja „Automat”), żeby złapać błędy sprzed Twojej zmiany, a nie
+  tylko te, które sam wprowadzisz. Istniejące błędy zgłoś, zanim zaczniesz poprawkę.
 
 ## Pliki skilla
 
