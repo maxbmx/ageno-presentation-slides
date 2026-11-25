@@ -3,7 +3,7 @@
  * Kontrola tekstu slajdów według references/redakcja.md.
  * Czyta widoczny tekst każdego slajdu (bez treści cytatów i zaślepek) i zgłasza fragmenty
  * z numerem reguły. BŁĄD = do poprawienia, UWAGA = do oceny w kontekście.
- * Sprawdza reguły 5, 6, 7, 10, 11, 12 (tylko nagłówki), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
+ * Sprawdza reguły 5, 6, 7, 10, 11, 12 (błąd w nagłówkach, uwaga w treści akapitów), 16, 17, 20, 21, 23, 28, 31, 32, 33, 34, 35,
  * 36 (tytuł slajdu dłuższy niż 5 słów), wycinek S3 (lista czasowników w 1. os. lm.), format dat
  * oraz tekst na wypełnionym tle w kolorze akcentu (pomarańczowy prostokąt pod tekstem,
  * references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
@@ -106,6 +106,7 @@ const rules = [
   ["11", "błąd", /(?<!\p{N}) – | - |(?<=\p{N}) – (?!\p{N})| [–-]$|^[–-] /u, "myślnik zamiast kropki lub przecinka"],
   ["11", "błąd", /[()]/u, "nawias"],
   ["12", "błąd", /:/u, "dwukropek w tytule lub nagłówku", true],
+  ["12", "uwaga", /:/u, "dwukropek w treści akapitu: czy zdanie da się przeformułować bez niego?", false, true],
   ["16", "błąd", /\p{Extended_Pictographic}/u, "emoji"],
   ["17", "błąd", /[„”“‘’«»]/u, "cudzysłów inny niż prosty"],
   ["20", "błąd", word("w celu|należy zauważyć|warto zauważyć|warto podkreślić"), "wypełniacz"],
@@ -136,8 +137,9 @@ slides.forEach(({ blocks, title }, i) => {
       found.push(["błąd", "akcent", "tekst na wypełnionym tle w kolorze akcentu; wyróżnij rozmiarem, grubością albo .mark (kreska)", text, text]);
       continue;
     }
-    for (const [id, level, re, label, headingOnly] of rules) {
+    for (const [id, level, re, label, headingOnly, bodyOnly] of rules) {
       if (headingOnly && !heading) continue;
+      if (bodyOnly && heading) continue;
       if (id === "33" && /^w zakresie$/iu.test(text)) continue; // nagłówek układu „Zakres”
       const m = text.match(re);
       if (m) found.push([level, id, label, text, m[0]]);
