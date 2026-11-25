@@ -8,8 +8,9 @@
  * oraz tekst na wypełnionym tle w kolorze akcentu (pomarańczowy prostokąt pod tekstem,
  * references/siatka.md, „Kolory”). Lista ma być zgodna z references/redakcja.md.
  * Dla całego decku (błąd „kontakt”, wiersz bez wcięcia po slajdach): ostatni [data-slide] musi mieć
- * klasę slide-contact i portret osoby (.person .person-photo), a wcześniej slide-contact nie może
- * wystąpić (references/uklady.md, „Kontakt”).
+ * klasę slide-contact i portret osoby (.person .person-photo), działające linki mailto: do
+ * służbowego e-maila osoby i do info@ageno.pl, i żadnego numeru telefonu w tekście slajdu;
+ * wcześniej slide-contact nie może wystąpić (references/uklady.md, „Kontakt”; references/qa.md).
  * Nie sprawdza reguł 3, 4, 8, 9, 13, 14, 15, 18, 19, 22, 24, 25, 26, 27, 29, 30 ani S1, S2, S4–S7;
  * nie czyta alt, <title> ani aria-label. Nie zastępuje czytania.
  *
@@ -70,14 +71,22 @@ const slides = await page.evaluate(() => {
     };
   });
 });
-// Slajd zamykający „Kontakt”: zawsze ostatni, tylko jeden, z portretem osoby.
+// Slajd zamykający „Kontakt”: zawsze ostatni, tylko jeden, z portretem osoby,
+// z działającymi linkami mailto: (osoba i info@ageno.pl) i bez numeru telefonu.
 const contact = await page.evaluate(() => {
   const all = [...document.querySelectorAll("[data-slide]")];
   const last = all.at(-1);
+  const mailtoHrefs = last
+    ? [...last.querySelectorAll('a[href^="mailto:"]')].map((a) => a.getAttribute("href").toLowerCase())
+    : [];
+  const text = last ? (last.textContent || "").replace(/\s+/g, " ") : "";
   return {
     lastIsContact: Boolean(last?.classList.contains("slide-contact")),
     lastHasPerson: Boolean(last?.querySelector(".person .person-photo")),
     earlier: all.slice(0, -1).flatMap((s, i) => (s.classList.contains("slide-contact") ? [i + 1] : [])),
+    hasInfoMail: mailtoHrefs.includes("mailto:info@ageno.pl"),
+    hasPersonMail: mailtoHrefs.some((h) => h !== "mailto:info@ageno.pl" && h.length > "mailto:".length),
+    hasPhone: /(?<![\p{L}\p{N}])(?:\+?\d[\d ()-]{6,}\d)(?![\p{L}\p{N}])/u.test(text),
   };
 });
 await browser.close();
@@ -155,7 +164,12 @@ slides.forEach(({ blocks, title }, i) => {
 });
 const deck = [];
 if (!contact.lastIsContact) deck.push("ostatni slajd to nie slajd zamykający „Kontakt” (.slide-contact, układ 24)");
-else if (!contact.lastHasPerson) deck.push("slajd „Kontakt” bez portretu osoby (.person .person-photo)");
+else {
+  if (!contact.lastHasPerson) deck.push("slajd „Kontakt” bez portretu osoby (.person .person-photo)");
+  if (!contact.hasPersonMail) deck.push("slajd „Kontakt” bez działającego linku mailto: do służbowego e-maila osoby");
+  if (!contact.hasInfoMail) deck.push("slajd „Kontakt” bez działającego linku mailto:info@ageno.pl");
+  if (contact.hasPhone) deck.push("slajd „Kontakt” zawiera numer telefonu (niedozwolony, references/qa.md)");
+}
 if (contact.earlier.length) deck.push(`slajd „Kontakt” przed końcem decku (slajd ${contact.earlier.join(", ")}); po nim nie może być nic`);
 if (deck.length) {
   console.log("\nDeck:");
