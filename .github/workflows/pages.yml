@@ -34,6 +34,7 @@ jobs:
             node scripts/grid-audit.mjs "$f"
             node scripts/text-lint.mjs "$f"
           done
+          node scripts/uklady-sync.mjs
       # 8 wybranych logotypów SVG jest w repo (logos/) i jest kopiowanych do build.
       # Góry, portret i ewentualne dodatkowe grafiki pobiera ageno-assets do $RUNNER_TEMP,
       # poza repozytorium. Brak tych opcjonalnych grafik nie przerywa budowania: inline-assets.mjs
