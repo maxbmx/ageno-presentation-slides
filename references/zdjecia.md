@@ -6,6 +6,10 @@ Zdjęcia z Unsplash (ze stocku) są dozwolone tylko w układzie „Zdjęcie + tr
 (slajdy 15 i 16 szablonu), jako tło klimatu przy otwarciu sekcji, maksymalnie jedno na kilka
 slajdów i zawsze z podpisem autora. Na innych slajdach obowiązuje zakaz zdjęć stockowych.
 
+Nie dodawaj zdjęcia, żeby zapełnić pusty slajd. Mało treści na slajdzie to sygnał złej
+gęstości, nie powód do zdjęcia (`references/tresc.md`, „Gęstość”) — połącz go z sąsiednim
+slajdem tej samej sekcji.
+
 ## Klimat: góry
 
 Ageno ma górski klimat, więc zdjęcie dobiera agent sam, bez pytania użytkownika, chyba że

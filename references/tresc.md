@@ -75,6 +75,10 @@ Jeśli źródła nie uzasadniają tezy, daj neutralny tytuł. Długość tezy: `
 - Podziel treść dopiero wtedy, gdy po sprawdzeniu odpowiednich układów nie mieści się
   w budżecie wysokości 704 px, przekracza limit wierszy w którejś kolumnie albo zawiera
   odrębne tezy wymagające osobnego wyjaśnienia. Nie zmniejszaj fontu, by uniknąć podziału.
+- Pusta przestrzeń na slajdzie (treść wyraźnie poniżej budżetu 704 px) to sygnał złej gęstości,
+  nie powód, by dodać zdjęcie stockowe jako wypełniacz (`references/zdjecia.md`). Połącz slajd
+  z sąsiednim tej samej sekcji albo przenieś na niego istniejące zdjęcie, zamiast szukać
+  nowego tylko po to, żeby zapełnić kadr.
 - Wykres tylko, gdy jest czytelniejszy niż tekst lub tabela. Nie interpoluj braków, nie
   sugeruj przyczynowości z korelacji, oznacz szacunki i prognozy. Osie, jednostki, legenda,
   źródło.
