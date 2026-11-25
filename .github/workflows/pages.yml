@@ -65,6 +65,14 @@ jobs:
               exit 1
             fi
           done
+      # Jak references/qa.md, „Automat”: uruchamiane na złożonym pliku z dist/ (tu: $SITE), nie na surowym źródle.
+      - name: Smoke-test i PDF (szablon i przykład)
+        run: |
+          SITE="$RUNNER_TEMP/site"
+          for f in index.html template.html; do
+            node scripts/qa-html-deck.mjs "$SITE/$f" --out "$RUNNER_TEMP/qa-$f"
+            node scripts/pdf.mjs "$SITE/$f" --out "$RUNNER_TEMP/$f.pdf"
+          done
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ${{ runner.temp }}/site
